@@ -7,6 +7,7 @@ CREATE TABLE RoleTable(
 CREATE TABLE RoleEntryTable(
     id INT AUTO_INCREMENT PRIMARY KEY,
     describes INT,
+    type VARCHAR(100),
     text_content VARCHAR(1000),
     binary_content LONGBLOB,
     FOREIGN KEY (describes) REFERENCES RoleTable(id)
@@ -15,6 +16,7 @@ CREATE TABLE RoleEntryTable(
 CREATE TABLE ScenarioTable(
     id INT AUTO_INCREMENT PRIMARY KEY,
     belongs_to INT,
+    type VARCHAR(100),
     text_content VARCHAR(1000),
     binary_content LONGBLOB,
     FOREIGN KEY (belongs_to) REFERENCES RoleTable(id)

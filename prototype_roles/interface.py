@@ -117,12 +117,13 @@ def make_role_entry_post_queries(candidates: list[str], role_map: dict[str, int]
         role_group = []
         for serial in obj["entries"]:
             describes = role_map[role_name]
+            type_ = serial["type"]
             text_content = load_resource_t(serial["text_content"])
             binary_content = load_resource_t(serial["binary_content"])
             role_group.append(make_insert(
                 "RoleEntryTable",
-                "describes, text_content, binary_content",
-                [f"{describes}, \"%s\", %s"],
+                "describes, type, text_content, binary_content",
+                [f"{describes}, \"{type_}\", \"%s\", %s"],
                 (text_content, binary_content)
             ))
         role_entries[role_name] = role_group
@@ -147,12 +148,13 @@ def make_scenario_post_queries(candidates: dict[str, list[str]], role_map: dict[
                 obj = json.load(file)
 
             belongs_to = role_map[role_name]
+            type_ = obj["type"]
             text_content = None if obj["text_content"] is None else load_resource_t(obj["text_content"])
             binary_content = None if obj["binary_content"] is None else load_resource_b(obj["binary_content"])
             scenarios[scenario_name] = make_insert(
                 "ScenarioTable",
-                "belongs_to, text_content, binary_content",
-                [f"{belongs_to}, \"%s\", %s"],
+                "belongs_to, type, text_content, binary_content",
+                [f"{belongs_to}, \"{type_}\", \"%s\", %s"],
                 (text_content, binary_content)
             )
 
