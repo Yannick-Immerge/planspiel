@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any
+
 from mysql.connector import connect
 from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstract
 
@@ -17,6 +20,19 @@ def _current_cursor() -> MySQLCursorAbstract:
     return _DB_CURSOR
 
 
+class PostQuery:
+    query: str
+    args: tuple
+
+    def __init__(self, query: str, args: tuple):
+        self.query = query
+        self.args = args
+
+    @staticmethod
+    def merge(q1: PostQuery, q2: PostQuery):
+        return PostQuery(q1.query + q2.query, tuple([*q1.args, *q2.args]))
+
+
 def initialize_db_context(hostname: str, port: int, db_name: str, username: str, password: str):
     """
     Initializes a connection to the mySQL backend hosted at the given server using the given credentials.
@@ -27,7 +43,7 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
     :param password:
     :return:
     """
-    global _DB_CONTEXT
+    global _DB_CONTEXT, _DB_CURSOR
     _DB_CONTEXT = connect(
         host=hostname,
         port=port,
@@ -35,6 +51,7 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
         password=password,
         database=db_name
     )
+    _DB_CURSOR = _DB_CONTEXT.cursor()
 
 
 def close_db_context():
@@ -43,6 +60,32 @@ def close_db_context():
 
 def commit_db_context():
     _current_context().commit()
+
+
+def execute_bool_query(bool_query: str) -> bool:
+    _current_cursor().execute(bool_query, ())
+    return _current_cursor().fetchone()[0] == 1
+
+
+def execute_void_query(void_query: str) -> None:
+    _current_cursor().execute(void_query, ())
+
+
+def execute_query(query: str) -> Any:
+    _current_cursor().execute(query, ())
+    return _current_cursor().fetchall()
+
+
+def execute_post_query(post_query: PostQuery):
+    _current_cursor().execute(post_query.query, post_query.args)
+    commit_db_context()
+
+
+def get_last_row_id() -> int:
+    v = _current_cursor().lastrowid
+    if v is None:
+        raise RuntimeError("It seems like there was no call to INSERT in this session.")
+    return v
 
 
 def get_record_by_id(table: str, id: int, names: tuple[str]):

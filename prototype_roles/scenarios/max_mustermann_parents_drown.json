@@ -1,0 +1,11 @@
+{
+  "conditions": [
+    {
+      "attribute": "sea_level",
+      "min_value": 5,
+      "max_value": 50
+    }
+  ],
+  "text_content": "max_mustermann_parents_drown.txt",
+  "binary_content": null
+}

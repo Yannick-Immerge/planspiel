@@ -1,0 +1,8 @@
+[
+  {
+    "simple_name": "sea_level",
+    "en_roads_name": "sea_level_offset_cm",
+    "description": "Describes the average offset of the sea levels from the current value.",
+    "icon": "sea_level_icon.png"
+  }
+]
