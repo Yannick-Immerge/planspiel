@@ -1,8 +1,8 @@
 # Planspiel "Arbeitstitel"
 In diesem Repository wird der gesamte Tech-Stacks des *planspiel* implementiert und dokumentiert. Das beinhaltet:
 + [Digitalisierte Definitionen der Prototyp-Rolen](#digitized)
-+ [Data Model](#daten-modell)
-+ [Backend Setup Tools](#backend-setup)
++ [Daten-Modell](#daten-modell)
++ [Backend-Werkzeuge](#backend-setup)
 + [Middleware-Dienste](#middleware-dienste)
 + [Frontware-Dienste und Web-Applikation](#frontware-und-web-applikation)
 
@@ -122,6 +122,9 @@ Da sich das Bild mit dem entsprechenden Namen im Ressourcen-Ordner befindet, wir
 **TODO**
 
 ## Daten-Modell
+
+### Scheme der relationalen Datenbank
+![Bild fehlt.](data_model/relational_db.drawio.png "Schema der relationalen Datenbank.")
 
 ## Backend Setup
 
