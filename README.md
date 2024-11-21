@@ -202,6 +202,21 @@ Eine beispielhafte Next.js-App befindet sich unter `web_apps/sample`, die tatsä
 ### App starten
 Um die App zu starten, muss zunächst Node.js installiert werden. Unter Windows geht das beispielsweise mit dem offiziellen [Installer](https://nodejs.org/en/download/prebuilt-installer).
 
+Nachdem Node.js installiert wurde (und im `PATH` verfügbar ist) kann testweise folgender Befehl ausgeführt werden:
+```shell
+npm --version
+```
 
+Bei einer Fehlermeldung ist entweder Node.js nicht im `PATH` verfügbar oder die Installation ist fehlgeschlagen.
+
+Ansonsten kann die `sample`-App folgendermaßen gestartet werden:
+```shell
+cd web_apps/sample
+npm install
+npm run dev
+```
+> Der Befehl `npm install` kann bei der ersten Ausführung etwas Zeit benötigen. Er muss auch **nur beim ersten Starten** ausgeführt werden.
+
+Jetzt ist die Web-App standardmäßig unter [http://localhost:3000](http://localhost:3000) mit einem beliebigen Browser erreichbar. 
 
 ## EN-ROADS Integration
