@@ -194,4 +194,14 @@ Eine optionale Bild-Ressource, die ein Icon für das Attribut beinhaltet.
 
 ## Frontware und Web-Applikation
 
+### Framework
+Als Frontware wird eine Web-Applikation angeboten. Diese wird über das Full-Stack Framework **Next.js** implementiert. Eine Einführung dazu findet sich [hier]().
+
+Eine beispielhafte Next.js-App befindet sich unter `web_apps/sample`, die tatsächliche Anwendung unter `web_apps/planspiel`.
+
+### App starten
+Um die App zu starten, muss zunächst Node.js installiert werden. Unter Windows geht das beispielsweise mit dem offiziellen [Installer](https://nodejs.org/en/download/prebuilt-installer).
+
+
+
 ## EN-ROADS Integration
