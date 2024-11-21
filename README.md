@@ -20,8 +20,6 @@ Um eine Rolle zu erstellen, muss zunächst ein *Name zur digitalen Identifikatio
 
 Nun reicht es eine JSON-Datei mit dem entsprechenden Namen im Ordner `prototype_roles/` zu erstellen. Für "Max Mustermann" wäre das also die Datei `prototype_roles/max_mustermann.json`. Der Inhalt dieser Datei muss immer die folgende Form haben:
 ```json
-// Inhalt von prototype_roles/<meine_rolle>.json:
-// --------------------------------------------
 {
     "name": "<Echter Name der Rolle>",
     "description": "<Kurze Beschreibung der Rolle>",
@@ -66,18 +64,14 @@ Eine Rolle lebt von den Informationsschnippseln, die ein Schüler zur Verfügung
 
 Ein Rolleneintrag wird mithilfe des `entries`-Attribut in die Rollendefinition eingefügt:
 ```json
-// Inhalt von prototype_roles/<meine_rolle>.json:
-// --------------------------------------------
 {
-// ...
   "entries": [
     {
       "type": "<mein_eintrags_typ>",
-      "text_content": "<meine_text_ressource>" | null,
-      "binary_content": "<meine_bild_ressource>" | null
+      "text_content": "<meine_text_ressource> | null",
+      "binary_content": "<meine_bild_ressource> | null"
     }
   ]
-// ...
 }
 ```
 > Genau genommen ist das `entries`-Attribut eine Liste, im Beispiel `max_mustermann.json` sieht man, wie mehrere Rolleneinträge definiert werden.
@@ -105,13 +99,11 @@ Ressourcen sind einzelne Dateien, die größere Inhalte abkapseln, damit die Rol
 
 Möchte ich beispielsweise einen Rolleneintrag vom Typ `"picture"`, also ein Bild, zu einer Rolle hinzufügen, muss ich zunächst die Bilddatei in den `prototype_roles/resources/`-Ordner ziehen. Dort gebe ich ihr dann einen passenden Namen, zum Beispiel: `<meine_rolle>_picture.png`. Zuletzt muss ich noch die Felder des Eintrags anpassen:
 ```json
-// ...
 {
   "type": "picture",
   "text_content": null,
   "binary_content": "<meine_rolle>_picture.png"
 }
-// ...
 ```
 
 Da sich das Bild mit dem entsprechenden Namen im Ressourcen-Ordner befindet, wird es automatisch dem Rolleneintrag zugeordnet.
@@ -123,7 +115,7 @@ Da sich das Bild mit dem entsprechenden Namen im Ressourcen-Ordner befindet, wir
 
 ## Daten-Modell
 
-### Scheme der relationalen Datenbank
+### Schema der relationalen Datenbank
 ![Bild fehlt.](data_model/relational_db.drawio.png "Schema der relationalen Datenbank.")
 
 ## Backend Setup
