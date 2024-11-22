@@ -1,11 +1,18 @@
 #!/usr/bin/env python
+
 import subprocess
 import sys
 import traceback
 from enum import Enum, auto, IntFlag
+from pathlib import Path
 from time import sleep
 
 import colorama
+
+# Fix path
+_REAL_PATH = str(Path(__file__).parent.parent)
+if _REAL_PATH not in sys.path:
+    sys.path.append(_REAL_PATH)
 
 import data_model.context
 from scripts.utility import print_f, print_suc, print_err, query_yes_no
