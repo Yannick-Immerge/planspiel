@@ -197,7 +197,7 @@ Eine optionale Bild-Ressource, die ein Icon für das Attribut beinhaltet.
 ### Framework
 Als Frontware wird eine Web-Applikation angeboten. Diese wird über das Full-Stack Framework **Next.js** implementiert. Eine Einführung dazu findet sich [hier]().
 
-Eine beispielhafte Next.js-App befindet sich unter `web_apps/sample`, die tatsächliche Anwendung unter `web_apps/planspiel`.
+Die Web-App für den Prototyp des Planspiels befindet sich unter `web_apps/planspiel-prototype`.
 
 ### App starten
 Um die App zu starten, muss zunächst Node.js installiert werden. Unter Windows geht das beispielsweise mit dem offiziellen [Installer](https://nodejs.org/en/download/prebuilt-installer).
@@ -211,12 +211,14 @@ Bei einer Fehlermeldung ist entweder Node.js nicht im `PATH` verfügbar oder die
 
 Ansonsten kann die `sample`-App folgendermaßen gestartet werden:
 ```shell
-cd web_apps/sample
-npm install
+cd web_apps/planspiel-prototype
+npm i
 npm run dev
 ```
-> Der Befehl `npm install` kann bei der ersten Ausführung etwas Zeit benötigen. Er muss auch **nur beim ersten Starten** ausgeführt werden.
+> Der Befehl `npm i` kann bei der ersten Ausführung etwas Zeit benötigen. Er muss auch **nur beim ersten Starten** ausgeführt werden.
 
 Jetzt ist die Web-App standardmäßig unter [http://localhost:3000](http://localhost:3000) mit einem beliebigen Browser erreichbar. 
+
+> Gerne mal die Datenbank aufsetzen und unter [/explore/roles/1](http://localhost:3000/explore/roles/1) überprüfen, ob alles klappt!
 
 ## EN-ROADS Integration
