@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import TextEingabe from '../login/TextEingabe'
 import { FaLock, FaUser } from 'react-icons/fa'
-import BackgroundWrapper from '../components/BackgroundWrapper'
+import EarthBackground from '../components/BackgroundWrapper'
 import { access } from 'fs'
 
 const CreateUser = () => {
@@ -12,22 +12,14 @@ const CreateUser = () => {
     const [password1, setPassword1] = useState("")
     const [password2, setPassword2] = useState("")
 
-    const changeAccessCode = (n:string) => {
-        setAccessCode(n)
-    }
-    const changeUserName = (n:string) => {
-        setUserName(n)
-    }
-    const changePassword1 = (n:string) => {
-        setPassword1(n)
-    }
-    const changePassword2 = (n:string) => {
-        setPassword2(n)
-    }
+    const changeAccessCode = (event: any) => {setAccessCode(event.target.value)}
+    const changeUserName = (event: any) => {setUserName(event.target.value)}
+    const changePassword1 = (event: any) => {setPassword1(event.target.value)}
+    const changePassword2 = (event: any) => {setPassword2(event.target.value)}
 
   return (
     <>
-    <BackgroundWrapper />
+    <EarthBackground />
     <div className="absolute left-1/4 w-1/2 pt-40">
             <div className="blurBox">
                 <div className="text-3xl font-bold">Neuen Benutzer erstellen</div>

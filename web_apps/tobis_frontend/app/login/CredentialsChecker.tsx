@@ -1,43 +1,38 @@
-'use client'
+import React from 'react'
 
-import React, { useState } from 'react'
-import TextEingabe from './TextEingabe'
-import { FaUser, FaLock } from "react-icons/fa"
-
-
-const CredentialsChecker = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-
-    const changeUsername = (event: any) => {setUsername(event.target.value)};
-    const changePassword = (event: any) => {setPassword(event.target.value)};
-
-    const click = () => {
-        alert(username + password)
+interface User {
+    id: number;
+    username: string;
+    address: {
+        suite: string
+        geo: {
+            lat: number
+            lng: number
+        }
     }
+}
 
-    return (
-        <div className="absolute left-1/3 w-1/3 pt-40">
-            <div className="blurBox">
-                <div className="text-3xl font-bold">Login</div>
-                <div>
-                    <TextEingabe onChange={changeUsername} input={username} type="text" text="Benutzername" icon={<FaUser />}/>
-                    <TextEingabe onChange={changePassword} input={password} type="password" text="Passwort" icon={<FaLock />}/>
-                    <a href="#" className="text-left pl-1 text-decoration-line: underline">Passwort vergessen?</a>
-                    
-                    <div className="flex-1">
-                        <div onClick={click} className="btn btn-secondary bg-sky-500 rounded-full border-0 mt-10 pl-10 pr-10">Login</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="pt-10" >
-                            <div>Noch kein Account?<a href="../create-user" className='pl-2 text-decoration-line: underline'>Erstell dir einen!</a></div>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-  )
+async function CredentialsChecker (props: {username: string, passwordSha256: string}) : Promise<string>{
+    const res = await fetch('https://jsonplaceholder.typicode.com/users', 
+        {cache: 'no-store', /* If data changes constantly */ next:{revalidate: 10}})
+    const users: User[] = await res.json();
+
+    const index = users.findIndex(n => n.username === props.username);
+    if (index != -1) {
+
+        // Let's pretend every User has their Suite Name Hashed instead of their Passwords.
+        const encoder = new TextEncoder();
+        const data = encoder.encode(users.at(index)?.address.suite);
+        const suiteSha256 = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(suiteSha256));
+        const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        
+        if (props.passwordSha256 == hashHex) {
+            return ("Korrektes Passwort!");
+        }
+    }
+    return ("Passwort oder Nutzername inkorrekt");
+  
 }
 
 export default CredentialsChecker
