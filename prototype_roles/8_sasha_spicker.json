@@ -1,0 +1,18 @@
+{
+  "name": "Sascha Spicker",
+  "description": "ITler in Berlin. TODO.",
+  "demographic": {},
+  "entries": [
+    {
+      "type": "picture",
+      "text_content": null,
+      "binary_content": "8_sasha_spicker.png"
+    },
+    {
+      "type": "info",
+      "text_content": "8_sasha_spicker_info.txt",
+      "binary_content": null
+    }
+  ],
+  "scenarios": []
+}
