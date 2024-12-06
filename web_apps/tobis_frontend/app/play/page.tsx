@@ -1,9 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic.js';
-import { TiPointOfInterest } from 'react-icons/ti';
-import { describe } from 'node:test';
-import EarthBackground from '../components/BackgroundWrapper';
 import LocalTime from './LocalTime';
 
 const OsmMapNoSSR = dynamic(() => import("./Map/Map"), {ssr: false});
@@ -27,7 +24,7 @@ interface UserProfil {
 }
 
 export interface PointOfInterest {
-    id: number;
+    key: string;
     pos: Coordinates;
     icon: string;
     description: string;
@@ -35,7 +32,7 @@ export interface PointOfInterest {
 
 const ProfileView = () => {
 
-    const user = {
+    const user: UserProfil = {
         vorname: "Victoria",
         timeZone: "America/New_York",
         titleCard: "/images/new-york-city-streets.png",
@@ -49,19 +46,19 @@ const ProfileView = () => {
     }
 
     const UserHome: PointOfInterest = {
-        id: 0, 
+        key: "0", 
         pos: user.geo, 
         description: user.wohnsituation, 
         icon:'🏠'
     }
     const UserFaveCafe: PointOfInterest = {
-        id: 1,
+        key: "1",
         pos: {lat: 40.7, lng: -73.4}, 
         description: "Victoria liebt Matcha-Tee und dieses kleine Café macht den besten Matcha Latte in ganz New York!",
         icon:'☕'
     }
     const UserWorkplace: PointOfInterest = {
-        id: 2,
+        key: "2",
         pos: {lat: 40.826179793171576, lng:-73.92350325810058},
         description: "Hier in der Bronx arbeitet Victoria als Richterin im Zivilgericht.",
         icon:'💼',

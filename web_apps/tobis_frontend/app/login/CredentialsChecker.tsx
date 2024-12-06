@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface User {
     id: number;
     username: string;
@@ -12,7 +10,16 @@ interface User {
     }
 }
 
-async function CredentialsChecker (props: {username: string, passwordSha256: string}) : Promise<string>{
+class Response {
+    constructor(allowed: boolean, value: number | undefined) {
+        this.allowed = allowed;
+        this.value = value;
+    }
+    allowed: boolean
+    value: number | undefined;
+}
+
+async function CredentialsChecker (props: {username: string, passwordSha256: string}) : Promise<Response>{
     const res = await fetch('https://jsonplaceholder.typicode.com/users', 
         {cache: 'no-store', /* If data changes constantly */ next:{revalidate: 10}})
     const users: User[] = await res.json();
@@ -27,11 +34,11 @@ async function CredentialsChecker (props: {username: string, passwordSha256: str
         const hashArray = Array.from(new Uint8Array(suiteSha256));
         const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
         
-        if (props.passwordSha256 == hashHex) {
-            return ("Korrektes Passwort!");
+        if (props.passwordSha256 == users.at(index)?.address.suite) {
+            return new Response(true, users.at(index)?.id);
         }
     }
-    return ("Passwort oder Nutzername inkorrekt");
+    return new Response(false, undefined);
   
 }
 
