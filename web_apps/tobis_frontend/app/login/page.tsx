@@ -1,13 +1,11 @@
 import React from 'react'
-import TextEingabe from './TextEingabe'
+import EarthBackground from '../components/BackgroundWrapper'
 import CredentialsInput from './CredentialsInput'
-import Image from 'next/image'
-import Background from '../components/BackgroundWrapper'
 
 const LoginPage = async () => {
   return (
     <>
-        <Background />
+        <EarthBackground />
         <CredentialsInput />
     </>
   )

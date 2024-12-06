@@ -1,22 +1,18 @@
 import React from 'react'
-import { Coordinates } from './page'
-import { TbSunset, TbSunrise, TbSun, TbMoon } from "react-icons/tb"
 import { LuMoonStar, LuSunrise, LuSunset, LuSun } from "react-icons/lu"
-import { PiX } from 'react-icons/pi';
 
 const LocalTime = (props: {timeZone: string}) => {
     
     const time = new Date().toLocaleTimeString("de", {timeZone: props.timeZone});
 
 
-    var icon = <TbSunrise />
-    var foreground = "#ff00ff";
-    var boxShadow: string = "";
-    //var numHour = time.getHours();
-    //var numMinutes = time.getMinutes();
-    var parts: string[] = time.split(':');
-    var numMinutes = Number(parts[1]);
-    var numHour = Number(parts[0]);
+    let icon = <LuSunrise />
+    let foreground = "#ff00ff";
+    let boxShadow: string = "";
+    
+    const parts: string[] = time.split(':');
+    const numMinutes = Number(parts[1]);
+    const numHour = Number(parts[0]);
 
 
 
