@@ -24,7 +24,7 @@ interface UserProfil {
 }
 
 export interface PointOfInterest {
-    key: string;
+    id: number;
     pos: Coordinates;
     icon: string;
     description: string;
@@ -33,7 +33,7 @@ export interface PointOfInterest {
 const ProfileView = () => {
 
     const user: UserProfil = {
-        vorname: "Victoria",
+        vorname: "Samantha",
         timeZone: "America/New_York",
         titleCard: "/images/new-york-city-streets.png",
         nachname: "Hurong",
@@ -42,25 +42,25 @@ const ProfileView = () => {
         height: 168,
         beruf: "Richterin",
         hobbies: ["Sportschiessen, Joggen, Fahrrad Fahren"],
-        wohnsituation: "Victoria lebt hier in Brooklyn zusammen mit ihrem Freud in einem großzügigen Apartment.",
+        wohnsituation: "Samantha lebt hier in Brooklyn zusammen mit ihrem Freud in einem großzügigen Apartment.",
     }
 
     const UserHome: PointOfInterest = {
-        key: "0", 
+        id: 0, 
         pos: user.geo, 
         description: user.wohnsituation, 
         icon:'🏠'
     }
     const UserFaveCafe: PointOfInterest = {
-        key: "1",
+        id: 1,
         pos: {lat: 40.7, lng: -73.4}, 
-        description: "Victoria liebt Matcha-Tee und dieses kleine Café macht den besten Matcha Latte in ganz New York!",
+        description: "Samantha liebt Matcha-Tee und dieses kleine Café macht den besten Matcha Latte in ganz New York!",
         icon:'☕'
     }
     const UserWorkplace: PointOfInterest = {
-        key: "2",
+        id: 2,
         pos: {lat: 40.826179793171576, lng:-73.92350325810058},
-        description: "Hier in der Bronx arbeitet Victoria als Richterin im Zivilgericht.",
+        description: "Hier in der Bronx arbeitet Samantha als Richterin im Zivilgericht.",
         icon:'💼',
     }
 
@@ -83,7 +83,7 @@ const ProfileView = () => {
                 </div>
                 
                 <div className="bg-[#D7DAB0] text-black p-5 rounded-3xl">
-                    <div className="m-auto text-xl text-center">Victoria Hurong</div>
+                    <div className="m-auto text-xl text-center">Samantha Hurong</div>
                     <table className="text-left text-s border-seperate">
                         <tbody>
                             <tr key={0}><td>Alter:</td><td className="pl-3 pt-2 pb-2">{user.alter}</td></tr>
@@ -91,7 +91,6 @@ const ProfileView = () => {
                             <tr key={2}><td>Beruf:</td><td className="pl-3 pt-2 pb-2">{user.beruf}</td></tr>
                             <tr key={3}><td>Familie:</td><td className="pl-3 pt-2 pb-2">ledig</td></tr>
                             <tr key={4}><td>Hobbies:</td><td className="pl-3 pt-2 pb-2">{user.hobbies.concat(", ", )}</td></tr>
-                            <tr key={5}><td>Hobbies:</td><td className="pl-3 pt-2 pb-2">{user.hobbies.concat(", ", )}</td></tr>
                         </tbody>
                     </table>
                 </div>

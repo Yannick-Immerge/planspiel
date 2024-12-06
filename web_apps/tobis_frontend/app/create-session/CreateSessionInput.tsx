@@ -3,19 +3,21 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCheckCircle } from 'react-icons/fa';
 import TextEingabe from '../login/TextEingabe';
-import EarthBackground from '../components/BackgroundWrapper';
+import { TryCreateSession } from './page';
 
 const USER_REGEX = /^[a-zA-Z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
-const CODE_REGEX = /^[A-Z0-9]{3}\-[A-Z0-9]{3}$/;
+const CODE_REGEX = /^[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}$/;
 
-export default function CreateUserChecker(props: {takenUNames: string[]}) {
+export default function CreateSessionInput() {
     const codeRef = useRef<HTMLInputElement>(null);
     const errRef = useRef<HTMLInputElement>(null);
 
-    const [sessionCode, setSessionCode] = useState("");
-    const [validSessionCode, setValidSessionCode] = useState(false);
-    const [sessionCodeFocus, setFocusSessionCode] = useState(false);
+    const [sessionKey, setSessionKey] = useState("")
+
+    const [accessCode, setAccessCode] = useState("");
+    const [validCode, setValidAccessCode] = useState(false);
+    const [codeFocus, setFocusCode] = useState(false);
 
     const [userName, setUserName] = useState("");
     const [validName, setValidName] = useState(false);
@@ -30,6 +32,8 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
     const [validPwdMatch, setValidPwdMatch] = useState(false);
     const [pwdMatchFocus, setFocusPwdMatch] = useState(false);
 
+
+
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
 
@@ -42,10 +46,6 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
         console.log(result);
         console.log(userName);
         setNameError("Dein Benutzername sollte zwischen 4 und 24 Zeichen lang sein und nur Buchstaben, Zahlen und _ enthalten.");
-        if (props.takenUNames.find(n => userName === n)) {
-          result = false;
-          setNameError("Unter diesem Namen gibt es schon eine Anmeldung. Bitte wende dich an deine Lehrkraft.");
-        }
         setValidName(result);
     }, [userName]);
 
@@ -62,50 +62,63 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
     }, [password, passwordMatch])
 
     useEffect(() => { // Test if Access Code input has the right formatting
-        const result = CODE_REGEX.test(sessionCode);
+        const result = CODE_REGEX.test(accessCode);
         console.log(result);
-        console.log(sessionCode);
-        setValidSessionCode(result);
+        console.log(accessCode);
+        setValidAccessCode(result);
     }) 
 
     useEffect(() => {
         setErrMsg('');
     }, [userName, password, passwordMatch]);
 
-    const changeAccessCode = (event: React.ChangeEvent<HTMLInputElement>) => {setSessionCode(event.target.value)}
+    const changeAccessCode = (event: React.ChangeEvent<HTMLInputElement>) => {setAccessCode(event.target.value)}
     const changeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {setUserName(event.target.value)}
     const changePassword = (event: React.ChangeEvent<HTMLInputElement>) => {setPassword(event.target.value)}
     const changePasswordMatch = (event: React.ChangeEvent<HTMLInputElement>) => {setPasswordMatch(event.target.value)}
 
-    const submitForm = () => {window.location.replace("/create-user/success")}
+    const submitForm = async () => {
+        if (sessionKey != "") {
+            setErrMsg("Deine Session existiert bereits unter dem Session Code: ")
+            return;
+        }
 
-    const handleKeyDown = (event: React.KeyboardEvent) => {
+        const response = await TryCreateSession({prodKey: accessCode})
+            .then((result) => { if (result) {
+                setErrMsg("Deine Session wurde erfolgreich erstellt! Der Session Code ist");
+                setSessionKey(result)
+            } else {
+                setErrMsg("Es gab ein Problem mit deinem Session key. Geh sicher dass du ihn richtig abgetippt hast und deine Lizenz noch gültig ist.");
+                setSessionKey("")
+            }})
+    }
+
+    const handleKeyDown = async (event: React.KeyboardEvent) => {
+        
       if (event.key === 'Enter') {
-        if (validPwdMatch && validSessionCode && validName && validPwd) submitForm();
+        if (validPwdMatch && validCode && validName && validPwd) submitForm();
       }
     }
 
-    const node = document.getElementsByClassName("randomId1")[0];
-
   return (
     <div className="blurBox">
-        <div className="text-3xl font-bold">Neuen Benutzer erstellen</div>
+        <div className="text-3xl font-bold">Neuen Session starten</div>
           <div>
               <div ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive"></div>
                 <div className="m-auto w-1/3">
                     <TextEingabe
                         onKeyDown={handleKeyDown}
                         describedby='randomId1'
-                        userFocus={sessionCodeFocus}
-                        onFocus={() => setFocusSessionCode(true)} 
-                        onBlur={() => setFocusSessionCode(false)}  
-                        validInput={validSessionCode}
+                        userFocus={codeFocus}
+                        onFocus={() => setFocusCode(true)} 
+                        onBlur={() => setFocusCode(false)}  
+                        validInput={validCode}
                         onChange={changeAccessCode} 
-                        input={sessionCode} 
+                        input={accessCode} 
                         type="text" 
-                        text="Session Code deiner Schule" 
-                        correction=''
-                        icon={validSessionCode? <FaCheckCircle /> : null}/>
+                        text="Freischaltcode deiner Schule" 
+                        correction='Der Freischaltcode sollte ein Format wie "ab12-cd34-ef56" haben.'
+                        icon={validCode? <FaCheckCircle /> : null}/>
                     </div>
                     <TextEingabe 
                         onKeyDown={handleKeyDown}
@@ -117,7 +130,7 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
                         onChange={changeUserName} 
                         input={userName} 
                         type="text" 
-                        text="Dein Benutzername (Von deiner Lehrkraft bereitgestellt)" 
+                        text="Dein Benutzername (Fur zukünftige Anmeldungen)" 
                         correction={nameError}
                         icon={validName? <FaCheckCircle /> : null}/>
                         
@@ -149,8 +162,14 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
                         icon={validPwdMatch? <FaCheckCircle /> : null}/>
                     
                     <div className="flex-1">
-                        <button onKeyUp={submitForm} onClick={submitForm} disabled={!(validPwdMatch && validSessionCode && validName && validPwd)} className="disabled:bg-slate-500 hover:bg-sky-400 bg-sky-500 rounded-full border-0 mt-10 pt-5 pb-5 pl-10 pr-10">Account Erstellen</button>
+                        {sessionKey == ""? <button onKeyUp={submitForm} onClick={submitForm} disabled={!(validPwdMatch && validCode && validName && validPwd)} className="disabled:bg-slate-500 hover:bg-sky-400 bg-sky-500 rounded-full border-0 mt-10 pt-5 pb-5 pl-10 pr-10">Session Aktivieren</button> : <div></div>}
                     </div>
+                    <div className="text-amber-400">
+                        {errMsg}
+                    </div>
+                    {sessionKey == ""? <div></div> : <div className="bg-sky-900 text-3xl rounded-full pt-5 pb-5 ml-20 mr-20">
+                        {sessionKey}
+                    </div>}
                     <div className="text-center">
                         <div className="pt-10" >
                             <div><a href="/login" className='pl-2 text-decoration-line: underline'>Zurück zum Login</a></div>
