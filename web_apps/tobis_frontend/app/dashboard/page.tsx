@@ -159,7 +159,7 @@ const page = () => {
                 Ende der Bürgerräte
             </div>
 
-            <div onClick={() => {}} className="mt-5 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full mt-0 hover:bg-amber-500 active:mt-3 transition-all duration-100">
+            <div onClick={() => {}} className="select-none mt-0 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full hover:bg-amber-500 active:mt-3 transition-all duration-100">
                 Bürgerräte Starten
             </div>
         </div>
