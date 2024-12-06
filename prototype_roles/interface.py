@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from data_model.context import PostQuery, execute_post_query, get_last_row_id, initialize_db_context, close_db_context
+from shared.data_model.context import PostQuery, execute_post_query, get_last_row_id, initialize_db_context, close_db_context
 
 _BASE_PATH: Path = Path(__file__).parent
 

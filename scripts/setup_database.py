@@ -14,7 +14,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-import data_model.context
+from shared.data_model.context import execute_bool_query, execute_void_query, initialize_db_context, close_db_context
 from scripts.utility import print_f, print_suc, print_err, query_yes_no
 from scripts.image.interface import get_docker_image_path
 from scripts.schema.interface import fetch_table_names, get_check_name_query, get_drop_query, load_query
@@ -266,16 +266,16 @@ def start_docker_container() -> bool:
 def get_conflicting_table_names() -> list[str]:
     return list(table_name
                 for table_name in fetch_table_names()
-                if data_model.context.execute_bool_query(get_check_name_query(table_name)))
+                if execute_bool_query(get_check_name_query(table_name)))
 
 
 def drop_conflicting_tables(conflicts: list[str]):
     for table_name in conflicts:
-        data_model.context.execute_void_query(get_drop_query(table_name))
+        execute_void_query(get_drop_query(table_name))
 
 
 def configure_database():
-    data_model.context.execute_void_query(load_query("create_tables"))
+    execute_void_query(load_query("create_tables"))
 
 
 def entrypoint():
@@ -319,7 +319,7 @@ def entrypoint():
     # Establish database connection
     print("\nEstablishing connection to database...")
     try:
-        data_model.context.initialize_db_context("localhost", 3306, "mydatabase", "admin", "admin")
+        initialize_db_context("localhost", 3306, "mydatabase", "admin", "admin")
         print_suc("Initialized connection successfully.")
     except:
         print_err("The database is currently not available. More info:")
@@ -352,7 +352,7 @@ def entrypoint():
             configured = True
 
     print("\nClosing connection...")
-    data_model.context.close_db_context()
+    close_db_context()
     print_suc("Disconnected from database server.")
 
     print_f(colorama.Fore.CYAN, "\nEnvironment is ready. Use 'setup_prototype_roles.py' to populate.")

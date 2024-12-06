@@ -136,15 +136,16 @@ export async function isSessionActive(sessionId: string) : Promise<ApiResult<IsS
     }));
 }
 
-export async function getSession(sessionId: string, adminToken: string) : Promise<ApiResult<GetSessionResult>> {
+export async function getSession(sessionId: string, administratorUsername: string, administratorToken: string) : Promise<ApiResult<GetSessionResult>> {
     return game_fetch<GetSessionResult>("/sessions/get", {
         sessionId: sessionId,
-        adminToken: adminToken
+        administratorUsername: administratorUsername,
+        administratorToken: administratorToken
     });
 }
 
-export async function getSessionMemberViews(sessionId: string, adminToken: string) : Promise<ApiResult<GetSessionMemberViewsResult>> {
-    const getSessionResult = await getSession(sessionId, adminToken);
+export async function getSessionMemberViews(sessionId: string, administratorUsername: string, administratorToken: string) : Promise<ApiResult<GetSessionMemberViewsResult>> {
+    const getSessionResult = await getSession(sessionId, administratorUsername, administratorToken);
     const memberUsernames = getSessionResult.data?.session.memberUsernames;
     if(memberUsernames === undefined) {
         return {
@@ -179,10 +180,11 @@ export async function getSessionMemberViews(sessionId: string, adminToken: strin
     };
 }
 
-
-export async function setSessionStatus(sessionId: string, status: "active" | "disabled") : Promise<ApiResult<SetSessionStatusResult>> {
+export async function setSessionStatus(sessionId: string, administratorUsername: string, administratorToken: string, status: "active" | "disabled") : Promise<ApiResult<SetSessionStatusResult>> {
     return game_fetch<SetSessionStatusResult>("/sessions/status", {
         sessionId: sessionId,
+        administratorUsername: administratorUsername,
+        administratorToken: administratorToken,
         status: status
     })
 }

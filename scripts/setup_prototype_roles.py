@@ -9,7 +9,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-from data_model.context import initialize_db_context, close_db_context
+from shared.data_model.context import initialize_db_context, close_db_context
 from prototype_roles.interface import post_roles
 from scripts.utility import print_f, print_err, print_suc
 
