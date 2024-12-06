@@ -9,11 +9,13 @@ export default function CustomMap(props: {center: Coordinates, living: PointOfIn
   return (
     <MapContainer key={68} center={props.center} zoom={10} scrollWheelZoom={true}>
         <TileLayer
+            key={8}
             url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" 
             attribution='&copy; <a href=http://osm.org/copyright">OpenStreetMap</> contributors'
         />
-        <CustomMarker key={"CustomMarker-" + props.living.key} pos={props.living.pos} description={props.living.description} icon={props.living.icon}/>
-        {props.poi.map((n) => <CustomMarker key={"CustomMarker-" + n.key} pos={n.pos} icon={n.icon} description={n.description}/>)}
+        <CustomMarker key={props.living.id} poi={props.living} />
+
+        {props.poi.map((n) => <CustomMarker key={n.id} poi={n} />)}
     </MapContainer>
   )
 }

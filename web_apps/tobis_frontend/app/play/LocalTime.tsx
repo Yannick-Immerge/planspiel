@@ -14,8 +14,6 @@ const LocalTime = (props: {timeZone: string}) => {
     const numMinutes = Number(parts[1]);
     const numHour = Number(parts[0]);
 
-
-
     if ((numHour >= 4 && numHour < 8) || (numHour >=18 && numHour < 20)) {
         foreground = "#E2825F"
         icon = numHour > 12? <LuSunset color={foreground} className="m-auto"/> : <LuSunrise color={foreground} className="m-auto"/>

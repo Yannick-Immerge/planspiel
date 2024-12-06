@@ -11,18 +11,18 @@ export default function Home() {
             <div className="absolute left-[10%] w-4/5 pt-[5%] flex">
                 <div className="w-[60%]">
                     <div className="blurBox">
-                        <div className="text-left text-8xl text-lime-600">
-                            Planspiel ohne Namen
+                        <div className="text-left text-7xl text-lime-600">
+                            Heftiges Planspiel, Bro 
                         </div>
                         <div className="flex">
-                            <div className="pl-0 text-left text-7xl text-sky-400">
+                            <div className="pl-0 text-left text-6xl text-sky-400">
                                 Gemeinsam
                             </div>
                         <div>
-                            <div className="text-left text-3xl text-sky-400">
+                            <div className="text-left text-2xl text-sky-400">
                                 für eine bessere Diskussionskultur.
                             </div>
-                            <div className="text-left text-3xl text-sky-400">
+                            <div className="text-left text-2xl text-sky-400">
                                 gegen den Klimawandel.
                             </div>
                         </div>
