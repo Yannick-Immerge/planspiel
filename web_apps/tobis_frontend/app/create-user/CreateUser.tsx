@@ -58,7 +58,8 @@ export default function CreateUser() {
     }, [password, passwordMatch])
 
     useEffect(() => { // Test if Access Code input has the right formatting
-        const result = CODE_REGEX.test(sessionCode);
+        // const result = CODE_REGEX.test(sessionCode); TODO: Disable for Testing
+        const result = true;
         console.log(result);
         console.log(sessionCode);
         setValidSessionCode(result);

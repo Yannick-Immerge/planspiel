@@ -1,4 +1,5 @@
-export const AWS_SERVER_ADDR_HTTP = "http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com"
+export const RUN_LOCAL = false;
+export const AWS_SERVER_ADDR_HTTP = RUN_LOCAL ? "http://localhost" : "http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com"
 
 
 // Api result object
@@ -24,6 +25,7 @@ export async function fetch_typesafe<T>(url: string, params?: Record<string, any
     if (params === undefined) {
         params = {}
     }
+
     const options: RequestInit = {
         method: "POST",
         headers: {
@@ -31,7 +33,7 @@ export async function fetch_typesafe<T>(url: string, params?: Record<string, any
         },
         body: JSON.stringify(params)
     };
-    const response = await fetch(url, options)
+    const response = await fetch(url, options);
 
     if(!response.ok) {
         return {
