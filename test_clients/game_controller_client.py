@@ -2,7 +2,7 @@ import requests
 
 if __name__ == "__main__":
     # Create a session
-    res = requests.post("http://localhost:5002/game/sessions/create", json={
+    res = requests.post("http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com:5002/game/sessions/create", json={
         "productKey": "Sesam",
         "administratorPasswordHash": "admin"
     }).json()
@@ -11,7 +11,7 @@ if __name__ == "__main__":
     print(f"Created session {session_id}. Administrator: {admin_username}.")
 
     # Add a user
-    res = requests.post("http://localhost:5002/game/users/create", json={
+    res = requests.post("http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com:5002/game/users/create", json={
         "sessionId": session_id,
         "passwordHash": "mypassword"
     }).json()
