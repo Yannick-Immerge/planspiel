@@ -186,7 +186,7 @@ Eine optionale Bild-Ressource, die ein Icon für das Attribut beinhaltet.
 ## Daten-Modell
 
 ### Schema der relationalen Datenbank
-![Bild fehlt.](data_model/relational_db.drawio.png "Schema der relationalen Datenbank.")
+![Bild fehlt.](shared/data_model/relational_db.drawio.png "Schema der relationalen Datenbank.")
 
 ## Backend Setup
 
