@@ -4,5 +4,17 @@
     "en_roads_name": "sea_level_offset_cm",
     "description": "Describes the average offset of the sea levels from the current value.",
     "icon": "sea_level_icon.png"
+  },
+  {
+    "simple_name": "energy_prod_coal",
+    "en_roads_name": "endenergie_kohle_GWh",
+    "description": "Describes how much energy is being produced by means of coal in GWh",
+    "icon": "coal_gwh.png"
+  },
+  {
+    "simple_name": "energy_prod_wind",
+    "en_roads_name": "endenergie_wind_GWh",
+    "description": "Describes how much energy is being produced by means of wind in GWh",
+    "icon": "wind_gwh.png"
   }
 ]

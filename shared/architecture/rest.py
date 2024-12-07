@@ -45,7 +45,7 @@ def call_api(target: Microservice, endpoint: str, params: Any) -> ApiResponse:
     return ApiResponse(response.json(), True, True, "")
 
 
-def safe_call(cb, *args) -> tuple[Response, int]:
+def safe_call(cb, *args) -> Response:
     try:
         data = cb(*args)
         ok = True
@@ -61,9 +61,12 @@ def safe_call(cb, *args) -> tuple[Response, int]:
         ok = False
         authentication_ok = True
         status_text = f"Error: {exc}"
-    return jsonify({
+    response = jsonify({
         "data": data,
         "ok": ok,
         "authenticationOk": authentication_ok,
-        "statusText": status_text,
-    }), 200
+        "statusText": status_text
+    })
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.status_code = 200
+    return response
