@@ -3,13 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCheckCircle } from 'react-icons/fa';
 import TextEingabe from '../login/TextEingabe';
-import EarthBackground from '../components/BackgroundWrapper';
+import { createUserForSession, existsSession, existsUser } from '../api/game_controller_interface';
 
-const USER_REGEX = /^[a-zA-Z0-9-_]{3,23}$/;
+const USER_REGEX = /^[a-zA-Z]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
 const CODE_REGEX = /^[A-Z0-9]{3}\-[A-Z0-9]{3}$/;
 
-export default function CreateUserChecker(props: {takenUNames: string[]}) {
+export default function CreateUser() {
     const codeRef = useRef<HTMLInputElement>(null);
     const errRef = useRef<HTMLInputElement>(null);
 
@@ -41,11 +41,7 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
         let result = USER_REGEX.test(userName);
         console.log(result);
         console.log(userName);
-        setNameError("Dein Benutzername sollte zwischen 4 und 24 Zeichen lang sein und nur Buchstaben, Zahlen und _ enthalten.");
-        if (props.takenUNames.find(n => userName === n)) {
-          result = false;
-          setNameError("Unter diesem Namen gibt es schon eine Anmeldung. Bitte wende dich an deine Lehrkraft.");
-        }
+        setNameError("Dein Benutzername sollte zwischen 3 und 24 Zeichen lang sein und nur Buchstaben enthalten.");
         setValidName(result);
     }, [userName]);
 
@@ -73,19 +69,46 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
     }, [userName, password, passwordMatch]);
 
     const changeAccessCode = (event: React.ChangeEvent<HTMLInputElement>) => {setSessionCode(event.target.value)}
-    const changeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {setUserName(event.target.value)}
+    const changeUserName = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        setUserName(event.target.value)
+    }
     const changePassword = (event: React.ChangeEvent<HTMLInputElement>) => {setPassword(event.target.value)}
     const changePasswordMatch = (event: React.ChangeEvent<HTMLInputElement>) => {setPasswordMatch(event.target.value)}
 
-    const submitForm = () => {window.location.replace("/create-user/success")}
+    const submitForm = async () => {
+        await existsUser(userName)
+            .then((answer) => {
+                if (answer.ok && answer.authenticationOk) {
+                    if (answer.data?.userExists) {
+                        setErrMsg("Unter diesem Namen gibt es schon eine Anmeldung. Bitte wende dich an deine Lehrkraft.")
+                        return;
+                    }
+                } else {
+                    setErrMsg("Es gab ein Problem mit der Kommunikation zum Server. Bitte versuche es späte erneut.")
+                    return;
+                }})
+            .catch(console.error.bind(console))
+        await existsSession(sessionCode)
+            .then((answer) => {
+                if (answer.ok && answer.authenticationOk) {
+                    if (answer.data?.sessionExists) {
+                        // TODO Hier sollte ein User erstellt werden
+                        window.location.replace("/create-user/success")
+                        return;
+                    } else {
+                        setErrMsg("Diese Session existiert nicht. Geh sicher dass du den Session Code richtig abgetippt hast.")
+                    }
+                } else {
+                    setErrMsg("Es gab ein Problem mit der Kommunikation zum Server. Bitte versuche es späte erneut.")
+                    return;
+                }});
+    }
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
       if (event.key === 'Enter') {
         if (validPwdMatch && validSessionCode && validName && validPwd) submitForm();
       }
     }
-
-    const node = document.getElementsByClassName("randomId1")[0];
 
   return (
     <div className="blurBox">
@@ -104,7 +127,7 @@ export default function CreateUserChecker(props: {takenUNames: string[]}) {
                         input={sessionCode} 
                         type="text" 
                         text="Session Code deiner Schule" 
-                        correction=''
+                        correction="Das hat nicht hingehauen."
                         icon={validSessionCode? <FaCheckCircle /> : null}/>
                     </div>
                     <TextEingabe 
