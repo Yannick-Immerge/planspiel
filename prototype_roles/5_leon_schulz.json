@@ -1,5 +1,5 @@
 {
-  "name": "5_Leon:_Schulz",
+  "name": "5_leon_schulz",
   "description": "Kohlearbeiter im ruhrpott",
   "demographic": {},
   "entries": [
@@ -24,6 +24,20 @@
         "content_type": "article"
       }
     },
+    {
+      "name": "5_leon_schulz_article_picture.png",
+      "resource": {
+        "identifier": "5_leon_schulz_article_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "5_leon_schulz_meta",
+      "resource": {
+        "identifier": "5_leon_schulz_meta.json",
+        "content_type": "metadata"
+      }
+    }
   ],
   "scenarios": []
 }

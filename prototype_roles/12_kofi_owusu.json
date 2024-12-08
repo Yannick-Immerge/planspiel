@@ -1,0 +1,36 @@
+{
+  "name": "12_kofi_owusu",
+  "description": "entwaldungs aktivist in gahna",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "12_kofi_owusu_picture",
+      "resource": {
+        "identifier": "12_kofi_owusu_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "12_kofi_owusu_biography",
+      "resource": {
+        "identifier": "12_kofi_owusu_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "12_kofi_owusu_article",
+      "resource": {
+        "identifier": "12_kofi_owusu_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "12_kofi_owusu_article_picture",
+      "resource": {
+        "identifier": "12_kofi_owusu_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}
