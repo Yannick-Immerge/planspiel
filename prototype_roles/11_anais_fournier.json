@@ -1,0 +1,36 @@
+{
+  "name": "Anais Fournier",
+  "description": "Metzgerin und bei der Tafel freiwillig.",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "11_anais_fournier_picture",
+      "resource": {
+        "identifier": "11_anais_fournier_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "11_anais_fournier_biography",
+      "resource": {
+        "identifier": "11_anais_fournier_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "11_anais_fournier_article",
+      "resource": {
+        "identifier": "11_anais_fournier_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "11_anais_fournier_article_picture",
+      "resource": {
+        "identifier": "11_anais_fournier_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}

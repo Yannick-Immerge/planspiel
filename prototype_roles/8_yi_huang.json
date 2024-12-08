@@ -1,0 +1,36 @@
+{
+  "name": "Yi Huang",
+  "description": "Erfahrener Landwirt: große Unternehmensfamilie mit Massenproduktion.",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "8_yi_huang_picture",
+      "resource": {
+        "identifier": "8_yi_huang_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "8_yi_huang_biography",
+      "resource": {
+        "identifier": "8_yi_huang_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "8_yi_huang_article",
+      "resource": {
+        "identifier": "8_yi_huang_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "8_yi_huang_article_picture",
+      "resource": {
+        "identifier": "8_yi_huang_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}

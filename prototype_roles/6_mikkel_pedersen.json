@@ -1,0 +1,36 @@
+{
+  "name": "Mikkel Pedersen",
+  "description": "Senior Offshore-Windingenieur und Nachhaltigkeitsbefürworter.",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "6_mikkel_pedersen_picture",
+      "resource": {
+        "identifier": "6_mikkel_pedersen_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "6_mikkel_pedersen_biography",
+      "resource": {
+        "identifier": "6_mikkel_pedersen_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "6_mikkel_pedersen_article",
+      "resource": {
+        "identifier": "6_mikkel_pedersen_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "6_mikkel_pedersen_article_picture",
+      "resource": {
+        "identifier": "6_mikkel_pedersen_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}
