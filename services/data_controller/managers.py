@@ -20,12 +20,11 @@ def _dbs(v: str | None) -> str:
 
 
 class DataType(Enum):
-    ROLE = auto()
-    ROLE_ENTRY = auto()
-    SCENARIO = auto()
-    SCENARIO_CONDITION = auto()
-    METRIC = auto()
-    PARAMETER = auto()
+    ROLE = "role"
+    ROLE_ENTRY = "role_entry"
+    SCENARIO = "scenario"
+    METRIC = "metric"
+    PARAMETER = "parameter"
 
 
 class DataManager:
@@ -52,9 +51,38 @@ class DataManager:
         n = execute_query(query)[0][0]
         return n > 0
 
+    def has_scenario(self, name: str) -> bool:
+        query = f"SELECT COUNT(*) FROM Scenario WHERE name = {_dbs(name)};"
+        n = execute_query(query)[0][0]
+        return n > 0
+
+    def has_parameter(self, name: str) -> bool:
+        query = f"SELECT COUNT(*) FROM Parameter WHERE simple_name = {_dbs(name)};"
+        n = execute_query(query)[0][0]
+        return n > 0
+
+    def has_metric(self, name: str) -> bool:
+        query = f"SELECT COUNT(*) FROM Metric WHERE simple_name = {_dbs(name)};"
+        n = execute_query(query)[0][0]
+        return n > 0
+
+    def get_conditions_for_scenario(self, name: str) -> list[dict]:
+        if not self.has_scenario(name):
+            raise NameError(f"There is no scenario with name: {name}.")
+        query = (f"SELECT ScenarioCondition.name, ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
+                 f"FROM ScenarioCondition INNER JOIN depends_on ON ScenarioCondition.name = depends_on.scenario_condition "
+                 f"WHERE depends_on.scenario = {_dbs(name)};")
+        return [{
+            "name": condition_name,
+            "metric": metric,
+            "minValue": min_value,
+            "maxValue": max_value
+        } for condition_name, metric, min_value, max_value in execute_query(query)]
+
     def list_roles(self) -> list[str]:
         query = "SELECT name FROM RoleTable;"
         return [row[0] for row in execute_query(query)]
+
 
     def get(self, data_type: DataType, identifier: str):
         if data_type == DataType.ROLE:
@@ -90,14 +118,40 @@ class DataManager:
                      f"FROM Scenario INNER JOIN Resource ON Scenario.resource = Resource.identifier "
                      f"WHERE Scenario.name = {_dbs(identifier)};")
             belongs_to, resource_identifier, resource_content_type = execute_query(query)[0]
+            conditions = self.get_conditions_for_scenario(identifier)
             return {
                 "name": identifier,
                 "belongsTo": belongs_to,
+                "conditions": conditions,
                 "resource": {
                     "identifier": resource_identifier,
                     "contentType": resource_content_type
                 }
             }
-
+        elif data_type == DataType.PARAMETER:
+            if not self.has_parameter(identifier):
+                raise NameError(f"There is no parameter with name: {identifier}.")
+            query = f"SELECT description, min_value, max_value FROM Parameter WHERE simple_name = {_dbs(identifier)};"
+            description, min_value, max_value = execute_query(query)[0]
+            return {
+                "name": identifier,
+                "description": description,
+                "min_value": min_value,
+                "max_value": max_value
+            }
+        elif data_type == DataType.METRIC:
+            if not self.has_metric(identifier):
+                raise NameError(f"There is no metric with name: {identifier}.")
+            query = f"SELECT description, min_value, max_value FROM Metric WHERE simple_name = {_dbs(identifier)};"
+            description, min_value, max_value = execute_query(query)[0]
+            return {
+                "name": identifier,
+                "description": description,
+                "min_value": min_value,
+                "max_value": max_value
+            }
         else:
             raise ValueError(f"Unknown data type: {data_type}.")
+
+
+DATA_MANAGER: DataManager = DataManager()
