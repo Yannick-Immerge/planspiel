@@ -1,0 +1,6 @@
+{
+  "name": "high_energy_prod_wind",
+  "metric": "energy_prod_wind",
+  "min_value": 30,
+  "max_value": 70
+}

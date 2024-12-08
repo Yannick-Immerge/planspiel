@@ -1,0 +1,6 @@
+{
+  "name": "low_energy_prod_coal",
+  "metric": "energy_prod_coal",
+  "min_value": 0,
+  "max_value": 5
+}

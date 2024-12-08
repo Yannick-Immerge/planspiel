@@ -18,7 +18,12 @@ def load_query(query_name: str) -> str:
 
 def fetch_table_names() -> list[str]:
     with open(_SCHEMA_DIR / "table_names.txt", "rt") as file:
-        names = list(map(lambda s: s[:-1], file.readlines()))
+        names = []
+        for line in file.readlines():
+            line = line.strip()
+            if line == "":
+                continue
+            names.append(line)
     return names
 
 

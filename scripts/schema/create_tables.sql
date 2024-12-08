@@ -1,78 +1,94 @@
+CREATE TABLE GameState(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    phase VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Parameter(
+    simple_name VARCHAR(100) PRIMARY KEY,
+    description VARCHAR(500) NOT NULL,
+    min_value FLOAT NOT NULL,
+    max_value FLOAT NOT NULL
+);
+
+CREATE TABLE controls(
+    game_state INT,
+    parameter VARCHAR(100),
+    buergerrat INT,
+    FOREIGN KEY (game_state) REFERENCES GameState(id),
+    FOREIGN KEY (parameter) REFERENCES Parameter(simple_name),
+    PRIMARY KEY (game_state, parameter, buergerrat)
+);
+
+CREATE TABLE ProductKey(
+    key_value VARCHAR(100) PRIMARY KEY,
+    num_sessions INT NOT NULL,
+    expires DATETIME NOT NULL
+);
+
+CREATE TABLE Session(
+    session_id VARCHAR(100) PRIMARY KEY,
+    product_key VARCHAR(100) NOT NULL,
+    administrator VARCHAR(100) NOT NULL,
+    game_state INT NOT NULL,
+    FOREIGN KEY (product_key) REFERENCES ProductKey(key_value),
+    FOREIGN KEY (game_state) REFERENCES GameState(id)
+);
+
 CREATE TABLE RoleTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    description VARCHAR(500)
+    name VARCHAR(100) PRIMARY KEY,
+    description VARCHAR(500) NOT NULL
 );
 
-CREATE TABLE RoleEntryTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    describes INT,
-    type VARCHAR(100),
-    text_content VARCHAR(1000),
-    binary_content LONGBLOB,
-    FOREIGN KEY (describes) REFERENCES RoleTable(id)
+CREATE TABLE User(
+    username VARCHAR(100) PRIMARY KEY,
+    member_of VARCHAR(100) NULL,
+    plays_as VARCHAR(100) NULL,
+    password_hash VARCHAR(500) NOT NULL,
+    buergerrat INT NULL,
+    FOREIGN KEY (member_of) REFERENCES Session(session_id),
+    FOREIGN KEY (plays_as) REFERENCES RoleTable(name)
 );
 
-CREATE TABLE ScenarioTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    belongs_to INT,
-    type VARCHAR(100),
-    text_content VARCHAR(1000),
-    binary_content LONGBLOB,
-    FOREIGN KEY (belongs_to) REFERENCES RoleTable(id)
+CREATE TABLE Metric(
+    simple_name VARCHAR(100) PRIMARY KEY,
+    description VARCHAR(500) NOT NULL,
+    min_value FLOAT NOT NULL,
+    max_value FLOAT NOT NULL
 );
 
-CREATE TABLE AttributeTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    simple_name VARCHAR(100),
-    en_roads_name VARCHAR(100),
-    description VARCHAR(500),
-    icon LONGBLOB
+CREATE TABLE ScenarioCondition(
+    name VARCHAR(100) PRIMARY KEY,
+    metric VARCHAR(100) NOT NULL,
+    min_value FLOAT NULL,
+    max_value FLOAT NULL,
+    FOREIGN KEY (metric) REFERENCES Metric(simple_name)
 );
 
-CREATE TABLE ScenarioConditionTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    attribute INT,
-    min_value FLOAT,
-    max_value FLOAT,
-    FOREIGN KEY (attribute) REFERENCES AttributeTable(id)
+CREATE TABLE Resource(
+    identifier VARCHAR(100) PRIMARY KEY,
+    content_type VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE RequireTable(
-    cond_id INT,
-    scenario_id INT,
-    FOREIGN KEY (cond_id) REFERENCES ScenarioConditionTable(id),
-    FOREIGN KEY (scenario_id) REFERENCES ScenarioTable(id),
-    PRIMARY KEY (cond_id, scenario_id)
+CREATE TABLE Scenario(
+    name VARCHAR(100) PRIMARY KEY,
+    belongs_to VARCHAR(100) NOT NULL,
+    resource VARCHAR(100) NOT NULL,
+    FOREIGN KEY (belongs_to) REFERENCES RoleTable(name),
+    FOREIGN KEY (resource) REFERENCES Resource(identifier)
 );
 
-CREATE TABLE GameStateTable(
-    id INT AUTO_INCREMENT PRIMARY KEY
+CREATE TABLE depends_on(
+    scenario VARCHAR(100),
+    scenario_condition VARCHAR(100),
+    FOREIGN KEY (scenario) REFERENCES Scenario(name),
+    FOREIGN KEY (scenario_condition) REFERENCES ScenarioCondition(name),
+    PRIMARY KEY (scenario, scenario_condition)
 );
 
-CREATE TABLE AdministratorTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    contact VARCHAR(100),
-    username VARCHAR(100),
-    pswrd_hash VARCHAR(100)
-);
-
-CREATE TABLE GameTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    state INT,
-    admin INT,
-    FOREIGN KEY (state) REFERENCES GameStateTable(id),
-    FOREIGN KEY (admin) REFERENCES AdministratorTable(id)
-);
-
-CREATE TABLE PlayerTable(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    member_of INT,
-    plays_as INT,
-    name VARCHAR(100),
-    username VARCHAR(100),
-    pswrd_hash VARCHAR(100),
-    FOREIGN KEY (member_of) REFERENCES GameTable(id),
-    FOREIGN KEY (plays_as) REFERENCES RoleTable(id)
+CREATE TABLE RoleEntry(
+    name VARCHAR(100) PRIMARY KEY,
+    belongs_to VARCHAR(100) NOT NULL,
+    resource VARCHAR(100) NOT NULL,
+    FOREIGN KEY (belongs_to) REFERENCES RoleTable(name),
+    FOREIGN KEY (resource) REFERENCES Resource(identifier)
 );

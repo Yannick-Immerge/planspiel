@@ -1,17 +1,11 @@
 {
-    "coditions":[
-        {
-            "attribute": "energy_prod_wind",
-            "min_value": 30,
-            "max_value": 70
-        },
-        {
-            "attribute": "energy_prod_coal",
-            "min_value": 0,
-            "max_value": 5
-        }
+    "name": "frederick_gallenstecher_good_ending",
+    "conditions":[
+        "high_energy_prod_wind",
+        "low_energy_prod_coal"
     ],
-    "type":"note_to_self",
-    "text_content":"grederick_gallenstecher_good_ending.txt",
-    "binary_content":null
+    "resource": {
+        "identifier": "grederick_gallenstecher_good_ending.txt",
+        "content_type": "note_to_self"
+    }
 }

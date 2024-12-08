@@ -1,21 +1,16 @@
 {
-    "name": "Frederick Gallenstecher",
-    "description": "Frederick Gallenstecher wurde 700 vor Bosporos Fall Admiral der Klingonischen Armada. Er führe viele Erfolgreiche Kampagnen im großen Krieg gegen die Sternenflotte.",
-    "demographic": {
-        "age":25,
-        "country":"germany"
-    },
-    "entries": [
-        {
-            "type":"diary",
-            "text_content":"Hak Nash de Gul, ne Haar ram jak faan ne bog bog gol!",
-            "binary_content":null
-        },
-        {
-            "type":"picture",
-            "text_content":null,
-            "bynary_content":"frederick_gallenstecher_picture.png"
-        }
-    ],
-    "scenarios": ["frederick_gallenstecher_good_ending"]
+  "name": "frederick_gallenstecher",
+  "description": "Frederick Gallenstecher wurde 700 vor Bosporos Fall Admiral der Klingonischen Armada. Er führe viele Erfolgreiche Kampagnen im großen Krieg gegen die Sternenflotte.",
+  "demographic": {
+  },
+  "entries": [
+    {
+      "name": "frederick_gallenstecher_picture",
+      "resource": {
+        "identifier": "frederick_gallenstecher_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": ["frederick_gallenstecher_good_ending"]
 }

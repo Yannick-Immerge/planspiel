@@ -1,12 +1,10 @@
 {
+  "name": "max_mustermann_parents_drown",
   "conditions": [
-    {
-      "attribute": "sea_level",
-      "min_value": 5,
-      "max_value": 50
-    }
+    "high_sea_level"
   ],
-  "type": "article",
-  "text_content": "max_mustermann_parents_drown.txt",
-  "binary_content": null
+  "resource": {
+    "identifier": "max_mustermann_parents_drown.txt",
+    "content_type": "article"
+  }
 }

@@ -1,17 +1,21 @@
 {
-  "name": "Max Mustermann",
+  "name": "max_mustermann",
   "description": "Eine Rolle, die beispielhaft das Format für ausgereiftere Rollen darstellt.",
   "demographic": {},
   "entries": [
     {
-      "type": "diary",
-      "text_content": "max_mustermann_diary.txt",
-      "binary_content": null
+      "name":  "max_mustermann_diary",
+      "resource": {
+        "identifier": "max_mustermann_diary.txt",
+        "content_type": "diary"
+      }
     },
     {
-      "type": "picture",
-      "text_content": null,
-      "binary_content": "max_mustermann_picture.png"
+      "name":  "max_mustermann_picture",
+      "resource": {
+        "identifier": "max_mustermann_picture.png",
+        "content_type": "diary"
+      }
     }
   ],
   "scenarios": ["max_mustermann_parents_drown"]

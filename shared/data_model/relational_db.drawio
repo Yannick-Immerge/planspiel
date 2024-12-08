@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.8.6">
   <diagram name="Page-1" id="YdjUrKygj7iY0KBtIIkb">
-    <mxGraphModel dx="1687" dy="2077" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="478" dy="1426" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -84,8 +84,8 @@
         <mxCell id="jeJnRWPtOftOerLY8mtM-23" value="&lt;div&gt;&lt;u style=&quot;background-color: initial;&quot;&gt;simple_name&lt;/u&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;: str&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;description: str&lt;/div&gt;&lt;div style=&quot;&quot;&gt;min_value: float&lt;/div&gt;&lt;div style=&quot;&quot;&gt;max_value: float&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="80" y="400" width="110" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="jeJnRWPtOftOerLY8mtM-25" value="&lt;div&gt;&lt;i style=&quot;&quot;&gt;&lt;u&gt;scenario: str&lt;/u&gt;&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&lt;i style=&quot;&quot;&gt;&lt;u&gt;condition: str&lt;/u&gt;&lt;/i&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="240" y="240" width="90" height="40" as="geometry" />
+        <mxCell id="jeJnRWPtOftOerLY8mtM-25" value="&lt;div&gt;&lt;i style=&quot;&quot;&gt;&lt;u&gt;scenario: str&lt;/u&gt;&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&lt;i style=&quot;&quot;&gt;&lt;u&gt;scenario_condition: str&lt;/u&gt;&lt;/i&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="240" width="140" height="40" as="geometry" />
         </mxCell>
         <mxCell id="jeJnRWPtOftOerLY8mtM-26" value="RoleEntry" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="600" y="360" width="120" height="40" as="geometry" />

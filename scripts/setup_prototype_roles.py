@@ -10,7 +10,7 @@ if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
 from shared.data_model.context import initialize_db_context, close_db_context
-from prototype_roles.interface import post_roles
+from prototype_roles.interface import post_all
 from scripts.utility import print_f, print_err, print_suc
 
 HELP_MESSAGE = """\
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print("\nCollecting and pushing prototype roles...")
     error = False
     try:
-        post_roles()
+        post_all()
         print_suc("Prototype Roles have been pushed to the database.")
     except:
         print_err("An error occurred while parsing or pushing the prototype roles. More info:")
