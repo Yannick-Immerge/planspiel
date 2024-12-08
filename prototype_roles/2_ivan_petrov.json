@@ -1,0 +1,43 @@
+{
+  "name": "4_li_wen",
+  "description": "fracking arbeiter in sibirien/russland",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "2_ivan_petrov_picture",
+      "resource": {
+        "identifier": "2_ivan_petrov_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "2_ivan_petrov_biography",
+      "resource": {
+        "identifier": "2_ivan_petrov_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "2_ivan_petrov_article",
+      "resource": {
+        "identifier": "2_ivan_petrov_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "2_ivan_petrov_article_picture.png",
+      "resource": {
+        "identifier": "2_ivan_petrov_article_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "4_li_wen_meta",
+      "resource": {
+        "identifier": "4_li_wen_meta.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": []
+}

@@ -1,0 +1,43 @@
+{
+  "name": "4_li_wen",
+  "description": "ärtztin in shanghai",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "4_li_wen_picture",
+      "resource": {
+        "identifier": "4_li_wen_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "4_li_wen_biography",
+      "resource": {
+        "identifier": "4_li_wen_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "4_li_wen_article",
+      "resource": {
+        "identifier": "4_li_wen_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "4_li_wen_article_picture.png",
+      "resource": {
+        "identifier": "4_li_wen_article_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "4_li_wen_meta",
+      "resource": {
+        "identifier": "4_li_wen_meta.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": []
+}
