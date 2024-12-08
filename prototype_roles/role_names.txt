@@ -1,5 +1,7 @@
 max_mustermann
 frederick_gallenstecher
+5_leon_schulz
 6_mikkel_pedersen
 8_yi_huang
 11_anais_fournier
+12_kofi_owusu

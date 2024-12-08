@@ -100,7 +100,7 @@ class UserManager:
         }
 
 
-USER_MANAGER = UserManager()
+USER_MANAGER: UserManager = UserManager()
 
 
 class GameStateManager:
@@ -109,7 +109,7 @@ class GameStateManager:
         execute_post_query(PostQuery(query, ()))
         return get_last_row_id()
 
-GAME_STATE_MANAGER = GameStateManager()
+GAME_STATE_MANAGER: GameStateManager = GameStateManager()
 
 
 class SessionManager:
@@ -168,6 +168,14 @@ class SessionManager:
         query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)};"
         return [row[0] for row in execute_query(query)]
 
+    def get_responsible_administrator(self, username: str) -> str:
+        if not USER_MANAGER.has_user(username):
+            raise NameError(f"There is no user with username: {username}.")
+        query = (f"SELECT Session.administrator FROM User INNER JOIN Session "
+                 f"ON User.member_of = Session.session_id "
+                 f"WHERE User.username = {_dbs(username)}")
+        return execute_query(query)[0][0]
+
     def set_session_status(self, session_id: str, session_status: str):
         # TODO: Session status
         pass
@@ -190,7 +198,7 @@ class SessionManager:
             "memberUsernames": member_usernames
         }
 
-SESSION_MANAGER = SessionManager()
+SESSION_MANAGER: SessionManager = SessionManager()
 
 
 class TokenManager:
@@ -226,4 +234,4 @@ class TokenManager:
             return UserStatus.OFFLINE
 
 
-TOKEN_MANAGER = TokenManager()
+TOKEN_MANAGER: TokenManager = TokenManager()
