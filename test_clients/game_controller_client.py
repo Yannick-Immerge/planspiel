@@ -21,9 +21,6 @@ if __name__ == "__main__":
     username = res["data"]["username"]
     print(f"Created user {username} in session {session_id}.")
 
-    # Configure a user
-
-
     # Log In as admin
     res = requests.post(SERVER_ADDR_HTTP + ":5002/game/users/login", json={
         "username": admin_username,
@@ -31,6 +28,15 @@ if __name__ == "__main__":
     }).json()
     token = res["data"]["token"]
     print(f"Token for administrator {admin_username}: {token}.")
+
+    # Configure a user
+    res = requests.post(SERVER_ADDR_HTTP + ":5002/game/users/configure", json={
+        "administratorUsername": admin_username,
+        "administratorToken": token,
+        "targetUsername": username,
+        "assignedRoleId": "non_existent",
+        "assignedBuergerrat": 2
+    }).json()
 
     # Get detailed Session Info
     res = requests.post(SERVER_ADDR_HTTP + ":5002/game/sessions/get", json={

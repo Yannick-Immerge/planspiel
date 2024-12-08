@@ -17,8 +17,13 @@ def impl_users_create(session_id: str, password_hash: str):
         "username": username
     }
 
-def impl_users_configure(username: str, assigned_role_id: str, assigned_buergerrat: int):
-    USER_MANAGER.configure_user(username, assigned_role_id, assigned_buergerrat)
+def impl_users_configure(administrator_username: str, administrator_token: str, target_username: str, assigned_role_id: str, assigned_buergerrat: int):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    responsible_administrator_username = SESSION_MANAGER.get_responsible_administrator(target_username)
+    if responsible_administrator_username != administrator_username:
+        raise RuntimeError(f"The authenticated administrator: {administrator_username} is not responsible for the "
+                           f"session of the target user: {target_username}.")
+    USER_MANAGER.configure_user(target_username, assigned_role_id, assigned_buergerrat)
     return {}
 
 

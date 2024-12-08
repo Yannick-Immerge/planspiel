@@ -27,8 +27,8 @@ def handle_options():
         return response
 
 @app.route("/game/test")
-def data_test():
-    return "<p>Hello, from the Planspiel Data-Controller API!</p>"
+def game_test():
+    return "<p>Hello, from the Planspiel Game-Controller API!</p>"
 
 
 @app.route("/game/users/create", methods=["POST"])
@@ -39,7 +39,7 @@ def users_create():
 @app.route("/game/users/configure", methods=["POST"])
 def users_configure():
     params = request.get_json()
-    return safe_call(impl_users_configure, params["username"], params["assignedRoleId"], params["assignedBuergerrat"])
+    return safe_call(impl_users_configure, params["administratorUsername"], params["administratorToken"], params["targetUsername"], params["assignedRoleId"], params["assignedBuergerrat"])
 
 @app.route("/game/users/exists", methods=["POST"])
 def users_exists():
