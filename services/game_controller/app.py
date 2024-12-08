@@ -34,7 +34,7 @@ def game_test():
 @app.route("/game/users/create", methods=["POST"])
 def users_create():
     params = request.get_json()
-    return safe_call(impl_users_create, params["sessionId"], params["passwordHash"])
+    return safe_call(impl_users_create, params["administratorUsername"], params["administratorToken"], params["sessionId"], params["passwordHash"])
 
 @app.route("/game/users/configure", methods=["POST"])
 def users_configure():
@@ -68,7 +68,7 @@ def users_logout():
 @app.route("/game/users/update_password", methods=["POST"])
 def users_update_password():
     params = request.get_json()
-    return safe_call(impl_users_update_password, params["username"], params["token"], params["oldPasswordHash"], params["newPasswordHash"])
+    return safe_call(impl_users_update_password, params["administratorUsername"], params["administratorToken"], params["targetUsername"], params["newPasswordHash"])
 
 
 @app.route("/game/sessions/create", methods=["POST"])

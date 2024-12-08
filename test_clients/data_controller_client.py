@@ -18,6 +18,12 @@ if __name__ == "__main__":
 
     for entry_name in entries:
         res = requests.post(SERVER_ADDR_HTTP + ":5001/data/role_entries/get", json={
-            "name": role_name
+            "name": entry_name
         }).json()
         print(f"Info about {entry_name}: " + str(res["data"]))
+
+    for scenario_name in scenarios:
+        res = requests.post(SERVER_ADDR_HTTP + ":5001/data/scenarios/get", json={
+            "name": scenario_name
+        }).json()
+        print(f"Info about {scenario_name}: " + str(res["data"]))

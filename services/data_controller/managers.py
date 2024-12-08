@@ -79,9 +79,11 @@ class DataManager:
             "maxValue": max_value
         } for condition_name, metric, min_value, max_value in execute_query(query)]
 
-    def list_roles(self) -> list[str]:
+    def list_roles(self):
         query = "SELECT name FROM RoleTable;"
-        return [row[0] for row in execute_query(query)]
+        return {
+            "names": [row[0] for row in execute_query(query)]
+        }
 
 
     def get(self, data_type: DataType, identifier: str):
@@ -91,10 +93,12 @@ class DataManager:
             query = f"SELECT description FROM RoleTable WHERE name = {_dbs(identifier)};"
             description = execute_query(query)[0][0]
             return {
-                "name": identifier,
-                "description": description,
-                "entries": self.list_entries_for_role(identifier),
-                "scenarios": self.list_scenarios_for_role(identifier)
+                "role": {
+                    "name": identifier,
+                    "description": description,
+                    "entries": self.list_entries_for_role(identifier),
+                    "scenarios": self.list_scenarios_for_role(identifier)
+                }
             }
         elif data_type == DataType.ROLE_ENTRY:
             if not self.has_role_entry(identifier):
@@ -104,11 +108,13 @@ class DataManager:
                      f"WHERE RoleEntry.name = {_dbs(identifier)};")
             belongs_to, resource_identifier, resource_content_type = execute_query(query)[0]
             return {
-                "name": identifier,
-                "belongsTo": belongs_to,
-                "resource": {
-                    "identifier": resource_identifier,
-                    "contentType": resource_content_type
+                "role_entry": {
+                    "name": identifier,
+                    "belongsTo": belongs_to,
+                    "resource": {
+                        "identifier": resource_identifier,
+                        "contentType": resource_content_type
+                    }
                 }
             }
         elif data_type == DataType.SCENARIO:
@@ -120,12 +126,14 @@ class DataManager:
             belongs_to, resource_identifier, resource_content_type = execute_query(query)[0]
             conditions = self.get_conditions_for_scenario(identifier)
             return {
-                "name": identifier,
-                "belongsTo": belongs_to,
-                "conditions": conditions,
-                "resource": {
-                    "identifier": resource_identifier,
-                    "contentType": resource_content_type
+                "scenario": {
+                    "name": identifier,
+                    "belongsTo": belongs_to,
+                    "conditions": conditions,
+                    "resource": {
+                        "identifier": resource_identifier,
+                        "contentType": resource_content_type
+                    }
                 }
             }
         elif data_type == DataType.PARAMETER:
@@ -134,10 +142,12 @@ class DataManager:
             query = f"SELECT description, min_value, max_value FROM Parameter WHERE simple_name = {_dbs(identifier)};"
             description, min_value, max_value = execute_query(query)[0]
             return {
-                "name": identifier,
-                "description": description,
-                "min_value": min_value,
-                "max_value": max_value
+                "parameter": {
+                    "simpleName": identifier,
+                    "description": description,
+                    "min_value": min_value,
+                    "max_value": max_value
+                }
             }
         elif data_type == DataType.METRIC:
             if not self.has_metric(identifier):
@@ -145,10 +155,12 @@ class DataManager:
             query = f"SELECT description, min_value, max_value FROM Metric WHERE simple_name = {_dbs(identifier)};"
             description, min_value, max_value = execute_query(query)[0]
             return {
-                "name": identifier,
-                "description": description,
-                "min_value": min_value,
-                "max_value": max_value
+                "metric": {
+                    "simpleName": identifier,
+                    "description": description,
+                    "min_value": min_value,
+                    "max_value": max_value
+                }
             }
         else:
             raise ValueError(f"Unknown data type: {data_type}.")

@@ -10,7 +10,12 @@ _ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(_ROOT_DIR))
 
 
-def impl_users_create(session_id: str, password_hash: str):
+def impl_users_create(administrator_username: str, administrator_token: str, session_id: str, password_hash: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    responsible_administrator_username = SESSION_MANAGER.get_session_administrator(session_id)
+    if responsible_administrator_username != administrator_username:
+        raise RuntimeError(f"The authenticated administrator: {administrator_username} is not responsible for the "
+                           f"session: {session_id}.")
     username = generate_name(USER_MANAGER.has_user)
     SESSION_MANAGER.add_session_member(session_id, username, password_hash)
     return {
@@ -53,11 +58,13 @@ def impl_users_logout(username: str, token: str):
     return {}
 
 
-def impl_users_update_password(username: str, token: str, old_password_hash: str, new_password_hash: str):
-    TOKEN_MANAGER.authenticate(username, token)
-    if not USER_MANAGER.verify_user_password(username, old_password_hash):
-        raise ValueError("The password is wrong.")
-    USER_MANAGER.update_user_password(username, new_password_hash)
+def impl_users_update_password(administrator_username: str, administrator_token: str, target_username: str, new_password_hash: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    responsible_administrator_username = SESSION_MANAGER.get_responsible_administrator(target_username)
+    if responsible_administrator_username != administrator_username:
+        raise RuntimeError(f"The authenticated administrator: {administrator_username} is not responsible for the "
+                           f"session of the target user: {target_username}.")
+    USER_MANAGER.update_user_password(target_username, new_password_hash)
     return {}
 
 

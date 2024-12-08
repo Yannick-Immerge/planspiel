@@ -96,7 +96,8 @@ class UserManager:
             "username": username,
             "status": status.value,
             "assignedRoleId": assigned_role_id,
-            "assignedBuergerrat": assigned_buergerrat
+            "assignedBuergerrat": assigned_buergerrat,
+            "administrator": self.is_user_admin(username)
         }
 
 
@@ -174,6 +175,12 @@ class SessionManager:
         query = (f"SELECT Session.administrator FROM User INNER JOIN Session "
                  f"ON User.member_of = Session.session_id "
                  f"WHERE User.username = {_dbs(username)}")
+        return execute_query(query)[0][0]
+
+    def get_session_administrator(self, session_id: str) -> str:
+        if not self.has_session(session_id):
+            raise NameError(f"There is no session with id: {session_id}.")
+        query = f"SELECT administrator FROM Session WHERE session_id = {_dbs(session_id)};"
         return execute_query(query)[0][0]
 
     def set_session_status(self, session_id: str, session_status: str):
