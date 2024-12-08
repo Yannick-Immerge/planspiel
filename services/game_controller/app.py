@@ -8,8 +8,8 @@ _ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(_ROOT_DIR))
 
 from services.game_controller.implementation import impl_users_create, impl_users_exists, impl_users_view, \
-    impl_users_login, impl_users_logout, impl_users_update_password, SessionStatus, impl_sessions_create, \
-    impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status
+    impl_users_login, impl_users_logout, impl_users_update_password, impl_sessions_create, \
+    impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status, impl_users_configure
 from shared.architecture.rest import safe_call
 
 app = Flask(__name__)
@@ -36,6 +36,10 @@ def users_create():
     params = request.get_json()
     return safe_call(impl_users_create, params["sessionId"], params["passwordHash"])
 
+@app.route("/game/users/configure", methods=["POST"])
+def users_configure():
+    params = request.get_json()
+    return safe_call(impl_users_configure, params["username"], params["assignedRoleId"], params["assignedBuergerrat"])
 
 @app.route("/game/users/exists", methods=["POST"])
 def users_exists():
@@ -95,7 +99,7 @@ def sessions_get():
 def sessions_status():
     params = request.get_json()
     return safe_call(impl_sessions_status, params["sessionId"], params["administratorUsername"],
-                         params["administratorToken"], SessionStatus.from_string(params["status"]))
+                         params["administratorToken"], params["status"])
 
 
 if __name__ == "__main__":

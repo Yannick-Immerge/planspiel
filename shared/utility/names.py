@@ -1,5 +1,5 @@
 import random
-from typing import Any
+from typing import Any, Callable
 
 _OPTIONS_NOUN = [
     "apfel", "banane", "kirsche", "hund", "elefant", "fisch", "traube", "haus",
@@ -79,8 +79,8 @@ _OPTIONS_ADJECTIVE = [
 ]
 
 
-def generate_name(reserved: dict[str, Any] | set[str]) -> str:
+def generate_name(in_use: Callable[[str], bool]) -> str:
     while True:
         option = f"{random.sample(_OPTIONS_NOUN, 1)[0]}-{random.sample(_OPTIONS_ADJECTIVE, 1)[0]}"
-        if option not in reserved:
+        if not in_use(option):
             return option

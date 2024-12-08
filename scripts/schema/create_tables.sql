@@ -22,7 +22,7 @@ CREATE TABLE controls(
 CREATE TABLE ProductKey(
     key_value VARCHAR(100) PRIMARY KEY,
     num_sessions INT NOT NULL,
-    expires DATETIME NOT NULL
+    expires DATETIME
 );
 
 CREATE TABLE Session(
@@ -30,6 +30,7 @@ CREATE TABLE Session(
     product_key VARCHAR(100) NOT NULL,
     administrator VARCHAR(100) NOT NULL,
     game_state INT NOT NULL,
+    session_status VARCHAR(100) NOT NULL,
     FOREIGN KEY (product_key) REFERENCES ProductKey(key_value),
     FOREIGN KEY (game_state) REFERENCES GameState(id)
 );
@@ -41,7 +42,7 @@ CREATE TABLE RoleTable(
 
 CREATE TABLE User(
     username VARCHAR(100) PRIMARY KEY,
-    member_of VARCHAR(100) NULL,
+    member_of VARCHAR(100) NOT NULL,
     plays_as VARCHAR(100) NULL,
     password_hash VARCHAR(500) NOT NULL,
     buergerrat INT NULL,

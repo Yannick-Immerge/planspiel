@@ -1,6 +1,7 @@
 import traceback
 from dataclasses import dataclass
 from enum import Enum, auto
+from traceback import print_exc
 from typing import Any, Callable
 
 import requests
@@ -61,6 +62,7 @@ def safe_call(cb, *args) -> Response:
         ok = False
         authentication_ok = True
         status_text = f"Error: {exc}"
+        print_exc()
     response = jsonify({
         "data": data,
         "ok": ok,
