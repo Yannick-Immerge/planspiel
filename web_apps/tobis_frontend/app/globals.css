@@ -41,3 +41,41 @@ body {
 .leaflet-marker-icon:hover {
   box-shadow: 10px 0px 10px rgba(0,0,0,0.8), 0px 0px 10px rgba(255, 255, 255, 0.8) inset;
 }
+
+/* NPArticle begin*/
+
+@font-face {
+    font-family: articleFont;
+    src: url(/src/assets/MailartRubberstamp-Regular.otf);
+}
+
+.article {
+    border-radius: 5px;
+    padding: 10px;
+    inline-size: 450px;
+    margin-block-end: 1em;
+    overflow-wrap: break-word;
+    left: 110px;
+    top: 110px;
+    font-family: articleFont;
+}
+
+.article-heading {
+    font-size: 40px;
+    line-height: 50px;
+    font-weight: 1000;
+    position: absolute;
+}
+
+.article-text {
+    font-size: 25px;
+    line-height: 30px;
+    position: absolute;
+}
+
+.article-background {
+    rotate: 1deg;
+    position: absolute;
+}
+
+/* NPArticle end*/
