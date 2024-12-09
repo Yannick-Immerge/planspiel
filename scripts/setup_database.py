@@ -14,7 +14,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-from shared.data_model.context import execute_bool_query, execute_void_query, initialize_db_context, close_db_context
+from shared.data_model.context import execute_bool_query, execute_void_query, initialize_db_context_default, close_db_context
 from scripts.utility import print_f, print_suc, print_err, query_yes_no
 from scripts.image.interface import get_docker_image_path
 from scripts.schema.interface import fetch_table_names, get_check_name_query, get_drop_query, load_query
@@ -65,6 +65,7 @@ If you understand the consequences choose (Y)es to continue or (N)o to cancel.\
 class ScriptOptions(IntFlag):
     CREATE_TEMPORARY_PERSISTENCE = auto()
     CONFIGURE_DATABASE = auto()
+    FORCE_CONFIGURE = auto()
 
 
 class ContainerAvailability(Enum):
@@ -84,6 +85,7 @@ def parse_cli_arguments() -> ScriptOptions:
     error = 0
     create_temporary_persistence = None
     configure_database = None
+    force_configure = None
     for p in sys.argv[1:]:
         if p == "--create-temporary-persistence":
             if create_temporary_persistence is None:
@@ -96,6 +98,14 @@ def parse_cli_arguments() -> ScriptOptions:
         elif p == "--configure-database":
             if configure_database is None:
                 configure_database = True
+            else:
+                print_f(colorama.Fore.RED, "Syntax Error: A flag can only be provided once.")
+                error = -1
+                print_help = True
+                break
+        elif p == "--force":
+            if force_configure is None:
+                force_configure = True
             else:
                 print_f(colorama.Fore.RED, "Syntax Error: A flag can only be provided once.")
                 error = -1
@@ -126,6 +136,8 @@ def parse_cli_arguments() -> ScriptOptions:
     if configure_database is not None and configure_database:
         opts |= ScriptOptions.CONFIGURE_DATABASE
 
+    if force_configure is not None and force_configure:
+        opts |= ScriptOptions.FORCE_CONFIGURE
     return opts
 
 
@@ -319,7 +331,7 @@ def entrypoint():
     # Establish database connection
     print("\nEstablishing connection to database...")
     try:
-        initialize_db_context("localhost", 3306, "mydatabase", "admin", "admin")
+        initialize_db_context_default()
         print_suc("Initialized connection successfully.")
     except:
         print_err("The database is currently not available. More info:")
@@ -337,7 +349,7 @@ def entrypoint():
             print_err("The database contains tables with CONFLICTING NAMES:")
             print_f(colorama.Fore.RED, f"\t{conflicts}")
             print_f(colorama.Fore.YELLOW, f"\n{DATABASE_NAME_CONFLICT_MESSAGE}")
-            if query_yes_no():
+            if ScriptOptions.FORCE_CONFIGURE in opts or query_yes_no():
                 actually_configure = True
                 print("\nDropping tables with conflicting names...")
                 drop_conflicting_tables(conflicts)

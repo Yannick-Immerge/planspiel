@@ -57,9 +57,11 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
 
 
 def initialize_db_context_default():
+    env_host = os.getenv("DATABASE_HOST")
+    env_port = os.getenv("DATABASE_PORT")
     initialize_db_context(
-        os.getenv("DATABASE_HOST"),
-        int(os.getenv("DATABASE_PORT")),
+       "localhost" if env_host is None else env_host,
+        3306 if env_port is None else int(env_port),
         "mydatabase",
         "admin",
         "admin",
