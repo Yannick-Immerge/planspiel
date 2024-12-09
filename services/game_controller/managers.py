@@ -219,6 +219,22 @@ class SessionManager:
             "memberUsernames": member_usernames
         }
 
+    def configure_prototype(self, session_id: str):
+        session = self.get_session(session_id)
+        if len(session["memberUsernames"]) != 11:
+            raise ValueError("For the prototype configuration a session needs exactly 10 users and one administrator.")
+        query = f"SELECT name FROM RoleTable"
+        role_names = [row[0] for row in execute_query(query)]
+        off = 0
+        for username in session["memberUsernames"]:
+            if username == session["administratorUsername"]:
+                continue
+            role_name = role_names[off]
+            buergerrat = int(off / 5) + 1
+            USER_MANAGER.configure_user(username, role_name, buergerrat)
+            off += 1
+
+
 SESSION_MANAGER: SessionManager = SessionManager()
 
 

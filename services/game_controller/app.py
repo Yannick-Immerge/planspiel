@@ -9,7 +9,8 @@ sys.path.append(str(_ROOT_DIR))
 
 from services.game_controller.implementation import impl_users_create, impl_users_exists, impl_users_view, \
     impl_users_login, impl_users_logout, impl_users_update_password, impl_sessions_create, \
-    impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status, impl_users_configure
+    impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status, impl_users_configure, \
+    impl_users_has_password, impl_sessions_configure_prototype
 from shared.architecture.rest import safe_call
 
 app = Flask(__name__)
@@ -104,6 +105,12 @@ def sessions_get():
 def sessions_status():
     params = request.get_json()
     return safe_call(impl_sessions_status, params["administratorUsername"], params["administratorToken"], params["status"])
+
+@app.route("/game/sessions/configure_prototype", methods=["POST"])
+def configure_prototype():
+    params = request.get_json()
+    return safe_call(impl_sessions_configure_prototype, params["administratorUsername"], params["administratorToken"])
+
 
 
 if __name__ == "__main__":

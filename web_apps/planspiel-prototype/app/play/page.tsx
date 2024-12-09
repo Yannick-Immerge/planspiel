@@ -1,5 +1,9 @@
+import ResourceComponent from "@/app/components/ResourceComponent";
+
 export default function Play() {
     return (
-      <p>Playing.</p>
+        <div>
+            <ResourceComponent resource={{contentType: "picture", identifier: "4_li_wen_picture.png"}}/>
+        </div>
     );
 }

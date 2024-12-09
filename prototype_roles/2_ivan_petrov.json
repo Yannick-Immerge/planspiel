@@ -1,5 +1,5 @@
 {
-  "name": "4_li_wen",
+  "name": "2_ivan_petrov",
   "description": "fracking arbeiter in sibirien/russland",
   "demographic": {},
   "entries": [
@@ -32,9 +32,9 @@
       }
     },
     {
-      "name": "4_li_wen_meta",
+      "name": "2_ivan_petrov_meta",
       "resource": {
-        "identifier": "4_li_wen_meta.json",
+        "identifier": "2_ivan_petrov_meta.json",
         "content_type": "metadata"
       }
     }
