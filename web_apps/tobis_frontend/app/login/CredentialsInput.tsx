@@ -1,12 +1,15 @@
 'use client'
 
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import CredentialsChecker, { CheckSessionCode } from './CredentialsChecker';
 import TextEingabe from './TextEingabe';
 import { FaLock, FaUser } from 'react-icons/fa';
 import { MdGroups2 } from 'react-icons/md';
 import { createSession, existsUser, logIn } from '../api/game_controller_interface';
 import { Encode } from '../components/AuthenticationHelper';
+import { PassThrough } from 'stream';
+
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
 
 const CredentialsInput = () => {
 
@@ -14,6 +17,12 @@ const CredentialsInput = () => {
     const [confirmedUsername, setConfirmedUsername] = useState("");
 
     const [enteredPassword, setEnteredPassword] = useState("");
+    const [needsPassword, setNeedsPassword] = useState(false);
+    const [validPwd, setValidPwd] = useState(false);
+    const [validPwdMatch, setValidPwdMatch] = useState(false);
+
+    const [enteredPasswordConfirmation, setEnteredPasswordConfirmation] = useState("");
+    
     const [ruckmeldung, setRuckmeldung] = useState("");    
 
     const changeEnteredUsername = (event: React.ChangeEvent<HTMLInputElement>) => {setEnteredUsername(event.target.value); setConfirmedUsername("")};
@@ -32,6 +41,16 @@ const CredentialsInput = () => {
         })
     }
 
+    useEffect(() => { // Test if Password input has the right formatting
+        const result = PWD_REGEX.test(enteredPassword);
+        setValidPwd(result);
+    }, [enteredPassword && needsPassword]);
+
+    useEffect(() => { // Check if the second Password entry matches the first
+        const matches = (enteredPassword != "") && (enteredPassword === enteredPasswordConfirmation);
+        setValidPwdMatch(matches)
+    }, [enteredPassword, enteredPasswordConfirmation, needsPassword])
+
     // TODO Es ist mir wirklich ein Dorn im Auge dass wir vor der versuchen Passworteingabe schon 
     //      exposen ob der Benutzer existiert. Das würde ich in der Zukunft gerne ändern.
     const submitUsernameAttempt = async () => {
@@ -41,6 +60,15 @@ const CredentialsInput = () => {
                     setRuckmeldung(`Da ist etwas mit dem Server schief gelaufen: ${response.statusText} bitte versuche es später erneut.`)
                 } else if (response.data?.userExists) {
                     setConfirmedUsername(enteredUsername)
+                    await hasPassword(confirmedUsername).then((response) => {
+                        if (!response.ok) {
+                            setRuckmeldung(`Da ist etwas mit dem Server schief gelaufen: ${response.statusText} bitte versuche es später erneut.`)
+                        } else if (response.data?.hasPassword) {
+                            setNeedsPassword(false);
+                        } else {
+                            setNeedsPassword(true);
+                        }
+                    })
                     setRuckmeldung("");
                 } else {
                     setRuckmeldung("Benutzer existiert nicht.");
@@ -90,7 +118,7 @@ const CredentialsInput = () => {
                         type="password" 
                         text="Passwort" 
                         icon={<FaLock />}/>
-                        <a href="#" className="text-left pl-1 text-decoration-line: underline">Passwort vergessen?</a>
+                        
                         </> : <div></div>}
 
                     <div className='text-amber-400'>{ruckmeldung}</div>
