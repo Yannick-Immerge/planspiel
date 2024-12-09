@@ -1,13 +1,10 @@
 'use client'
 
-import React, { FormEvent, useEffect, useState } from 'react'
-import CredentialsChecker, { CheckSessionCode } from './CredentialsChecker';
+import React, { useEffect, useState } from 'react'
 import TextEingabe from './TextEingabe';
 import { FaLock, FaUser } from 'react-icons/fa';
-import { MdGroups2 } from 'react-icons/md';
-import { createSession, existsUser, hasUserPassword, logIn } from '../api/game_controller_interface';
+import { hasUserPassword, logIn } from '../api/game_controller_interface';
 import { Encode } from '../components/AuthenticationHelper';
-import { PassThrough } from 'stream';
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
 
