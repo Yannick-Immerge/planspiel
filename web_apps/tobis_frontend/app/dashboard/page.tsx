@@ -1,11 +1,14 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MockupGetUserIDs } from "./MockupGetUserIDs"
 import { TbZzz } from "react-icons/tb"
 import { LuUserCheck, LuUserX } from 'react-icons/lu'
 import { FaPoo, FaStopwatch } from 'react-icons/fa'
 import TextEingabe from '../login/TextEingabe'
+import { viewUser } from '../api/game_controller_interface'
+import { getSessionUsername } from '../api/utility'
+import { UserView } from '../api/models'
 
 interface UserStatus {
     userID: number,
@@ -32,6 +35,34 @@ function GetProperTimeAmountString(props: {time: Date}) {
 }
 
 const page = () => {
+    const [user, setUser] = useState<UserView | undefined>();
+
+    const [nachrichtenzeile, setNachrichtenzeile] = useState("")
+
+    useEffect(() => {
+        const username = getSessionUsername();
+        if(username === undefined) {
+            window.location.replace("../login");
+            return;
+        }
+        const fetchUserInfo = async () => {
+            let response = await viewUser(username);
+            if (response.data === undefined) {
+                window.location.replace("../login");
+                return;
+            }
+            const user = response.data.userView;
+            setUser(user);
+            if (user.administrator) {
+                setNachrichtenzeile("Willkommen, Admin!");
+            } else {
+                window.location.replace("../login");
+                return;
+            }
+        }
+        fetchUserInfo();
+    }, []);
+
 
     const startTime = GetProperTimeString({time: new Date(new Date().getTime() + 45*60000)});
     const [endeBurgerrat, setEndeBurgerrat] = useState(startTime)
@@ -95,8 +126,7 @@ const page = () => {
   return (
     <div className="bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
         <div className="pl-5 pt-2 flex text-left">
-            <div className='leading-[2rem] pt-2 pb-2 pr-3 text-2xl'>Session:  </div>
-            <div className='text-amber-300 pt-2 pb-2 pl-4 pr-4 text-3xl rounded-full shadow-[0px_10px_10px_rgba(0,0,0,0.5)] backdrop-blur-xl'>Globale-Herde-47</div>
+            <div className='leading-[2rem] pt-2 pb-2 pr-3 text-2xl'>{nachrichtenzeile}</div>
         </div>
         <div className="mt-5 flex w-full">
             <div className="w-full ml-6 mr-3">
