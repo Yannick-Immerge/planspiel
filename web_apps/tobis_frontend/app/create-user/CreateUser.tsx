@@ -39,16 +39,12 @@ export default function CreateUser() {
 
     useEffect(() => {// Test if username input has the right formatting
         let result = USER_REGEX.test(userName);
-        console.log(result);
-        console.log(userName);
         setNameError("Dein Benutzername sollte zwischen 3 und 24 Zeichen lang sein und nur Buchstaben enthalten.");
         setValidName(result);
     }, [userName]);
 
     useEffect(() => { // Test if Password input has the right formatting
         const result = PWD_REGEX.test(password);
-        console.log(result);
-        console.log(password);
         setValidPwd(result);
     }, [password]);
 
@@ -60,8 +56,6 @@ export default function CreateUser() {
     useEffect(() => { // Test if Access Code input has the right formatting
         // const result = CODE_REGEX.test(sessionCode); TODO: Disable for Testing
         const result = true;
-        console.log(result);
-        console.log(sessionCode);
         setValidSessionCode(result);
     }) 
 
