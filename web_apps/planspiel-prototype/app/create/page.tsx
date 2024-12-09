@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState,FormEvent } from 'react';
-import {createSession} from "@/app/api/game_controller_interface";
+import {
+  configureSessionPrototype,
+  createSession,
+  createUserForSession,
+  CreateUserResult, getSessionMemberViews, logIn
+} from "@/app/api/game_controller_interface";
+import {ApiResult} from "@/app/api/utility";
+import {log} from "node:util";
 
 export default function FormComponent() {
   const [productKey, setProductKey] = useState('');
@@ -10,13 +17,34 @@ export default function FormComponent() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await createSession(productKey, adminPassword); // TODO: Plain Text password
-    if (response.ok) {
-        setMessage(`Successfully created Session ${response.data?.sessionId}. Your username is ${response.data?.administratorUsername}. REMEMBER!!`);
-    } else {
-        setMessage(`Error: ${response.statusText}`);
+    // Create session
+    const createResponse = await createSession(productKey, adminPassword); // TODO: Plain Text password
+    if(!createResponse.ok || createResponse.data === undefined) {
+      setMessage(`Error: ${createResponse.statusText}`);
+      return;
     }
 
+    // Login
+    const loginResponse = await logIn(createResponse.data.administratorUsername, adminPassword);
+    if(!loginResponse.ok) {
+      setMessage(`Error: ${loginResponse.statusText}`);
+      return;
+    }
+
+    // Create users
+    for (let i = 0; i < 10; i++) {
+      const userResponse = await createUserForSession();
+      if(!userResponse.ok) {
+        setMessage(`Error: ${userResponse.statusText}`);
+        return;
+      }
+    }
+    const configureResponse = await configureSessionPrototype();
+    if(!configureResponse.ok) {
+        setMessage(`Error: ${configureResponse.statusText}`);
+        return;
+    }
+    setMessage("Success!");
   };
 
   return (

@@ -115,3 +115,10 @@ def impl_sessions_status(administrator_username: str, administrator_token: str, 
         raise AuthError()
     SESSION_MANAGER.set_session_status(session_id, status)
     return {}
+
+
+def impl_sessions_configure_prototype(administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    SESSION_MANAGER.configure_prototype(session_id)
+    return {}

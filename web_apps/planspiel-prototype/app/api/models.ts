@@ -50,7 +50,7 @@ export interface Role {
  */
 export interface Resource {
     identifier: string,
-    contentType: string
+    contentType: "picture" | "article" | "diary"
 }
 
 /**
