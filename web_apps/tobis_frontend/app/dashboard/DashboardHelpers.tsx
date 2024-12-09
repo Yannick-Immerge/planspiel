@@ -17,13 +17,13 @@ export const CreateUserButton = () => {
 export async function GetUsersInSession() : Promise<UserViewIDWrapper[]>  {
     const dummyReturn : UserViewIDWrapper[] = [{userView: {username: "Dummy", status: "disabled", assignedRoleId: undefined, assignedBuergerrat: undefined, administrator: false}, id: 0}];
 
-    const response = await getSessionMemberViews().catch((error) => console.log("Error while getting users in session: " + error));
+    const response = await getSessionMemberViews();
 
-        if (!response.ok || !response.authenticationOk) {
-            console.log("Mistake while getting users in session: " + response.statusText)
-            return dummyReturn;
-        } else {
-            let idCounter = 0;
-            return response.data?.memberViews.map((n) => {return {userView: n, id: idCounter++};});
-        }})
+    if (!response.ok || response.data === undefined) {
+        console.log("Mistake while getting users in session: " + response?.statusText)
+        return dummyReturn;
+    } else {
+        let idCounter = 0;
+        return response.data.memberViews.map((n) => {return {userView: n, id: idCounter++}});
+    }
 }

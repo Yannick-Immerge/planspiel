@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCheckCircle } from 'react-icons/fa';
 import TextEingabe from '../login/TextEingabe';
-import { TryCreateSession } from './page';
 import { createSession } from '../api/game_controller_interface';
+import { Encode } from '../components/AuthenticationHelper';
 
 const USER_REGEX = /^[a-zA-Z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
@@ -67,7 +67,7 @@ export default function CreateSessionInput() {
 
     const tryCreateSession = async () => {
         setYellowMsg("Versuche anzumelden...");
-        await createSession(accessCode, "Verschlüsselt(" + passwordMatch + ")")
+        await createSession(accessCode, Encode(passwordMatch))
             .then((result) => { if (result.ok) {
                                     setYellowMsg("Deine Session wurde erfolgreich erstellt! Du kannst dich jetzt mit deinem neuen Passwort unter dem folgenden Benutzernamen anmelden:")
                                     setShownUsername(result.data?.administratorUsername? result.data?.administratorUsername : "ERROR");

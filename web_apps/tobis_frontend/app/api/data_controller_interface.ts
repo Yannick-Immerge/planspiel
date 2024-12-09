@@ -7,7 +7,6 @@ export const DATA_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + DATA_CO
 
 export interface ListRolesResult {
     names: string[],
-
 }
 
 export interface GetRoleResult {

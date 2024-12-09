@@ -9,16 +9,14 @@ import { Encode } from '../components/AuthenticationHelper';
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
 
 const CredentialsInput = () => {
-
+    const [headerText, setHeaderText] = useState("Login")
     const [enteredUsername, setEnteredUsername] = useState("");
 
     const [enteredPassword, setEnteredPassword] = useState("");
     const [passwordValid, setPasswordValid] = useState(false);
-    const [passwordFeedback, setPasswordFeedback] = useState("");
 
     const [enteredPasswordConfirmation, setEnteredPasswordConfirmation] = useState("");
     const [validPwdMatch, setValidPwdMatch] = useState(false);
-    const [passwordConfirmationFeedback, setPasswordConfirmationFeedback] = useState("");
 
     const [needsPassword, setNeedsPassword] = useState(false);
     
@@ -36,6 +34,7 @@ const CredentialsInput = () => {
 
     const changeEnteredUsername = (event: React.ChangeEvent<HTMLInputElement>) => {setEnteredUsername(event.target.value);};
     const changePassword = (event: React.ChangeEvent<HTMLInputElement>) => {setEnteredPassword(event.target.value)};
+    const changePasswordConfirmation = (event: React.ChangeEvent<HTMLInputElement>) => {setEnteredPasswordConfirmation(event.target.value)};
 
     const submitAuthenticationAttempt = async () => {
         setRuckmeldung(`Submitting Authentication attempt...`)
@@ -44,7 +43,17 @@ const CredentialsInput = () => {
             if (!response.ok) {
                 setRuckmeldung(`Benutzername oder Passwort falsch (0).`)
             } else if (needsPassword) {
-                setRuckmeldung("Bitte Lege ein sicheres Passwort für deinen Benutzer fest.")
+                if (validPwdMatch && passwordValid) {
+                    await logIn(enteredUsername, Encode(enteredPassword)).then((response) => {
+                        if (!response.ok) {
+                            setRuckmeldung(`Benutzername oder Passwort falsch.`)
+                        } else if (response.data?.administrator) {
+                            window.location.replace("../dashboard")
+                        } else {
+                            window.location.replace("../play")
+                        }
+                    })
+                }
             } else if (response.data?.hasPassword) {
                 setNeedsPassword(false);
                 setRuckmeldung("")
@@ -59,7 +68,9 @@ const CredentialsInput = () => {
                 })
             } else {
                 setNeedsPassword(true);
-                setEnteredPassword("Benutzername oder Passwort falsch (1).")                
+                setEnteredPassword("")
+                setHeaderText("Willkommen,")
+                setRuckmeldung("Bitte Lege ein sicheres Passwort für deinen Benutzer fest (und merke es dir gut 😉)")                
             }
         })
     }
@@ -82,10 +93,10 @@ const CredentialsInput = () => {
     <>
       <div className="absolute left-1/3 w-1/3 pt-40">
             <div className="blurBox">
-                <div className="text-3xl font-bold">Login</div>
+                <div className="text-3xl font-bold">{headerText}</div>
                 
                 <div>
-                    <TextEingabe
+                    {!needsPassword? <TextEingabe
                         onKeyDown={handleEnterOnAuthentication}
                         userFocus={false}
                         onBlur={null}
@@ -97,7 +108,7 @@ const CredentialsInput = () => {
                         input={enteredUsername} 
                         type="text" 
                         text="Benutzername" 
-                        icon={<FaUser />}/>
+                        icon={<FaUser />}/> : <div className="pt-2 pb-2 bg-[#fff1] rounded-full">{enteredUsername}</div>}
 
                     <TextEingabe
                         onKeyDown={handleEnterOnAuthentication}
@@ -110,7 +121,7 @@ const CredentialsInput = () => {
                         onChange={changePassword} 
                         input={enteredPassword} 
                         type="password" 
-                        text="Passwort" 
+                        text={needsPassword? "Dein neues Passwort" : "Passwort"}
                         icon={<FaLock />}/>
 
                     {needsPassword? <TextEingabe
@@ -121,10 +132,10 @@ const CredentialsInput = () => {
                         correction="Passwörter stimmen nicht überein."
                         describedby={"randomID102"}
                         validInput={validPwdMatch}
-                        onChange={changePassword} 
-                        input={enteredPassword} 
+                        onChange={changePasswordConfirmation} 
+                        input={enteredPasswordConfirmation} 
                         type="password" 
-                        text="Passwort" 
+                        text="Passwort wiederholen" 
                         icon={<FaLock />}/> : <div></div>}
 
                     <div className='text-amber-400'>{ruckmeldung}</div>

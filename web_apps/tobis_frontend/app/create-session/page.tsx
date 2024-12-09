@@ -15,10 +15,4 @@ const page = () => {
   )
 }
 
-export async function TryCreateSession (props: {prodKey: string}) : Promise<string | null> {
-    if (!props.prodKey || props.prodKey === "") return null;
-    // get session id from prodKey
-    return "Globale-Herde-47"
-}
-
 export default page
