@@ -1,15 +1,8 @@
-from enum import Enum, auto
+from enum import Enum
 
-from shared.data_model.context import initialize_db_context, execute_query
+from shared.data_model.context import execute_query, initialize_db_context_default
 
-
-initialize_db_context(
-    "localhost",
-    3306,
-    "mydatabase",
-    "admin",
-    "admin"
-)
+initialize_db_context_default()
 
 
 def _dbs(v: str | None) -> str:

@@ -1,0 +1,31 @@
+services:
+  database:
+    image: mysql
+    container_name: database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    networks:
+      - mynetwork
+  data_controller:
+    build:
+      context: ..
+      dockerfile: deploy/data_controller/Dockerfile
+    image: planspiel-app/data_controller:latest
+    restart: always
+    environment:
+      PLANSPIEL_DATA_CONTROLLER_PORT: 5001
+      DATABASE_HOST: database
+      DATABASE_PORT: 3306
+    ports:
+      - "5001:5001"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:

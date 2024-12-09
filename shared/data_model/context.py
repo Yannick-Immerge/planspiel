@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import os
 from typing import Any
 
 from mysql.connector import connect
@@ -52,6 +54,16 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
         database=db_name
     )
     _DB_CURSOR = _DB_CONTEXT.cursor()
+
+
+def initialize_db_context_default():
+    initialize_db_context(
+        os.getenv("DATABASE_HOST"),
+        int(os.getenv("DATABASE_PORT")),
+        "mydatabase",
+        "admin",
+        "admin",
+    )
 
 
 def close_db_context():

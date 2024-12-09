@@ -1,4 +1,4 @@
-export const USE_LOCAL_SERVER = false;
+export const USE_LOCAL_SERVER = true;
 export const SERVER_ADDR_HTTP = USE_LOCAL_SERVER ? "http://localhost" : "http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com";
 
 
