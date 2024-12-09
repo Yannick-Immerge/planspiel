@@ -6,7 +6,7 @@ import { TbZzz } from "react-icons/tb"
 import { LuUserCheck, LuUserX } from 'react-icons/lu'
 import { FaPoo, FaStopwatch } from 'react-icons/fa'
 import TextEingabe from '../login/TextEingabe'
-import { viewUser } from '../api/game_controller_interface'
+import { configureSessionPrototype, setSessionStatus, viewUser } from '../api/game_controller_interface'
 import { getSessionUsername } from '../api/utility'
 import { UserView } from '../api/models'
 import { CreateUserButton, GetUsersInSession } from './DashboardHelpers'
@@ -29,7 +29,7 @@ function GetProperTimeAmountString(props: {time: Date}) {
 
 const page = () => {
     const [user, setUser] = useState<UserView | undefined>();
-
+    const [enoughUsers, setEnoughUsers] = useState(true);
     const [nachrichtenzeile, setNachrichtenzeile] = useState("")
 
     useEffect(() => {
@@ -56,7 +56,6 @@ const page = () => {
         fetchUserInfo();
     }, []);
 
-
     const startTime = GetProperTimeString({time: new Date(new Date().getTime() + 45*60000)});
     const [endeBurgerrat, setEndeBurgerrat] = useState(startTime)
     const [restzeit, setRestZeit] = useState("00:45:00")
@@ -71,9 +70,12 @@ const page = () => {
     useEffect(() => {
         const intervalID = setInterval(async () => {
                 await GetUsersInSession()
-                    .then((result) => setUserStati(result))
+                    .then((result) => {
+                        setUserStati(result.filter((n) => {return !n.userView.administrator}));
+                        setEnoughUsers(userStati.length > 9);
+                    })
                     .catch((error) => setNachrichtenzeile(error))
-            }, 5000);
+            }, 1000);
             
         return () => clearInterval(intervalID);
     }, []);
@@ -133,7 +135,7 @@ const page = () => {
 
                 <FilteredUserList userStati={userStati} desiredStatus={"disabled"} description="noch nicht vergebene Profile"/>
 
-                <CreateUserButton />
+                <CreateUserButton disabled={enoughUsers}/>
             </div>
             <div className="w-full ml-3 mr-3 bg-[#ffa2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
                 <div className="text-2xl">
@@ -144,7 +146,7 @@ const page = () => {
                 </div>
                 <div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {userStati.filter((n) => { n.userView.status != "disabled" && n.userView.assignedBuergerrat === 2;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
+                        {userStati.filter((n) => { return n.userView.status != "disabled" && n.userView.assignedBuergerrat === 2;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
                 <div>
@@ -191,17 +193,15 @@ const page = () => {
             <div onClick={() => {}} className="select-none mt-0 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full hover:bg-amber-500 active:mt-3 transition-all duration-100">
                 Bürgerräte Starten
             </div>
+            <div onClick={() => {configureSessionPrototype()}} className="select-none mt-0 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full hover:bg-amber-500 active:mt-3 transition-all duration-100">
+                Session aktivieren
+            </div>
         </div>
     </div>
   )
 }
 
-function GetIconFromStatus(props: {status: "online" | "offline" | "disabled"}) : React.ReactElement {
-    if (props.status === "online") return <LuUserX />
-    if (props.status === "offline") return <TbZzz />
-    if (props.status === "disabled") return <LuUserCheck />
-    else return <FaPoo />
-}
+
 
 function FilteredUserList(props: {userStati: UserViewIDWrapper[], desiredStatus: "online" | "offline" | "disabled", description: string}) {
     const filteredUsers = props.userStati.filter((n) => {return n.userView.status === props.desiredStatus});
@@ -223,11 +223,23 @@ function UserEntry(props: {user: UserView}) {
             <div className="absolute translate-y-[25%] pl-2">
                 {GetIconFromStatus({status: props.user.status})}
             </div>
-            <div className='pl-10'>
-                {props.user.username}
-            </div>
+            {GetFormatTextFromStatus({status: props.user.status, text: props.user.username})}
         </div>
     )
+}
+
+function GetIconFromStatus(props: {status: "online" | "offline" | "disabled"}) : React.ReactElement {
+    if (props.status === "disabled") return <LuUserX color="#aaaa"/>
+    if (props.status === "offline") return <TbZzz color="#aaaa"/>
+    if (props.status === "online") return <LuUserCheck color="#a3e635"/>
+    else return <FaPoo />
+}
+
+function GetFormatTextFromStatus(props: {status: "online" | "offline" | "disabled", text: string}) : React.ReactElement {
+    if (props.status === "disabled") return <div className='pl-10 text-[#aaaa]'>{props.text}</div>
+    if (props.status === "offline") return <div className='pl-10 text-[#aaaa]'>{props.text}</div>
+    if (props.status === "online") return <div className='pl-10 text-lime-400'>{props.text}</div>
+    else return <div className='pl-10 text-amber-400'>{"Disallowed Status!"}</div>
 }
 
 export default page

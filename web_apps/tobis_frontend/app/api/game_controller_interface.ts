@@ -63,6 +63,9 @@ export interface GetSessionMemberViewsResult {
 export interface SetSessionStatusResult {
 }
 
+export interface ConfigureSessionPrototypeResult {
+}
+
 
 function game_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
     return fetch_typesafe<T>(GAME_CONTROLLER_SERVER_ADDR_HTTP + endpoint, params);
@@ -118,7 +121,7 @@ export async function logIn(username: string, passwordHash: string) : Promise<Ap
     });
     if(result.data !== undefined) {
         sessionStorage.setItem("username", username);
-        sessionStorage.setItem("token", result.data?.token);
+        sessionStorage.setItem("token", result.data.token);
     }
     return result;
 }
@@ -233,6 +236,15 @@ export async function setSessionStatus(status: "active" | "disabled", overrideAd
             administratorUsername: localUsername,
             administratorToken: localToken,
             status: status
+        })
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function configureSessionPrototype(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ConfigureSessionPrototypeResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<ConfigureSessionPrototypeResult>("/sessions/configure_prototype", {
+            administratorUsername: localUsername,
+            administratorToken: localToken
         })
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }

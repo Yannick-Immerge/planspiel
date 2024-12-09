@@ -4,14 +4,15 @@ import { createUserForSession, getSessionMemberViews } from '../api/game_control
 import { UserView } from '../api/models'
 import { UserViewIDWrapper } from './page'
 
-export const CreateUserButton = () => {
+export const CreateUserButton = (props: {disabled: boolean}) => {
     const createNewUser = async () => {
+        if (props.disabled) return
         await createUserForSession()
     }
 
-    return <div onClick={createNewUser} className="w-[3rem] h-[3rem] rounded-full backdrop-blur-sm bg-[#8f82] hover:bg-[#dfd3] transition-all duration-150">
-        <FaUserPlus className="w-[1.5rem] h-[1.5rem] translate-y-[50%] translate-x-[50%]"/>
-    </div>
+    return <button disabled={props.disabled} onClick={createNewUser} className="w-[3rem] h-[3rem] rounded-full disabled:bg-[#fff1] backdrop-blur-sm bg-[#8f82] hover:bg-[#dfd3] transition-all duration-150">
+        <FaUserPlus className="w-[1.5rem] h-[1.5rem] translate-x-[50%]"/>
+    </button>
 }
 
 export async function GetUsersInSession() : Promise<UserViewIDWrapper[]>  {
