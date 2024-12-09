@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import CredentialsChecker, { CheckSessionCode } from './CredentialsChecker';
 import TextEingabe from './TextEingabe';
 import { FaLock, FaUser } from 'react-icons/fa';
 import { MdGroups2 } from 'react-icons/md';
+import { createSession, logIn } from '../api/game_controller_interface';
 
 async function SHA265(props: {inputString: string}) : Promise<string> {
     // Let's pretend every User has their Suite Name Hashed instead of their Passwords.
@@ -18,9 +19,10 @@ async function SHA265(props: {inputString: string}) : Promise<string> {
 }
 
 const CredentialsInput = () => {
+
     const [username, setUsername] = useState("");
     const [enteredPassword, setEnteredPassword] = useState("");
-    const [ruckmeldung, setRuckmeldung] = useState("");
+    const [ruckmeldung, setRuckmeldung] = useState("");    
 
     const [enteredSessionCode, setEnteredSessionKey] = useState("");
 
@@ -43,6 +45,19 @@ const CredentialsInput = () => {
                                 } else {
                                     setRuckmeldung("Benutzername oder Passwort inkorrekt.");
                                 }})
+    }
+
+    const submitUsernameAttempt = async (e: FormEvent<HTMLFormElement>) => {
+        
+            e.preventDefault();
+            const response = await createSession(confirmedSessionCode, enteredPassword); // TODO: Plain Text password
+            if (response.ok) {
+                setRuckmeldung(`Successfully created Session ${response.data?.sessionId}. Your username is ${response.data?.administratorUsername}. REMEMBER!!`);
+            } else {
+                setRuckmeldung(`Error: ${response.statusText}`);
+            }
+        
+        
     }
 
     const submitSessionKeyAttempt = async () => {
