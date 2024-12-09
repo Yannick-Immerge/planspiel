@@ -1,5 +1,5 @@
 import {ApiResult, SERVER_ADDR_HTTP, fetch_typesafe, mapApiResult, fetch_with_auth} from "@/app/api/utility";
-import {Session, SessionView, UserView} from "@/app/api/models";
+import {GamePhase, GameState, Session, SessionView, UserView} from "@/app/api/models";
 
 export const GAME_CONTROLLER_SERVER_PORT = "5002";
 export const GAME_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + GAME_CONTROLLER_SERVER_PORT + "/game";
@@ -66,6 +66,17 @@ export interface SetSessionStatusResult {
 export interface ConfigureSessionPrototypeResult {
 }
 
+export interface GetGameStateResult {
+    gameState: GameState
+}
+
+export interface TransitionGameStateResult {
+}
+
+export interface ReadyToTransitionGameStateResult {
+    readyToTransition: boolean
+}
+
 
 function game_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
     return fetch_typesafe<T>(GAME_CONTROLLER_SERVER_ADDR_HTTP + endpoint, params);
@@ -119,7 +130,7 @@ export async function logIn(username: string, passwordHash: string) : Promise<Ap
         username: username,
         passwordHash: passwordHash
     });
-    if(result.data !== undefined) {
+    if(result.data !== null) {
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("token", result.data.token);
     }
@@ -180,7 +191,7 @@ export async function viewSession(overrideAdministratorUsername?: string, overri
 }
 
 export async function isSessionActive(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<IsSessionActiveResult>> {
-    return mapApiResult(viewSession(overrideAdministratorUsername, overrideAdministratorToken), (data: ViewSessionResult | undefined) => ({
+    return mapApiResult(viewSession(overrideAdministratorUsername, overrideAdministratorToken), (data: ViewSessionResult | null) => ({
         sessionActive: data?.sessionView.status === "active"
     }));
 }
@@ -199,7 +210,7 @@ export async function getSessionMemberViews(overrideAdministratorUsername?: stri
     const memberUsernames = getSessionResult.data?.session.memberUsernames;
     if(memberUsernames === undefined) {
         return {
-            data: undefined,
+            data: null,
             ok: false,
             authenticationOk: getSessionResult.authenticationOk,
             statusText: `Failed querying usernames: ${getSessionResult.statusText}.`
@@ -209,9 +220,9 @@ export async function getSessionMemberViews(overrideAdministratorUsername?: stri
     let memberViews = [];
     for (const username of memberUsernames) {
         const viewMemberResult = await viewUser(username);
-        if(viewMemberResult.data === undefined) {
+        if(viewMemberResult.data === null) {
             return {
-                data: undefined,
+                data: null,
                 ok: false,
                 authenticationOk: viewMemberResult.authenticationOk,
                 statusText: `Failed quering info about user ${username}: ${viewMemberResult.statusText}.`
@@ -246,5 +257,37 @@ export async function configureSessionPrototype(overrideAdministratorUsername?: 
             administratorUsername: localUsername,
             administratorToken: localToken
         })
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+
+// Game State Management
+
+export async function getGameState(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetGameStateResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<GetGameStateResult>("game_state/get", {
+            administratorUsername: localUsername,
+            administratorToken: localToken
+        })
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function readyToTransitionGameState(targetPhase: GamePhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ReadyToTransitionGameStateResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<ReadyToTransitionGameStateResult>("/game_state/ready_to_transition", {
+            targetPhase: targetPhase,
+            administratorUsername: localUsername,
+            administratorToken: localToken
+        });
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function transitionGameState(targetPhase: GamePhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<TransitionGameStateResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<TransitionGameStateResult>("/game_state/transition", {
+            targetPhase: targetPhase,
+            administratorUsername: localUsername,
+            administratorToken: localToken
+        });
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }

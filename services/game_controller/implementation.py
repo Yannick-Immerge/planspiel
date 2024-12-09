@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER
+from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER, GAME_STATE_MANAGER
 from shared.architecture.rest import AuthError
 from shared.utility.names import generate_name
 
@@ -121,4 +121,28 @@ def impl_sessions_configure_prototype(administrator_username: str, administrator
     TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
     session_id = USER_MANAGER.get_session_if_admin(administrator_username)
     SESSION_MANAGER.configure_prototype(session_id)
+    return {}
+
+
+def impl_game_state_get(administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "gameState": GAME_STATE_MANAGER.get_game_state(game_state_id)
+    }
+
+def impl_game_state_ready_to_transition(target_phase: str, administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "readyToTransition": GAME_STATE_MANAGER.ready_to_transition(game_state_id, target_phase)
+    }
+
+def impl_game_state_transition(target_phase: str, administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    GAME_STATE_MANAGER.transition(game_state_id, target_phase)
     return {}
