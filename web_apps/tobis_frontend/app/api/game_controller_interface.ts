@@ -9,6 +9,10 @@ export interface CreateUserResult {
     username: string
 }
 
+export interface HasUserPasswordResult {
+    hasPassword: boolean
+}
+
 export interface ConfigureUserResult {
 }
 
@@ -68,15 +72,19 @@ function game_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise
 // User Management
 
 
-export async function createUserForSession(sessionId: string, passwordHash: string, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<CreateUserResult>> {
+export async function createUserForSession(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<CreateUserResult>> {
     return fetch_with_auth((localUsername, localToken) => {
         return game_fetch<CreateUserResult>("/users/create", {
             administratorUsername: localUsername,
-            administratorToken: localToken,
-            sessionId: sessionId,
-            passwordHash: passwordHash
+            administratorToken: localToken
         });
     }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function hasUserPassword(username: string) : Promise<ApiResult<HasUserPasswordResult>>{
+    return game_fetch<HasUserPasswordResult>("/users/has_password", {
+        username: username
+    })
 }
 
 export async function configureUser(targetUsername: string, assignedRoleId: string, assignedBuergerrat: number, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) {
@@ -150,36 +158,41 @@ export async function createSession(productKey: string, administratorPasswordHas
     });
 }
 
-export async function existsSession(sessionId: string) : Promise<ApiResult<ExistsSessionResult>> {
-    return game_fetch<ExistsSessionResult>("/sessions/exists", {
-        sessionId: sessionId
-    });
-}
-
-export async function viewSession(sessionId: string) : Promise<ApiResult<ViewSessionResult>> {
-    return game_fetch<ViewSessionResult>("/sessions/view", {
-        sessionId: sessionId
-    });
-}
-
-export async function isSessionActive(sessionId: string) : Promise<ApiResult<IsSessionActiveResult>> {
-    return mapApiResult(viewSession(sessionId), (data: ViewSessionResult | undefined) => ({
-        sessionActive: data?.sessionView.status === "active"
-    }));
-}
-
-export async function getSession(sessionId: string, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetSessionResult>> {
+export async function existsSession(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ExistsSessionResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<GetSessionResult>("/sessions/get", {
-            sessionId: sessionId,
+        return game_fetch<ExistsSessionResult>("/sessions/exists", {
             administratorUsername: localUsername,
             administratorToken: localToken
         });
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }
 
-export async function getSessionMemberViews(sessionId: string, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetSessionMemberViewsResult>> {
-    const getSessionResult = await getSession(sessionId, overrideAdministratorUsername, overrideAdministratorToken);
+export async function viewSession(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ViewSessionResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<ViewSessionResult>("/sessions/view", {
+            administratorUsername: localUsername,
+            administratorToken: localToken
+        });
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function isSessionActive(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<IsSessionActiveResult>> {
+    return mapApiResult(viewSession(overrideAdministratorUsername, overrideAdministratorToken), (data: ViewSessionResult | undefined) => ({
+        sessionActive: data?.sessionView.status === "active"
+    }));
+}
+
+export async function getSession(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetSessionResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<GetSessionResult>("/sessions/get", {
+            administratorUsername: localUsername,
+            administratorToken: localToken
+        });
+    }, overrideAdministratorUsername, overrideAdministratorToken);
+}
+
+export async function getSessionMemberViews(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetSessionMemberViewsResult>> {
+    const getSessionResult = await getSession(overrideAdministratorUsername, overrideAdministratorToken);
     const memberUsernames = getSessionResult.data?.session.memberUsernames;
     if(memberUsernames === undefined) {
         return {
@@ -214,10 +227,9 @@ export async function getSessionMemberViews(sessionId: string, overrideAdministr
     };
 }
 
-export async function setSessionStatus(sessionId: string, status: "active" | "disabled", overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<SetSessionStatusResult>> {
+export async function setSessionStatus(status: "active" | "disabled", overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<SetSessionStatusResult>> {
     return fetch_with_auth((localUsername, localToken) => {
         return game_fetch<SetSessionStatusResult>("/sessions/status", {
-            sessionId: sessionId,
             administratorUsername: localUsername,
             administratorToken: localToken,
             status: status

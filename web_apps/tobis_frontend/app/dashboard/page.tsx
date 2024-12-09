@@ -9,18 +9,11 @@ import TextEingabe from '../login/TextEingabe'
 import { viewUser } from '../api/game_controller_interface'
 import { getSessionUsername } from '../api/utility'
 import { UserView } from '../api/models'
+import { CreateUserButton, GetUsersInSession } from './DashboardHelpers'
 
-interface UserStatus {
-    userID: number,
-    name: string,
-    burger: number,
-    status: number, // 0 - No User Attached   1 - User Attached   2 - User Attached & Online
-}
-
-interface User {
-    id: number,
-    username: string,
-    address: {suite: string},
+export interface UserViewIDWrapper {
+    userView: UserView
+    id: number
 }
 
 const TIME_REGEX = /^[0-9]{2}\:[0-9]{2}$/;
@@ -47,7 +40,7 @@ const page = () => {
         }
         const fetchUserInfo = async () => {
             let response = await viewUser(username);
-            if (response.data === undefined) {
+            if (!response.data) {
                 window.location.replace("../login");
                 return;
             }
@@ -72,13 +65,19 @@ const page = () => {
         setEndeBurgerrat(event.target.value)
     }
 
-    const users : UserStatus[] = [{name: "", userID: 0, status: 0, burger: 0}];
+    const users : UserViewIDWrapper[] = [{userView: {username: "AusgangsUser", status: "disabled", assignedRoleId: undefined, assignedBuergerrat: undefined, administrator: false}, id: 0}];
     const [userStati, setUserStati] = useState(users)
 
-    const refreshUserStati = async () => {
-        await MockupGetUserIDs()
-            .then((result) => setUserStati(result))
-    }
+    useEffect(() => {
+        const intervalID = setInterval(async () => {
+                await GetUsersInSession()
+                    .then((result) => setUserStati(result))
+                    .catch((error) => setNachrichtenzeile(error))
+            }, 5000);
+            
+        return () => clearInterval(intervalID);
+    }, []);
+    
 
     const reformatEndeBurgerrat = async () => {
         if (TIME_REGEX.test(endeBurgerrat)) {
@@ -117,8 +116,6 @@ const page = () => {
         )
     }
 
-    refreshUserStati();
-
     const handleEnter = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter') reformatEndeBurgerrat()
     }
@@ -130,11 +127,13 @@ const page = () => {
         </div>
         <div className="mt-5 flex w-full">
             <div className="w-full ml-6 mr-3">
-                <FilteredUserList userStati={userStati} desiredStatus={2} description="benutzer online"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"online"} description="benutzer online"/>
 
-                <FilteredUserList userStati={userStati} desiredStatus={1} description="benutzer offline"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"offline"} description="benutzer offline"/>
 
-                <FilteredUserList userStati={userStati} desiredStatus={0} description="noch nicht vergebene Profile"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"disabled"} description="noch nicht vergebene Profile"/>
+
+                <CreateUserButton />
             </div>
             <div className="w-full ml-3 mr-3 bg-[#ffa2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
                 <div className="text-2xl">
@@ -145,7 +144,7 @@ const page = () => {
                 </div>
                 <div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {userStati.filter((n) => { return n.status != 0 && n.burger === 0;}).map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {userStati.filter((n) => { n.userView.status != "disabled" && n.userView.assignedBuergerrat === 2;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
                 <div>
@@ -161,7 +160,7 @@ const page = () => {
                 </div>
                 <div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {userStati.filter((n) => { return n.status != 0 && n.burger === 1;}).map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {userStati.filter((n) => { return n.userView.status != "disabled" && n.userView.assignedBuergerrat === 1;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
                 <div>
@@ -197,35 +196,35 @@ const page = () => {
   )
 }
 
-function GetIconFromStatus(props: {status: number}) : React.ReactElement {
-    if (props.status == 0) return <LuUserX />
-    if (props.status == 1) return <TbZzz />
-    if (props.status == 2) return <LuUserCheck />
+function GetIconFromStatus(props: {status: "online" | "offline" | "disabled"}) : React.ReactElement {
+    if (props.status === "online") return <LuUserX />
+    if (props.status === "offline") return <TbZzz />
+    if (props.status === "disabled") return <LuUserCheck />
     else return <FaPoo />
 }
 
-function FilteredUserList(props: {userStati: UserStatus[], desiredStatus: number, description: string}) {
-    const filteredUsers = props.userStati.filter((n) => {return n.status === props.desiredStatus});
+function FilteredUserList(props: {userStati: UserViewIDWrapper[], desiredStatus: "online" | "offline" | "disabled", description: string}) {
+    const filteredUsers = props.userStati.filter((n) => {return n.userView.status === props.desiredStatus});
     return (
         <div className="bg-[#faf2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
                     <div>
                         {filteredUsers.length} {props.description}{filteredUsers.length == 0? "" : ":"}
                     </div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {filteredUsers.map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {filteredUsers.map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
     )
 }
 
-function UserEntry(props: {user: UserStatus}) {
+function UserEntry(props: {user: UserView}) {
     return (
         <div className="text-left flex">
             <div className="absolute translate-y-[25%] pl-2">
                 {GetIconFromStatus({status: props.user.status})}
             </div>
             <div className='pl-10'>
-                {props.user.name}
+                {props.user.username}
             </div>
         </div>
     )
