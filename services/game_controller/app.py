@@ -34,7 +34,12 @@ def game_test():
 @app.route("/game/users/create", methods=["POST"])
 def users_create():
     params = request.get_json()
-    return safe_call(impl_users_create, params["administratorUsername"], params["administratorToken"], params["sessionId"], params["passwordHash"])
+    return safe_call(impl_users_create, params["administratorUsername"], params["administratorToken"])
+
+@app.route("/game/users/has_password", methods=["POST"])
+def users_has_password():
+    params = request.get_json()
+    return safe_call(impl_users_has_password, params["username"])
 
 @app.route("/game/users/configure", methods=["POST"])
 def users_configure():
@@ -80,26 +85,25 @@ def sessions_create():
 @app.route("/game/sessions/exists", methods=["POST"])
 def sessions_exists():
     params = request.get_json()
-    return safe_call(impl_sessions_exists, params["sessionId"])
+    return safe_call(impl_sessions_exists, params["administratorUsername"], params["administratorToken"])
 
 
 @app.route("/game/sessions/view", methods=["POST"])
 def sessions_view():
     params = request.get_json()
-    return safe_call(impl_sessions_view, params["sessionId"])
+    return safe_call(impl_sessions_view, params["administratorUsername"], params["administratorToken"])
 
 
 @app.route("/game/sessions/get", methods=["POST"])
 def sessions_get():
     params = request.get_json()
-    return safe_call(impl_sessions_get, params["sessionId"], params["administratorUsername"], params["administratorToken"])
+    return safe_call(impl_sessions_get, params["administratorUsername"], params["administratorToken"])
 
 
 @app.route("/game/sessions/status", methods=["POST"])
 def sessions_status():
     params = request.get_json()
-    return safe_call(impl_sessions_status, params["sessionId"], params["administratorUsername"],
-                         params["administratorToken"], params["status"])
+    return safe_call(impl_sessions_status, params["administratorUsername"], params["administratorToken"], params["status"])
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 export const USE_LOCAL_SERVER = true;
-export const SERVER_ADDR_HTTP = USE_LOCAL_SERVER ? "http://localhost" : "http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com";
+export const SERVER_ADDR_HTTP = USE_LOCAL_SERVER ? "http://localhost" : "ec2-34-228-111-6.compute-1.amazonaws.com";
 
 
 // Api result object

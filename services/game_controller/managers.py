@@ -37,6 +37,13 @@ class UserManager:
         n = execute_query(query)[0][0]
         return n > 0
 
+    def has_password(self, username: str) -> bool:
+        if not self.has_user(username):
+            raise NameError(f"There is no user with username: {username}.")
+        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash IS NOT NULL"
+        n = execute_query(query)[0][0]
+        return n > 0
+
     def is_user_admin(self, username: str) -> bool:
         query = (f"SELECT COUNT(*) FROM User INNER JOIN Session "
                  f"ON User.member_of = Session.session_id AND User.username = Session.administrator "
@@ -51,19 +58,23 @@ class UserManager:
         n = execute_query(query)[0][0]
         return n > 0
 
-    def add_user(self, username: str, password_hash: str, member_of: str):
+    def add_user(self, username: str, password_hash: str | None, member_of: str):
         if self.has_user(username):
             raise NameError(f"A user with given username: {username} already exists.")
         query = (f"INSERT INTO User(username, password_hash, member_of) "
                  f"VALUES ({_dbs(username)}, {_dbs(password_hash)}, {_dbs(member_of)});")
         execute_post_query(PostQuery(query, ()))
 
-    def verify_user_password(self, username: str, password_hash: str) -> bool:
+    def verify_or_create_user_password(self, username: str, password_hash: str) -> bool:
         if not self.has_user(username):
             raise NameError(f"No user with username: {username}")
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash = {_dbs(password_hash)};"
-        n = execute_query(query)[0][0]
-        return n > 0
+        if self.has_password(username):
+            query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash = {_dbs(password_hash)};"
+            n = execute_query(query)[0][0]
+            return n > 0
+        else:
+            self.update_user_password(username, password_hash)
+            return True
 
     def configure_user(self, username: str, plays_as: str, buergerrat: int):
         if not self.has_user(username):
@@ -93,6 +104,15 @@ class UserManager:
             "assignedBuergerrat": assigned_buergerrat,
             "administrator": self.is_user_admin(username)
         }
+
+    def get_session_if_admin(self, username: str) -> str:
+        if not self.has_user(username):
+            raise NameError(f"No user with username: {username}")
+        if not self.is_user_admin(username):
+            raise RuntimeError(f"User {username} is not the administrator of this session.")
+        query = f"SELECT member_of FROM User WHERE username = {_dbs(username)}"
+        return execute_query(query)[0][0]
+
 
 
 USER_MANAGER: UserManager = UserManager()
@@ -152,10 +172,10 @@ class SessionManager:
         execute_post_query(PostQuery(query, ()))
         USER_MANAGER.add_user(administrator_username, administrator_password_hash, session_id)
 
-    def add_session_member(self, session_id: str, username: str, password_hash: str):
+    def add_session_member(self, session_id: str, username: str):
         if not self.has_session(session_id):
             raise NameError(f"There is no session with id: {session_id}.")
-        USER_MANAGER.add_user(username, password_hash, session_id)
+        USER_MANAGER.add_user(username, None, session_id)
 
     def list_session_members(self, session_id: str) -> list[str]:
         if not self.has_session(session_id):
@@ -213,7 +233,7 @@ class TokenManager:
         if username in self._user_tokens:
             self._user_tokens.pop(username)
 
-        if not USER_MANAGER.verify_user_password(username, password_hash):
+        if not USER_MANAGER.verify_or_create_user_password(username, password_hash):
             raise ValueError("Invalid Password.")
 
         token = str(uuid.uuid4())

@@ -44,7 +44,7 @@ CREATE TABLE User(
     username VARCHAR(100) PRIMARY KEY,
     member_of VARCHAR(100) NOT NULL,
     plays_as VARCHAR(100) NULL,
-    password_hash VARCHAR(500) NOT NULL,
+    password_hash VARCHAR(500) NULL,
     buergerrat INT NULL,
     FOREIGN KEY (member_of) REFERENCES Session(session_id),
     FOREIGN KEY (plays_as) REFERENCES RoleTable(name)
