@@ -17,6 +17,9 @@ export interface UserView {
 export interface SessionView {
     id: string,
     status: "active" | "inactive"
+    state: {
+        phase: string
+    }
 }
 
 /**

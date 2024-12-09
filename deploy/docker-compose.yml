@@ -12,6 +12,17 @@ services:
       - "3306:3306"
     networks:
       - mynetwork
+  database_populator:
+    build:
+      context: ..
+      dockerfile: deploy/database_populator/Dockerfile
+    image: planspiel-app/database_populator:latest
+    restart: no
+    environment:
+      DATABASE_HOST: database
+      DATABASE_PORT: 3306
+    networks:
+      - mynetwork
   data_controller:
     build:
       context: ..
@@ -24,6 +35,20 @@ services:
       DATABASE_PORT: 3306
     ports:
       - "5001:5001"
+    networks:
+      - mynetwork
+  game_controller:
+    build:
+      context: ..
+      dockerfile: deploy/game_controller/Dockerfile
+    image: planspiel-app/game_controller:latest
+    restart: always
+    environment:
+      PLANSPIEL_GAME_CONTROLLER_PORT: 5002
+      DATABASE_HOST: database
+      DATABASE_PORT: 3306
+    ports:
+      - "5002:5002"
     networks:
       - mynetwork
 

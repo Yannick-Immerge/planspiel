@@ -9,7 +9,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-from shared.data_model.context import initialize_db_context, close_db_context
+from shared.data_model.context import initialize_db_context_default, close_db_context
 from prototype_roles.interface import post_all
 from scripts.utility import print_f, print_err, print_suc
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # Establish database connection
     print("Establishing connection to database...")
     try:
-        initialize_db_context("localhost", 3306, "mydatabase", "admin", "admin")
+        initialize_db_context_default()
         print_suc("Initialized connection successfully.")
     except:
         print_err("The database is currently not available. More info:")
