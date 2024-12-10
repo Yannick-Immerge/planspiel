@@ -4,16 +4,16 @@ export const SERVER_ADDR_HTTP = USE_LOCAL_SERVER ? "http://localhost" : "ec2-34-
 
 // Api result object
 export interface ApiResult<T> {
-    data: T | undefined;
+    data: T | null;
     ok: boolean;
     authenticationOk: boolean;
     statusText: string;
 }
 
-export async function mapApiResult<T, V>(result: Promise<ApiResult<T>>, map: (data: T | undefined) => V | undefined) : Promise<ApiResult<V>> {
+export async function mapApiResult<T, V>(result: Promise<ApiResult<T>>, map: (data: T | null) => V | null) : Promise<ApiResult<V>> {
     const obj = await result;
     return {
-        data: (obj.ok) ? undefined : map(obj.data),
+        data: (obj.ok) ? null : map(obj.data),
         ok: obj.ok,
         authenticationOk: obj.authenticationOk,
         statusText: obj.statusText
@@ -21,27 +21,27 @@ export async function mapApiResult<T, V>(result: Promise<ApiResult<T>>, map: (da
 }
 
 
-export function getSessionUsername() : string | undefined {
+export function getLocalUsername() : string | null {
     const sessionUsername = sessionStorage.getItem("username");
-    return sessionUsername === null ? undefined : sessionUsername;
+    return sessionUsername === null ? null : sessionUsername;
 }
 
-export function getSessionToken() : string | undefined {
+export function getLocalToken() : string | null {
     const sessionUsername = sessionStorage.getItem("token");
-    return sessionUsername === null ? undefined : sessionUsername;
+    return sessionUsername === null ? null : sessionUsername;
 }
 
 
 export async function fetch_with_auth<T>(auth_cb: (localUsername: string, localToken: string) => Promise<ApiResult<T>>, overrideUsername? : string, overrideToken? : string, authFailMessage?: string) : Promise<ApiResult<T>> {
-    let username = overrideUsername;
-    let token = overrideToken;
-    if(username === undefined){
-        username = getSessionUsername();
+    let username = overrideUsername === undefined ? null : overrideUsername;
+    let token = overrideToken === undefined ? null : overrideToken;
+    if(username === null){
+        username = getLocalUsername();
     }
-    if(token === undefined){
-        token = getSessionToken();
+    if(token === null){
+        token = getLocalToken();
     }
-    if(username === undefined || token === undefined){
+    if(username === null || token === null){
         return auth_fail<T>(authFailMessage);
     }
     return auth_cb(username, token);
@@ -54,9 +54,21 @@ export async function auth_fail<T>(message?: string) : Promise<ApiResult<T>> {
         message = "No access token present. Log in before using sensitive API endpoints.";
     }
     return {
-        data: undefined,
+        data: null,
         ok: false,
         authenticationOk: false,
+        statusText: message
+    };
+}
+
+export async function fail<T>(message?: string) : Promise<ApiResult<T>> {
+    if(message === undefined) {
+        message = "No error description.";
+    }
+    return {
+        data: null,
+        ok: false,
+        authenticationOk: true,
         statusText: message
     };
 }
@@ -77,7 +89,7 @@ export async function fetch_typesafe<T>(url: string, params?: Record<string, any
 
     if(!response.ok) {
         return {
-            data: undefined,
+            data: null,
             ok: false,
             authenticationOk: false,
             statusText: response.statusText

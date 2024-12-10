@@ -10,6 +10,9 @@ sys.path.append(str(_ROOT_DIR))
 from services.data_controller.implementation import impl_roles_list, impl_get_route
 from services.data_controller.managers import DataType
 from shared.architecture.rest import safe_call
+from shared.data_model.context import initialize_db_context_default, initialize_db_context
+
+initialize_db_context_default()
 
 app = Flask(__name__)
 

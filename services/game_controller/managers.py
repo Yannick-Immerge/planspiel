@@ -8,8 +8,6 @@ from shared.architecture.rest import AuthError
 from shared.data_model.context import initialize_db_context_default, execute_query, PostQuery, \
     execute_post_query, get_last_row_id
 
-initialize_db_context_default()
-
 
 def _dbs(v: str | None):
     if v is None:
@@ -28,6 +26,15 @@ class UserStatus(Enum):
     ONLINE = "online"
     OFFLINE = "offline"
     DISABLED = "disabled"
+
+
+class GamePhase(Enum):
+    CONFIGURING = "configuring"
+    IDENTIFICATION_1 = "identification1"
+    DISCUSSION_1 = "discussion1"
+    IDENTIFICATION_2 = "identification2"
+    DISCUSSION_2 = "discussion2"
+    DEBRIEFING = "debriefing"
 
 
 class UserManager:
@@ -83,6 +90,8 @@ class UserManager:
             raise RuntimeError(f"Cannot configure administrator: {username}: Only members can be assigned a role.")
         if self.is_user_configured(username):
             raise RuntimeError(f"Cannot configure user: {username}: Already assigned a role.")
+        if buergerrat != 1 and buergerrat != 2:
+            raise ValueError("Buergerrat must be 1 or 2.")
         query = f"UPDATE User SET plays_as = {_dbs(plays_as)}, buergerrat = {_dbi(buergerrat)} WHERE username = {_dbs(username)};"
         execute_post_query(PostQuery(query, ()))
 
@@ -110,7 +119,7 @@ class UserManager:
             raise NameError(f"No user with username: {username}")
         if not self.is_user_admin(username):
             raise RuntimeError(f"User {username} is not the administrator of this session.")
-        query = f"SELECT member_of FROM User WHERE username = {_dbs(username)}"
+        query = f"SELECT member_of FROM User WHERE username = {_dbs(username)};"
         return execute_query(query)[0][0]
 
 
@@ -119,10 +128,103 @@ USER_MANAGER: UserManager = UserManager()
 
 
 class GameStateManager:
+    def has_game_state(self, game_state_id: int) -> bool:
+        query = f"SELECT COUNT(*) FROM GameState WHERE id = {_dbi(game_state_id)};"
+        n = execute_query(query)[0][0]
+        return n > 0
+
     def add_game_state(self) -> int:
-        query = "INSERT INTO GameState(phase) VALUES (phase)"
+        query = f"INSERT INTO GameState(phase) VALUES ({_dbs(GamePhase.CONFIGURING.value)});"
         execute_post_query(PostQuery(query, ()))
         return get_last_row_id()
+
+    def get_controlled_parameters(self, game_state_id: int, buergerrat: int) -> list:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = (f"SELECT parameter FROM controls "
+                 f"WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};")
+        return [row[0] for row in execute_query(query)]
+
+    def get_buergerraete(self, game_state_id: int) -> tuple[dict, dict]:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+
+        return ({
+            "index": 1,
+            "parameters": self.get_controlled_parameters(game_state_id, 1),
+            "configuration1": None,
+            "configuration2": None
+        }, {
+            "index": 2,
+            "parameters": self.get_controlled_parameters(game_state_id, 2),
+            "configuration1": None,
+            "configuration2": None
+        })
+
+
+    def get_game_state(self, game_state_id: int):
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0][0]
+        buergerrat1, buergerrat2 = self.get_buergerraete(game_state_id)
+        return {
+            "id": game_state_id,
+            "buergerrat1": buergerrat1,
+            "buergerrat2": buergerrat2,
+            "phase": phase
+        }
+
+    def are_users_configured(self, game_state_id: int) -> bool:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = f"SELECT session_id FROM Session WHERE game_state = {_dbi(game_state_id)};"
+        session_id = execute_query(query)[0][0]
+        query = (f"SELECT COUNT(*) "
+                 f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
+                 f"WHERE Session.session_id = {_dbs(session_id)} AND User.plays_as IS NULL AND User.username != Session.administrator;")
+        n = execute_query(query)[0][0]
+        return n == 0
+
+    def are_buergerraete_configured(self, game_state_id: int) -> bool:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        params1 = self.get_controlled_parameters(game_state_id, 1)
+        params2 = self.get_controlled_parameters(game_state_id, 2)
+        return len(params1) > 0 and len(params2) > 0
+
+    def ready_to_transition(self, game_state_id: int, target_phase: str):
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0][0]
+        if phase == GamePhase.CONFIGURING.value:
+            if target_phase != GamePhase.IDENTIFICATION_1.value:
+                return False
+            return self.are_users_configured(game_state_id) and self.are_buergerraete_configured(game_state_id)
+        else:
+            raise NotImplementedError("Other phase transitions not yet implemented.")
+
+    def transition(self, game_state_id: int, target_phase: str):
+        if not self.ready_to_transition(game_state_id, target_phase):
+            raise RuntimeError("Not yet ready to transition (Are all users configured?).")
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0][0]
+        if phase == GamePhase.CONFIGURING.value and target_phase == GamePhase.IDENTIFICATION_1.value:
+            query = f"UPDATE GameState SET phase = {_dbs(target_phase)} WHERE id = {_dbi(game_state_id)};"
+            execute_post_query(PostQuery(query, ()))
+        else:
+            raise NotImplementedError("Other phase transitions not yet implemented.")
+
+    def add_parameter_to_buergerrat(self, game_state_id: int, buergerrat: int, parameter: str):
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        if buergerrat != 1 and buergerrat != 2:
+            raise ValueError("Buergerrat must be 1 or 2.")
+        query = (f"INSERT INTO controls(game_state, parameter, buergerrat) VALUES "
+                 f"({_dbi(game_state_id)}, {_dbi(buergerrat)}, {_dbs(parameter)});")
+        execute_post_query(PostQuery(query, ()))
+
 
 GAME_STATE_MANAGER: GameStateManager = GameStateManager()
 
@@ -209,17 +311,25 @@ class SessionManager:
         }
 
     def get_session(self, session_id: str):
-        query = f"SELECT administrator, session_status FROM Session WHERE session_id = {_dbs(session_id)};"
-        administrator_username, status = execute_query(query)[0]
+        query = f"SELECT administrator, session_status, game_state FROM Session WHERE session_id = {_dbs(session_id)};"
+        administrator_username, status, game_state = execute_query(query)[0]
         member_usernames = self.list_session_members(session_id)
         return {
             "id": session_id,
             "administratorUsername": administrator_username,
             "status": execute_query(query)[0][0],
-            "memberUsernames": member_usernames
+            "memberUsernames": member_usernames,
+            "gameState": game_state
         }
 
+    def get_game_state_id(self, session_id: str) -> int:
+        if not self.has_session(session_id):
+            raise NameError(f"There is no session with session id: {session_id}.")
+        query = f"SELECT game_state FROM Session WHERE session_id = {_dbs(session_id)};"
+        return execute_query(query)[0][0]
+
     def configure_prototype(self, session_id: str):
+        # Configure Users
         session = self.get_session(session_id)
         if len(session["memberUsernames"]) != 11:
             raise ValueError("For the prototype configuration a session needs exactly 10 users and one administrator.")
@@ -233,6 +343,9 @@ class SessionManager:
             buergerrat = int(off / 5) + 1
             USER_MANAGER.configure_user(username, role_name, buergerrat)
             off += 1
+
+        # Configure Bürgerräte
+        # GAME_STATE_MANAGER.add_parameter_to_buergerrat()         TODO: Populate & Implement Parameters
 
 
 SESSION_MANAGER: SessionManager = SessionManager()

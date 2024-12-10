@@ -6,8 +6,8 @@
 export interface UserView {
     username: string,
     status: "online" | "offline" | "disabled",
-    assignedRoleId: string | undefined,
-    assignedBuergerrat: number | undefined,
+    assignedRoleId: string | null,
+    assignedBuergerrat: number | null,
     administrator: boolean
 }
 
@@ -17,9 +17,6 @@ export interface UserView {
 export interface SessionView {
     id: string,
     status: "active" | "inactive"
-    state: {
-        phase: string
-    }
 }
 
 /**
@@ -30,6 +27,30 @@ export interface Session {
     administratorUsername: string,
     status: "active" | "inactive",
     memberUsernames: string[]
+    gameState: number
+}
+
+/**
+ * A Bürgerrat object.
+ */
+export interface Buergerrat {
+    parameters: string[]
+    configuration1: Record<string, string> | null
+    configuration2: Record<string, string> | null
+}
+
+
+export type GamePhase = "configuring" | "identification1" | "discussion1" | "identification2" | "discussion2" | "debriefing"
+
+
+/**
+ * A game state object.
+ */
+export interface GameState {
+    id: number,
+    buergerrat1: Buergerrat,
+    buergerrat2: Buergerrat,
+    phase: GamePhase
 }
 
 
@@ -45,12 +66,20 @@ export interface Role {
     scenarios: string[]
 }
 
+export interface RoleMetadata {
+    name: string,
+    age: number,
+    nationality: string,
+    address: string,
+    height: number
+}
+
 /**
  * A Resource object.
  */
 export interface Resource {
     identifier: string,
-    contentType: "picture" | "article" | "diary"
+    contentType: "picture" | "article" | "diary" | "metadata"
 }
 
 /**

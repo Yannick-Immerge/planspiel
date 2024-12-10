@@ -59,11 +59,12 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
 def initialize_db_context_default():
     env_host = os.getenv("DATABASE_HOST")
     env_port = os.getenv("DATABASE_PORT")
+    env_user = os.getenv("DATABASE_USER")
     initialize_db_context(
        "localhost" if env_host is None else env_host,
         3306 if env_port is None else int(env_port),
         "mydatabase",
-        "admin",
+        "admin" if env_user is None else env_user,
         "admin",
     )
 
@@ -76,21 +77,41 @@ def commit_db_context():
     _current_context().commit()
 
 
+def assure_connection(retries : int = 3):
+    n = 0
+    while n <= retries:
+        if _DB_CONTEXT.is_connected():
+            return
+        try:
+            print("Try reconnect!")
+            _DB_CONTEXT.reconnect()
+        finally:
+            n += 1
+    raise RuntimeError("Database is currently not available!")
+
+
 def execute_bool_query(bool_query: str) -> bool:
+    assure_connection()
     _current_cursor().execute(bool_query, ())
     return _current_cursor().fetchone()[0] == 1
 
 
 def execute_void_query(void_query: str) -> None:
+    assure_connection()
+
     _current_cursor().execute(void_query, ())
 
 
 def execute_query(query: str) -> Any:
+    assure_connection()
+
     _current_cursor().execute(query, ())
     return _current_cursor().fetchall()
 
 
 def execute_post_query(post_query: PostQuery):
+    assure_connection()
+
     _current_cursor().execute(post_query.query, post_query.args)
     commit_db_context()
 
