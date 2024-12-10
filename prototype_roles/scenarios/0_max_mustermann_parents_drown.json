@@ -1,0 +1,10 @@
+{
+  "name": "0_max_mustermann_parents_drown",
+  "conditions": [
+    "high_sea_level"
+  ],
+  "resource": {
+    "identifier": "0_max_mustermann_parents_drown.txt",
+    "content_type": "article"
+  }
+}

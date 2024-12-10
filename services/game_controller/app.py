@@ -13,11 +13,15 @@ from services.game_controller.implementation import impl_users_create, impl_user
     impl_users_has_password, impl_sessions_configure_prototype, impl_game_state_get, \
     impl_game_state_ready_to_transition, impl_game_state_transition
 from shared.architecture.rest import safe_call
+from shared.data_model.context import initialize_db_context_default, initialize_db_context
+
+initialize_db_context_default()
 
 app = Flask(__name__)
 
 @app.before_request
 def handle_options():
+    print(f"Running: {request.path}")
     if request.method == "OPTIONS":
         response = jsonify()  # Empty response body
         response.headers.add("Allow", "GET, POST, OPTIONS")  # Adjust methods as needed

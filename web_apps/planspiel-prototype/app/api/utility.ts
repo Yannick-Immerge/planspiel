@@ -61,6 +61,18 @@ export async function auth_fail<T>(message?: string) : Promise<ApiResult<T>> {
     };
 }
 
+export async function fail<T>(message?: string) : Promise<ApiResult<T>> {
+    if(message === undefined) {
+        message = "No error description.";
+    }
+    return {
+        data: null,
+        ok: false,
+        authenticationOk: true,
+        statusText: message
+    };
+}
+
 // Type safe fetch wrapper
 export async function fetch_typesafe<T>(url: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
     if (params === undefined) {

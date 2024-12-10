@@ -66,12 +66,20 @@ export interface Role {
     scenarios: string[]
 }
 
+export interface RoleMetadata {
+    name: string,
+    age: number,
+    nationality: string,
+    address: string,
+    height: number
+}
+
 /**
  * A Resource object.
  */
 export interface Resource {
     identifier: string,
-    contentType: "picture" | "article" | "diary"
+    contentType: "picture" | "article" | "diary" | "metadata"
 }
 
 /**

@@ -13,3 +13,5 @@ python scripts/setup_prototype_roles.py
 sleep 2
 echo "Setting up product key..."
 python scripts/setup_product_key.py
+echo "Configuring database users..."
+python scripts/setup_microservice_users.py

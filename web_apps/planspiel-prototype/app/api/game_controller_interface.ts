@@ -265,7 +265,7 @@ export async function configureSessionPrototype(overrideAdministratorUsername?: 
 
 export async function getGameState(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetGameStateResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<GetGameStateResult>("game_state/get", {
+        return game_fetch<GetGameStateResult>("/game_state/get", {
             administratorUsername: localUsername,
             administratorToken: localToken
         })

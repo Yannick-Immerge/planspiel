@@ -2,8 +2,6 @@ from enum import Enum
 
 from shared.data_model.context import execute_query, initialize_db_context_default
 
-initialize_db_context_default()
-
 
 def _dbs(v: str | None) -> str:
     if v is None:

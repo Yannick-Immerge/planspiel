@@ -8,8 +8,6 @@ from shared.architecture.rest import AuthError
 from shared.data_model.context import initialize_db_context_default, execute_query, PostQuery, \
     execute_post_query, get_last_row_id
 
-initialize_db_context_default()
-
 
 def _dbs(v: str | None):
     if v is None:

@@ -59,11 +59,12 @@ def initialize_db_context(hostname: str, port: int, db_name: str, username: str,
 def initialize_db_context_default():
     env_host = os.getenv("DATABASE_HOST")
     env_port = os.getenv("DATABASE_PORT")
+    env_user = os.getenv("DATABASE_USER")
     initialize_db_context(
        "localhost" if env_host is None else env_host,
         3306 if env_port is None else int(env_port),
         "mydatabase",
-        "admin",
+        "admin" if env_user is None else env_user,
         "admin",
     )
 
@@ -82,10 +83,10 @@ def assure_connection(retries : int = 3):
         if _DB_CONTEXT.is_connected():
             return
         try:
+            print("Try reconnect!")
             _DB_CONTEXT.reconnect()
         finally:
-            pass
-        n += 1
+            n += 1
     raise RuntimeError("Database is currently not available!")
 
 
