@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import {viewUser} from "@/app/api/game_controller_interface";
 import {getLocalUsername} from "@/app/api/utility";
 import {getRole} from "@/app/api/data_controller_interface";
+import CollapsingCard from "@/app/components/CollapsingCard";
+import DraggableEntry from "@/app/components/DraggableEntry";
 
 export default function Play() {
     const [message, setMessage] = useState("");
@@ -39,6 +41,10 @@ export default function Play() {
 
     return (
         <div>
+            <CollapsingCard heading={"Hello"}>
+                <ResourceComponent resource={{identifier: "2_ivan_petrov_article.md", contentType: "article"}}/>
+            </CollapsingCard>
+            <DraggableEntry></DraggableEntry>
             <p>{message}</p>
         </div>
     );
