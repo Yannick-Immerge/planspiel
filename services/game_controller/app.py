@@ -127,7 +127,7 @@ def game_state_ready_to_transition():
 
 
 @app.route("/game/game_state/transition", methods=["POST"])
-def game_state_get():
+def game_state_transition():
     params = request.get_json()
     return safe_call(impl_game_state_transition, params["targetPhase"], params["administratorUsername"], params["administratorToken"])
 

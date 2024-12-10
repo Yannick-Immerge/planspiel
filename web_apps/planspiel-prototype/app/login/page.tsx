@@ -13,7 +13,7 @@ export default function FormComponent() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await logIn(username, password); // TODO: Plain Text password
-    if (response.ok && response.data !== undefined) {
+    if (response.ok && response.data !== null) {
         router.push(response.data.administrator ? "/dashboard" : "/play")
     } else {
         setMessage(`Error: ${response.statusText}`);

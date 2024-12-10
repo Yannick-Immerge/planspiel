@@ -1,26 +1,26 @@
 "use client";
 
-import {getSessionUsername} from "@/app/api/utility";
+import {getLocalUsername} from "@/app/api/utility";
 import {useEffect, useState} from "react";
 import {UserView} from "@/app/api/models";
 import {getSessionMemberViews, viewUser} from "@/app/api/game_controller_interface";
 
 
 export default function Dashboard() {
-    const [user, setUser] = useState<UserView | undefined>();
-    const [members, setMembers] = useState<UserView[] | undefined>();
+    const [user, setUser] = useState<UserView | null>(null);
+    const [members, setMembers] = useState<UserView[] | null>(null);
     const [message, setMessage] = useState("");
     useEffect(() => {
-        const username = getSessionUsername();
-        if(username === undefined) {
-            setUser(undefined);
+        const username = getLocalUsername();
+        if(username === null) {
+            setUser(null);
             setMessage("You are logged out!")
             return;
         }
         const fetchUserInfo = async () => {
             let response = await viewUser(username);
-            if (!response.ok || response.data === undefined) {
-                setUser(undefined);
+            if (!response.ok || response.data === null) {
+                setUser(null);
                 setMessage(`Error: ${response.statusText}`);
                 return;
             }
@@ -33,7 +33,7 @@ export default function Dashboard() {
             }
 
             const membersResponse = await getSessionMemberViews();
-            if (!membersResponse.ok || membersResponse.data === undefined) {
+            if (!membersResponse.ok || membersResponse.data === null) {
                 setMessage(`Error: ${response.statusText}`);
                 return;
             }
@@ -45,8 +45,8 @@ export default function Dashboard() {
     }, []);
     return (
         <div>
-            <p>Welcome to the dashboard: {user === undefined ? "Unidentified!" : user.username}</p>
-            {members === undefined ? (
+            <p>Welcome to the dashboard: {user === null ? "Unidentified!" : user.username}</p>
+            {members === null ? (
                 <div></div>
             ) : (
                 <div>

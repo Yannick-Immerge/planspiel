@@ -21,12 +21,12 @@ export async function mapApiResult<T, V>(result: Promise<ApiResult<T>>, map: (da
 }
 
 
-export function getSessionUsername() : string | null {
+export function getLocalUsername() : string | null {
     const sessionUsername = sessionStorage.getItem("username");
     return sessionUsername === null ? null : sessionUsername;
 }
 
-export function getSessionToken() : string | null {
+export function getLocalToken() : string | null {
     const sessionUsername = sessionStorage.getItem("token");
     return sessionUsername === null ? null : sessionUsername;
 }
@@ -36,10 +36,10 @@ export async function fetch_with_auth<T>(auth_cb: (localUsername: string, localT
     let username = overrideUsername === undefined ? null : overrideUsername;
     let token = overrideToken === undefined ? null : overrideToken;
     if(username === null){
-        username = getSessionUsername();
+        username = getLocalUsername();
     }
     if(token === null){
-        token = getSessionToken();
+        token = getLocalToken();
     }
     if(username === null || token === null){
         return auth_fail<T>(authFailMessage);

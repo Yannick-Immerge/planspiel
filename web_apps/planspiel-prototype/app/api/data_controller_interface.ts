@@ -2,7 +2,7 @@ import {ApiResult, SERVER_ADDR_HTTP, fetch_typesafe} from "@/app/api/utility";
 import {Metric, Parameter, Role, RoleEntry, Scenario} from "@/app/api/models";
 
 export const DATA_CONTROLLER_SERVER_PORT = "5001";
-export const DATA_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + DATA_CONTROLLER_SERVER_PORT + "/game";
+export const DATA_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + DATA_CONTROLLER_SERVER_PORT + "/data";
 
 
 export interface ListRolesResult {

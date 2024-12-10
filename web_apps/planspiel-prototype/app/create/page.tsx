@@ -5,10 +5,9 @@ import {
   configureSessionPrototype,
   createSession,
   createUserForSession,
-  CreateUserResult, getSessionMemberViews, logIn
+  logIn
 } from "@/app/api/game_controller_interface";
-import {ApiResult} from "@/app/api/utility";
-import {log} from "node:util";
+
 
 export default function FormComponent() {
   const [productKey, setProductKey] = useState('');
@@ -19,7 +18,7 @@ export default function FormComponent() {
     e.preventDefault();
     // Create session
     const createResponse = await createSession(productKey, adminPassword); // TODO: Plain Text password
-    if(!createResponse.ok || createResponse.data === undefined) {
+    if(!createResponse.ok || createResponse.data === null) {
       setMessage(`Error: ${createResponse.statusText}`);
       return;
     }
