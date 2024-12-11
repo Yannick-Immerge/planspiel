@@ -14,6 +14,7 @@ import WarningArea from "@/app/components/WarningArea";
 import VotingArea from "@/app/play/VotingArea";
 import DiscussionArea from "@/app/play/DiscussionArea";
 import RoleDetailsArea from "@/app/play/RoleDetailsArea";
+import StatusArea from "@/app/play/StatusArea";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -95,19 +96,40 @@ export default function Play() {
         setScenarios(scenariosResponse.data);
     };
 
-    useEffect(() => {
+    const revalidate = async () => {
         fetchUser();
         fetchGameState();
         fetchRoleEntries();
         fetchScenarios();
+    }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            revalidate();
+        }, 500);
+
+        return () => clearInterval(interval);
     }, []);
 
     return (
         <div>
-            <DiscussionArea user={user} gameState={gameState}/>
-            <VotingArea gameState={gameState}/>
-            <RoleDetailsArea gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
-            <WarningArea warning={warning}/>
+            <div className="w-10/12 mx-auto">
+                <div className="h-40">
+                    <StatusArea gameState={gameState}></StatusArea>
+                    </div>
+                <div className=" flex justify-between gap-14">
+                    <div className="pr-5">
+                        <DiscussionArea user={user} gameState={gameState}/>
+                        <div className="h-10"></div>
+                        <VotingArea gameState={gameState}/>
+                    </div>
+                    <div className="flex-1">
+                        <RoleDetailsArea gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
+                    </div>
+                </div>
+                <div className="h-10"></div>
+                <WarningArea warning={warning}/>
+            </div>
         </div>
     );
 }

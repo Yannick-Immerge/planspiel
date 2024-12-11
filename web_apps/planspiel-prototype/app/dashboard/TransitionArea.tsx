@@ -8,8 +8,11 @@ export default function TransitionArea({gameState, onTransitionAction}: {gameSta
     ) : (
         <div>
             <h1 className="text-lg">Game is in Phase: {gameState.phase}</h1>
+            <div className="h-3"></div>
             {gameState.discussionPhase === "inactive" || gameState.discussionPhase === "completed" ? (
-                <TransitionButton phase={gameState.phase} onTransitionAction={onTransitionAction}/>
+                <div className="mx-auto">
+                    <TransitionButton phase={gameState.phase} onTransitionAction={onTransitionAction}/>
+                </div>
             ) : (
                 <p>Finish the discussion before continuing.</p>
             )}

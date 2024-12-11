@@ -8,34 +8,33 @@ export default function RoleDetailsArea({gameState, entries, scenarios} : {gameS
         return <p>Could not fetch game state.</p>;
     }
 
-    if(gameState.phase === "identification1" || gameState.phase == "discussion1") {
-        return <div>
+    if(gameState.phase == "configuring")
+        return <div></div>;
+
+    return (
+        <div>
             <h1 className="text-xl">Get to know your role:</h1>
             {entries === null ? (
                 <p>Could not fetch role entries.</p>
             ) : (
                 <div>
                     <MetadataComponent metadata={entries.metadata} />
-                    <ResourceListComponent resourceEntries={entries.resourceEntries} />
+                    <div className="h-5"></div>
+                    {gameState.phase === "identification2" || gameState.phase == "discussion2" ? (
+                        scenarios === null ? (
+                            <p></p>
+                        ) : (
+                            <div>
+                                <ResourceListComponent resourceEntries={scenarios.resourceEntries} collapsible={true} heading="Check what has happened to your role:"/>
+                                <div className="h-5"></div>
+                            </div>
+                        )
+                    ) : <div></div>}
+                    <ResourceListComponent resourceEntries={entries.resourceEntries} collapsible={true} heading="Your Role Entries:" />
                 </div>
             )}
-        </div>;
-    }
-    if(gameState.phase === "identification2" || gameState.phase == "discussion2") {
-        return <div>
-            <h1 className="text-xl">Check what happened to your role:</h1>
-            {entries === null || scenarios === null ? (
-                <p>Could not fetch role entries/scenarios.</p>
-            ) : (
-                <div>
-                    <MetadataComponent metadata={entries.metadata} />
-                    <ResourceListComponent resourceEntries={scenarios.resourceEntries} />
-                    <ResourceListComponent resourceEntries={entries.resourceEntries} />
-                </div>
-            )}
-        </div>;
-    }
-
-    return <div></div>
+        </div>
+    );
 }
+
 

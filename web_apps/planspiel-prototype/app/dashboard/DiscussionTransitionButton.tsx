@@ -1,20 +1,21 @@
 import {DiscussionPhase, getNextDiscussionPhase} from "@/app/api/models";
 import {useEffect, useState} from "react";
 import {nextSpeaker, readyToTransitionDiscussion} from "@/app/api/game_controller_interface";
+import StyledButton from "@/app/components/StyledButton";
 
 export default function DiscussionTransitionButton({phase, onDiscussionTransitionAction}: {phase: DiscussionPhase, onDiscussionTransitionAction: (targetPhase: DiscussionPhase) => void}) {
-    const [ready, setReady] = useState<boolean>(false);
+    const [ready, setReady] = useState<boolean | null>(null);
 
     const fetchReady = async () => {
         const nextPhase = getNextDiscussionPhase(phase);
         if(nextPhase === null) {
-            setReady(false);
+            setReady(null);
             return;
         }
 
         const readyResult = await readyToTransitionDiscussion(nextPhase);
         if(!readyResult.ok || readyResult.data === null) {
-            setReady(false);
+            setReady(null);
             return;
         }
         setReady(readyResult.data.readyToTransition);
@@ -30,37 +31,48 @@ export default function DiscussionTransitionButton({phase, onDiscussionTransitio
         await fetchReady();
     }
 
-    useEffect(() => {
+    const revalidate = () => {
         fetchReady();
+    }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            revalidate();
+        }, 500);
+
+        return () => clearInterval(interval);
     }, []);
 
-    switch (phase) {
-        case "inactive":
-            return <p>Unexpected discussion state!</p>
-        case "preparing":
-            return <button onClick={() => handleDiscussionTransitionRequest("introduction")}>Start the Introductions!</button>;
-        case "introduction":
-            if (ready) {
-                return <button onClick={() => handleDiscussionTransitionRequest("free")}>Start the Free Discussion!</button>;
-            } else {
-                return <button onClick={() => nextSpeakerAction()}>Next speaker!</button>
-            }
-        case "free":
-            return <button onClick={() => handleDiscussionTransitionRequest("closing")}>Start the Closing Words!</button>;
-        case "closing":
-            if (ready) {
-                return <button onClick={() => handleDiscussionTransitionRequest("voting")}>Start the Voting!</button>;
-            } else {
-                return <button onClick={() => nextSpeakerAction()}>Next speaker!</button>
-            }
-        case "voting":
-            if (ready) {
-                return <button onClick={() => handleDiscussionTransitionRequest("completed")}>Finish the Discussion!</button>;
-            } else {
-                return <p>Wait for all votes!</p>
-            }
-        case "completed":
-            return <p>The discussion has been completed!</p>
-    }
+    return <div>
+        {ready ===  null ? (
+            <p>Cannot determine whether transition is possible.</p>
+        ) : phase === "inactive" ? (
+            <p>Unexpected discussion state!</p>
+        ) : phase === "preparing" ? (
+            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("introduction")}>Start the Introductions!</StyledButton>
+        ) : phase === "introduction" ? (
+            ready ? (
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("free")}>Start the Free Discussion!</StyledButton>
+            ) : (
+                <StyledButton onClickAction={() => nextSpeakerAction()}>Next speaker!</StyledButton>
+            )
+        ) : phase === "free" ? (
+            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("closing")}>Start the Closing Words!</StyledButton>
+        ) : phase === "closing" ? (
+            ready ? (
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("voting")}>Start the Voting!</StyledButton>
+            ) : (
+                <StyledButton onClickAction={() => nextSpeakerAction()}>Next speaker!</StyledButton>
+            )
+        ) : phase === "voting" ? (
+            ready ? (
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("completed")}>Finish the Discussion!</StyledButton>
+            ) : (
+                <p>Wait for all votes!</p>
+            )
+        ) : (
+            <p>The discussion has been completed!</p>
+        )}
+    </div>
 }
 

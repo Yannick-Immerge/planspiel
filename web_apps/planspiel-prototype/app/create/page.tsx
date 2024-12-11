@@ -7,12 +7,14 @@ import {
   createUserForSession,
   logIn
 } from "@/app/api/game_controller_interface";
+import {useRouter} from "next/navigation";
 
 
 export default function FormComponent() {
   const [productKey, setProductKey] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [message, setMessage] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +45,9 @@ export default function FormComponent() {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;
     }
-    setMessage("Success!");
+
+    //Forward to Dashboard
+    router.push("/dashboard");
   };
 
   return (

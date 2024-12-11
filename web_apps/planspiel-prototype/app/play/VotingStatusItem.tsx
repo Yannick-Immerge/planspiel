@@ -20,7 +20,7 @@ export default function VotingStatusItem({parameter, hasVoted, voteParameterActi
         fetchParameterInfo();
     }, []);
 
-    return <div>
+    return <div className="border-red-50 border-2 rounded-2xl p-3 my-3 text-center">
         <h1 className="text-lg">{parameter}</h1>
         {hasVoted ? <p>You have already voted for the parameter.</p> : (
             parameterInfo === null ? (

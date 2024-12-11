@@ -1,5 +1,5 @@
 
-export const USE_LOCAL_SERVER = false;
+export const USE_LOCAL_SERVER = true;
 
 export function getServerAddrHttp() {
     if(USE_LOCAL_SERVER) {

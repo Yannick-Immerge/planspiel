@@ -17,8 +17,16 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
         setVotingStatus(votingStatusResult.data.votingStatus);
     };
 
-    useEffect(() => {
+    const revalidate = () => {
         fetchVotingStatus();
+    }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            revalidate();
+        }, 500);
+
+        return () => clearInterval(interval);
     }, []);
 
     const voteParameterAction = (parameter: string, votedValue: number) => {
@@ -26,7 +34,6 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
             await vote(parameter, votedValue);
             await fetchVotingStatus();
         }
-        console.log("Second Voting!")
         pushVoteParameter(parameter, votedValue);
     }
 
