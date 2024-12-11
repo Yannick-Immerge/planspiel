@@ -1,5 +1,16 @@
-export const USE_LOCAL_SERVER = true;
-export const SERVER_ADDR_HTTP = USE_LOCAL_SERVER ? "http://localhost" : "ec2-34-228-111-6.compute-1.amazonaws.com";
+
+export const USE_LOCAL_SERVER = false;
+
+export function getServerAddrHttp() {
+    if(USE_LOCAL_SERVER) {
+        return "http://localhost";
+    }
+    const AWS_INSTANCE_ADDR_HTTP = undefined
+    if(AWS_INSTANCE_ADDR_HTTP === undefined){
+        throw URIError("Specify the Uri!.")
+    }
+    return AWS_INSTANCE_ADDR_HTTP;
+}
 
 
 // Api result object

@@ -1,7 +1,7 @@
 import requests
 
-USE_LOCAL_SERVER = True
-SERVER_ADDR_HTTP = "http://localhost" if USE_LOCAL_SERVER else "http://ec2-16-171-21-132.eu-north-1.compute.amazonaws.com"
+USE_LOCAL_SERVER = False
+SERVER_ADDR_HTTP = "http://localhost" if USE_LOCAL_SERVER else "http://ec2-13-60-68-141.eu-north-1.compute.amazonaws.com"
 
 if __name__ == "__main__":
     # Create a session

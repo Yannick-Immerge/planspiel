@@ -1,8 +1,14 @@
-import {ApiResult, SERVER_ADDR_HTTP, fetch_typesafe, mapApiResult, fetch_with_auth, fail} from "@/app/api/utility";
+import {
+    ApiResult,
+    fetch_typesafe,
+    mapApiResult,
+    fetch_with_auth,
+    fail,
+    getServerAddrHttp
+} from "@/app/api/utility";
 import {DiscussionPhase, GamePhase, GameState, Session, SessionView, UserView, VotingStatus} from "@/app/api/models";
 
 export const GAME_CONTROLLER_SERVER_PORT = "5002";
-export const GAME_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + GAME_CONTROLLER_SERVER_PORT + "/game";
 
 
 export interface CreateUserResult {
@@ -108,7 +114,8 @@ export interface GetVotingStatusResult {
 
 
 function game_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
-    return fetch_typesafe<T>(GAME_CONTROLLER_SERVER_ADDR_HTTP + endpoint, params);
+    const addr = `${getServerAddrHttp()}:${GAME_CONTROLLER_SERVER_PORT}/game${endpoint}`
+    return fetch_typesafe<T>(addr, params);
 }
 
 

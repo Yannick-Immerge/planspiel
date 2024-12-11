@@ -1,10 +1,9 @@
-import {ApiResult, SERVER_ADDR_HTTP, fetch_typesafe, fail} from "@/app/api/utility";
+import {ApiResult, fetch_typesafe, fail, getServerAddrHttp} from "@/app/api/utility";
 import {Metric, Parameter, Role, RoleEntry, RoleMetadata, Scenario, Resource} from "@/app/api/models";
 import {loadMetadataResource} from "@/app/api/resources";
 import {isScenarioApplicable} from "@/app/api/game_controller_interface";
 
 export const DATA_CONTROLLER_SERVER_PORT = "5001";
-export const DATA_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + DATA_CONTROLLER_SERVER_PORT + "/data";
 
 
 export interface ListRolesResult {
@@ -43,7 +42,8 @@ export interface GetScenarioInformationResult {
 
 
 function data_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
-    return fetch_typesafe<T>(DATA_CONTROLLER_SERVER_ADDR_HTTP + endpoint, params);
+    const addr = `${getServerAddrHttp()}:${DATA_CONTROLLER_SERVER_PORT}/data${endpoint}`
+    return fetch_typesafe<T>(addr, params);
 }
 
 export async function listRoles() : Promise<ApiResult<ListRolesResult>> {
