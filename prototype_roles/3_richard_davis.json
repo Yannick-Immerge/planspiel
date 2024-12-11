@@ -1,0 +1,36 @@
+{
+  "name": "3_richard_davis",
+  "demographic": {},
+  "description": "Leitungsrolle bei Shell.",
+  "entries": [
+    {
+      "name": "3_richard_davis_picture",
+      "resource": {
+        "identifier": "3_richard_davis_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "3_richard_davis_biography",
+      "resource": {
+        "identifier": "3_richard_davis_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "3_richard_davis_article",
+      "resource": {
+        "identifier": "3_richard_davis_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "3_richard_davis_article_picture",
+      "resource": {
+        "identifier": "3_richard_davis_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}

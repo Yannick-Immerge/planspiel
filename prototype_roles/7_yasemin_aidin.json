@@ -1,0 +1,36 @@
+{
+  "name": "7_yasemin_aidin",
+  "demographic": {},
+  "description": "Unternehmerin. Leitet veganen türkischen Restaurant.",
+  "entries": [
+    {
+      "name": "7_yasemin_aidin_picture",
+      "resource": {
+        "identifier": "7_yasemin_aidin_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "7_yasemin_aidin_biography",
+      "resource": {
+        "identifier": "7_yasemin_aidin_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "7_yasemin_aidin_article",
+      "resource": {
+        "identifier": "7_yasemin_aidin_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "7_yasemin_aidin_article_picture",
+      "resource": {
+        "identifier": "7_yasemin_aidin_article_picture.png",
+        "content_type": "picture"
+      }
+    }
+  ],
+  "scenarios": []
+}
