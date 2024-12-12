@@ -1,9 +1,9 @@
-import {ApiResult, SERVER_ADDR_HTTP, fetch_typesafe, fail} from "@/app/api/utility";
+import {ApiResult, fetch_typesafe, fail, getServerAddrHttp} from "@/app/api/utility";
 import {Metric, Parameter, Role, RoleEntry, RoleMetadata, Scenario, Resource} from "@/app/api/models";
 import {loadMetadataResource} from "@/app/api/resources";
+import {isScenarioApplicable} from "@/app/api/game_controller_interface";
 
 export const DATA_CONTROLLER_SERVER_PORT = "5001";
-export const DATA_CONTROLLER_SERVER_ADDR_HTTP = SERVER_ADDR_HTTP + ":" + DATA_CONTROLLER_SERVER_PORT + "/data";
 
 
 export interface ListRolesResult {
@@ -36,9 +36,14 @@ export interface GetRoleEntryInformationResult {
     resourceEntries: Resource[]
 }
 
+export interface GetScenarioInformationResult {
+    resourceEntries: Resource[]
+}
+
 
 function data_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
-    return fetch_typesafe<T>(DATA_CONTROLLER_SERVER_ADDR_HTTP + endpoint, params);
+    const addr = `${getServerAddrHttp()}:${DATA_CONTROLLER_SERVER_PORT}/data${endpoint}`
+    return fetch_typesafe<T>(addr, params);
 }
 
 export async function listRoles() : Promise<ApiResult<ListRolesResult>> {
@@ -108,6 +113,38 @@ export async function getRoleEntryInformation(name: string) : Promise<ApiResult<
     return {
         data: {
             metadata: metadata,
+            resourceEntries: resourceEntries
+        },
+        ok: true,
+        authenticationOk: true,
+        statusText: ""
+    };
+}
+
+export async function getScenarioInformation(name: string) : Promise<ApiResult<GetScenarioInformationResult>> {
+    const roleResult = await getRole(name);
+    if(!roleResult.ok || roleResult.data === null) {
+        return fail<GetScenarioInformationResult>(`Error fetching role ${name}: ${roleResult.statusText}`);
+    }
+
+    let resourceEntries : Resource[] = [];
+    for (const scenarioName of roleResult.data.role.scenarios) {
+        const isApplicableResult = await isScenarioApplicable(scenarioName);
+        if(!isApplicableResult.ok || isApplicableResult.data === null) {
+            return fail<GetScenarioInformationResult>(`Error checking whether scenario ${scenarioName} of role ${name} is applicable: ${isApplicableResult.statusText}`);
+        }
+        if(!isApplicableResult.data.isScenarioApplicable) {
+            continue;
+        }
+
+        const scenarioResult = await getScenario(scenarioName);
+        if(!scenarioResult.ok || scenarioResult.data === null) {
+            return fail<GetScenarioInformationResult>(`Error fetching scenario ${scenarioName} of role ${name}: ${scenarioResult.statusText}`);
+        }
+        resourceEntries.push(scenarioResult.data.scenario.resource)
+    }
+    return {
+        data: {
             resourceEntries: resourceEntries
         },
         ok: true,

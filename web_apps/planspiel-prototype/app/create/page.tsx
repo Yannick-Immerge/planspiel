@@ -9,6 +9,7 @@ import {
 } from "@/app/api/game_controller_interface";
 import { FaKey, FaLock, FaPoo } from 'react-icons/fa';
 import { TextEingabe } from '../components/TextEingabe';
+import {useRouter} from "next/navigation";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
 
@@ -26,12 +27,14 @@ export default function FormComponent() {
     console.log(result);
     console.log(adminPassword);
     setAdminPasswordValid(result);
-}, [adminPassword]);
+  }, [adminPassword]);
 
-useEffect(() => { // Check if the second Password entry matches the first
-    const matches = (adminPassword != "") && (adminPassword === adminPasswordConfirmation);
-    setAdminPasswordConfirmationValid(matches)
-}, [adminPassword, adminPasswordConfirmation])
+  useEffect(() => { // Check if the second Password entry matches the first
+      const matches = (adminPassword != "") && (adminPassword === adminPasswordConfirmation);
+      setAdminPasswordConfirmationValid(matches)
+  }, [adminPassword, adminPasswordConfirmation])
+
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     if (!adminPasswordValid || !adminPasswordConfirmationValid) return;
@@ -53,14 +56,14 @@ useEffect(() => { // Check if the second Password entry matches the first
     }
 
     // Create users
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 2; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
         setMessage(`Error: ${userResponse.statusText}`);
         return;
       }
     }
-    const configureResponse = await configureSessionPrototype();
+    const configureResponse = await configureSessionPrototype("friday_trial_2_users");
     if(!configureResponse.ok) {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;
@@ -114,7 +117,7 @@ useEffect(() => { // Check if the second Password entry matches the first
           {message? 
             <p className="bg-[#79E58033] p-3 rounded-xl grid">
               {message}
-              <button onClick={() => window.location.replace("../dashboard")} className="m-auto bg-sky-500 hover:bg-sky-400 disabled:bg-slate-500 active:bg-sky-600 transition-all duration-200 rounded-full pt-3 pb-3 pl-6 pr-6">
+              <button onClick={() => router.push("/dashboard")} className="m-auto bg-sky-500 hover:bg-sky-400 disabled:bg-slate-500 active:bg-sky-600 transition-all duration-200 rounded-full pt-3 pb-3 pl-6 pr-6">
                 Öffne meine Session!</button>
             </p> 
           :

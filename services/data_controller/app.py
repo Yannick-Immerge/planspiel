@@ -55,9 +55,9 @@ def scenarios_get():
 @app.route("/data/metrics/get", methods=["POST"])
 def metrics_get():
     params = request.get_json()
-    return safe_call(impl_get_route, DataType.METRIC, params["name"])
+    return safe_call(impl_get_route, DataType.METRIC, params["simpleName"])
 
 @app.route("/data/parameters/get", methods=["POST"])
 def parameters_get():
     params = request.get_json()
-    return safe_call(impl_get_route, DataType.PARAMETER, params["name"])
+    return safe_call(impl_get_route, DataType.PARAMETER, params["simpleName"])

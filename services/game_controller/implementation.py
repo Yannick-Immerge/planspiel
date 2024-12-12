@@ -117,20 +117,21 @@ def impl_sessions_status(administrator_username: str, administrator_token: str, 
     return {}
 
 
-def impl_sessions_configure_prototype(administrator_username: str, administrator_token: str):
+def impl_sessions_configure_prototype(configuration: str, administrator_username: str, administrator_token: str):
     TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
     session_id = USER_MANAGER.get_session_if_admin(administrator_username)
-    SESSION_MANAGER.configure_prototype(session_id)
+    SESSION_MANAGER.configure_prototype(session_id, configuration)
     return {}
 
 
-def impl_game_state_get(administrator_username: str, administrator_token: str):
-    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
-    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+def impl_game_state_get(username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    session_id = USER_MANAGER.get_session(username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
         "gameState": GAME_STATE_MANAGER.get_game_state(game_state_id)
     }
+
 
 def impl_game_state_ready_to_transition(target_phase: str, administrator_username: str, administrator_token: str):
     TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
@@ -140,9 +141,66 @@ def impl_game_state_ready_to_transition(target_phase: str, administrator_usernam
         "readyToTransition": GAME_STATE_MANAGER.ready_to_transition(game_state_id, target_phase)
     }
 
+
 def impl_game_state_transition(target_phase: str, administrator_username: str, administrator_token: str):
     TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
     session_id = USER_MANAGER.get_session_if_admin(administrator_username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     GAME_STATE_MANAGER.transition(game_state_id, target_phase)
+    return {}
+
+
+def impl_game_state_is_scenario_applicable(name: str, username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    session_id = USER_MANAGER.get_session(username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "isScenarioApplicable": GAME_STATE_MANAGER.is_scenario_applicable(game_state_id, name)
+    }
+
+
+def impl_game_state_discussion_have_all_spoken(username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    session_id = USER_MANAGER.get_session(username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "haveAllSpoken": GAME_STATE_MANAGER.discussion_have_all_spoken(game_state_id)
+    }
+
+
+def impl_game_state_discussion_next_speaker(administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    GAME_STATE_MANAGER.discussion_next_speaker(game_state_id)
+    return {}
+
+
+def impl_game_state_discussion_ready_to_transition(target_phase: str, administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "readyToTransition": GAME_STATE_MANAGER.discussion_ready_to_transition(game_state_id, target_phase)
+    }
+
+
+def impl_game_state_discussion_transition(target_phase: str, administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    GAME_STATE_MANAGER.discussion_transition(game_state_id, target_phase)
+    return {}
+
+
+def impl_game_state_discussion_has_voted(parameter: str, username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    return {
+        "hasVoted": GAME_STATE_MANAGER.discussion_has_voted(username, parameter)
+    }
+
+
+def impl_game_state_discussion_vote(parameter: str, voted_value: float, username:str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    GAME_STATE_MANAGER.discussion_vote(username, parameter, voted_value)
     return {}

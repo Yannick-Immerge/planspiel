@@ -9,6 +9,7 @@ from shared.data_model.context import PostQuery, execute_post_query
 
 _BASE_PATH: Path = Path(__file__).parent
 _METRICS_PATH = _BASE_PATH / "metrics.json"
+_PARAMETERS_PATH = _BASE_PATH / "parameters.json"
 _ROLE_NAMES_PATH = _BASE_PATH / "role_names.txt"
 _RESOURCES_PATH = _BASE_PATH / "resources"
 _CONDITIONS_PATH = _BASE_PATH / "conditions"
@@ -24,6 +25,20 @@ def load_role_names() -> list[str]:
                 continue
             names.append(line)
     return names
+
+
+class ParameterDefinition(pydantic.BaseModel):
+    simple_name: str
+    description: str
+    min_value: float
+    max_value: float
+
+
+def load_all_parameters() -> list[ParameterDefinition]:
+    with open(_PARAMETERS_PATH, "rt") as file:
+        data = json.load(file)
+    all_parameters = [ParameterDefinition(**item) for item in data]
+    return [parameter for parameter in all_parameters]
 
 
 class MetricDefinition(pydantic.BaseModel):
@@ -143,12 +158,22 @@ def collect_queries() -> list[PostQuery]:
         )
     }
     metric_defs = load_all_metrics()
+    parameter_defs = load_all_parameters()
     viable_metric_defs: list[MetricDefinition] = list(metric_defs[scenario_cond_def.metric]
                                                     for scenario_cond_def in itertools.chain(*scenario_cond_defs.values()))
     viable_resource_defs: list[ResourceDefinition] = list(entry.resource for entry in
                                                         list(itertools.chain(*scenario_defs.values())) +
                                                         list(itertools.chain(*role_entry_defs.values())))
 
+    parameter_query = make_insert(
+        "Parameter",
+        "simple_name, description, min_value, max_value",
+        [
+            f"\"{parameter_def.simple_name}\", \"{parameter_def.description}\", {parameter_def.min_value}, {parameter_def.max_value}"
+            for parameter_def in parameter_defs
+        ],
+        ()
+    )
     metric_query = make_insert(
         "Metric",
         "simple_name, description, min_value, max_value",
@@ -214,6 +239,7 @@ def collect_queries() -> list[PostQuery]:
     )
 
     return [
+        parameter_query,
         metric_query,
         resource_query,
         scenario_cond_query,

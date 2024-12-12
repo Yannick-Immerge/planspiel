@@ -11,3 +11,5 @@ ProductKey
 controls
 Parameter
 GameState
+Projection
+Voting

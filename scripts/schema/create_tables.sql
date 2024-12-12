@@ -1,6 +1,9 @@
 CREATE TABLE GameState(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    phase VARCHAR(100) NOT NULL
+    phase VARCHAR(100) NOT NULL,
+    discussion_phase VARCHAR(100),
+    discussion_speaker1 VARCHAR(100) NULL,
+    discussion_speaker2 VARCHAR(100) NULL
 );
 
 CREATE TABLE Parameter(
@@ -14,6 +17,8 @@ CREATE TABLE controls(
     game_state INT,
     parameter VARCHAR(100),
     buergerrat INT,
+    choice1 FLOAT NULL,
+    choice2 FLOAT NULL,
     FOREIGN KEY (game_state) REFERENCES GameState(id),
     FOREIGN KEY (parameter) REFERENCES Parameter(simple_name),
     PRIMARY KEY (game_state, parameter, buergerrat)
@@ -93,3 +98,24 @@ CREATE TABLE RoleEntry(
     FOREIGN KEY (belongs_to) REFERENCES RoleTable(name),
     FOREIGN KEY (resource) REFERENCES Resource(identifier)
 );
+
+CREATE TABLE Projection(
+    game_state INT NOT NULL,
+    metric VARCHAR(100) NOT NULL,
+    projected_value1 FLOAT NULL,
+    projected_value2 FLOAT NULL,
+    FOREIGN KEY (game_state) REFERENCES GameState(id),
+    FOREIGN KEY (metric) REFERENCES Metric(simple_name),
+    PRIMARY KEY (game_state, metric)
+);
+
+CREATE TABLE Voting(
+    user VARCHAR(100) NOT NULL,
+    parameter VARCHAR(100) NOT NULL,
+    voted_value1 FLOAT NULL,
+    voted_value2 FLOAT NULL,
+    FOREIGN KEY (user) REFERENCES User(username),
+    FOREIGN KEY (parameter) REFERENCES Parameter(simple_name),
+    PRIMARY KEY (user, parameter)
+);
+
