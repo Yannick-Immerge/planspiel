@@ -1,7 +1,38 @@
 {
   "name": "9_aigerim_amanova",
   "demographic": {},
-  "description": "",
-  "entries": [],
-  "scenarios": []
+  "description": "Agrarökologin und Expertin für nachhaltige Landwirtschaft",
+  "entries": [
+    {
+      "name": "9_aigerim_amanova_picture",
+      "resource": {
+        "identifier": "9_aigerim_amanova_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "9_aigerim_amanova_biography",
+      "resource": {
+        "identifier": "9_aigerim_amanova_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "9_aigerim_amanova_article",
+      "resource": {
+        "identifier": "9_aigerim_amanova_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "9_aigerim_amanova_meta",
+      "resource": {
+        "identifier": "9_aigerim_amanova.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": [
+    "9_aigerim_amanova_default"
+  ]
 }

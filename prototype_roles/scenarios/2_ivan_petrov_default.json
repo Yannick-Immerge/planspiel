@@ -1,0 +1,8 @@
+{
+  "name": "2_ivan_petrov_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "2_ivan_petrov_default_scenario.txt",
+    "content_type": "article"
+  }
+}

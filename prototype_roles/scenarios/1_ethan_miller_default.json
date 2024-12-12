@@ -1,0 +1,8 @@
+{
+  "name": "1_ethan_miller_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "1_ethan_miller_default_scenario.txt",
+    "content_type": "article"
+  }
+}

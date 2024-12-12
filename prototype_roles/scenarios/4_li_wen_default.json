@@ -1,0 +1,8 @@
+{
+  "name": "4_li_wen_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "4_li_wen_default_scenario.txt",
+    "content_type": "article"
+  }
+}

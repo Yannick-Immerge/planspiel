@@ -1,0 +1,8 @@
+{
+  "name": "12_kofi_owusu_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "12_kofi_owusu_default_scenario.txt",
+    "content_type": "article"
+  }
+}

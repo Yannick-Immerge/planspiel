@@ -30,7 +30,16 @@
         "identifier": "11_anais_fournier_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "11_anais_fournier_meta",
+      "resource": {
+        "identifier": "11_anais_fournier_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "11_anais_fournier_default"
+  ]
 }

@@ -4,26 +4,28 @@
   "demographic": {},
   "entries": [
     {
-      "name":  "0_max_mustermann_meta",
+      "name": "0_max_mustermann_meta",
       "resource": {
         "identifier": "0_max_mustermann_meta.json",
         "content_type": "metadata"
       }
     },
     {
-      "name":  "0_max_mustermann_diary",
+      "name": "0_max_mustermann_diary",
       "resource": {
         "identifier": "0_max_mustermann_diary.txt",
         "content_type": "diary"
       }
     },
     {
-      "name":  "0_max_mustermann_picture",
+      "name": "0_max_mustermann_picture",
       "resource": {
         "identifier": "0_max_mustermann_picture.png",
         "content_type": "picture"
       }
     }
   ],
-  "scenarios": ["0_max_mustermann_parents_drown"]
+  "scenarios": [
+    "0_max_mustermann_parents_drown"
+  ]
 }

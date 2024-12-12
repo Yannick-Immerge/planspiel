@@ -30,7 +30,16 @@
         "identifier": "12_kofi_owusu_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "12_kofi_owusu_meta",
+      "resource": {
+        "identifier": "12_kofi_owusu_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "12_kofi_owusu_default"
+  ]
 }

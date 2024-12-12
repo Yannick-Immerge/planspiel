@@ -1,4 +1,3 @@
-0_max_mustermann
 1_ethan_miller
 2_ivan_petrov
 3_richard_davis
@@ -11,6 +10,3 @@
 10_joao_silva
 11_anais_fournier
 12_kofi_owusu
-13_roxanne_mudau
-14_josephine_allen
-frederick_gallenstecher

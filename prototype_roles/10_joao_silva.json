@@ -1,7 +1,38 @@
 {
   "name": "10_joao_silva",
   "demographic": {},
-  "description": "",
-  "entries": [],
-  "scenarios": []
+  "description": "Sojabauer und Betreiber konventioneller Landwirtschaft in Brasilien",
+  "entries": [
+    {
+      "name": "10_joao_silva_picture",
+      "resource": {
+        "identifier": "10_joao_silva_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "10_joao_silva_biography",
+      "resource": {
+        "identifier": "10_joao_silva_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "10_joao_silva_article",
+      "resource": {
+        "identifier": "10_joao_silva_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "10_joao_silva_meta",
+      "resource": {
+        "identifier": "10_joao_silva_meta.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": [
+    "10_joao_silva_default"
+  ]
 }
