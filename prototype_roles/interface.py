@@ -240,13 +240,13 @@ def collect_queries() -> list[PostQuery]:
 
     return [
         parameter_query,
-        metric_query,
+        # metric_query,
         resource_query,
-        scenario_cond_query,
+        # scenario_cond_query,
         role_query,
         role_entry_query,
         scenario_query,
-        depends_on_query
+        #depends_on_query
     ]
 
 

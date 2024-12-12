@@ -22,6 +22,12 @@ export default function ResourceComponent({ resource } : { resource: Resource}) 
             )
             break;
     }
+    // TODO: Temporary
+    if(comp === undefined) {
+        comp = (
+            <ArticleComponent path={`/resources/${resource.identifier}`}/>
+        );
+    }
     return <div>
         {comp === undefined ? <p>Unknown resource content-type: {resource.contentType}</p> : comp}
     </div>

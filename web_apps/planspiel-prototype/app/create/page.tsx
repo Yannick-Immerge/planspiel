@@ -33,14 +33,14 @@ export default function FormComponent() {
     }
 
     // Create users
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 10; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
         setMessage(`Error: ${userResponse.statusText}`);
         return;
       }
     }
-    const configureResponse = await configureSessionPrototype("friday_trial_2_users");
+    const configureResponse = await configureSessionPrototype("friday_trial_10_users");
     if(!configureResponse.ok) {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;

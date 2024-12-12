@@ -293,7 +293,7 @@ export async function setSessionStatus(status: "active" | "disabled", overrideAd
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }
 
-export async function configureSessionPrototype(configuration: "friday_trial" | "friday_trial_2_users", overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ConfigureSessionPrototypeResult>> {
+export async function configureSessionPrototype(configuration: "friday_trial" | "friday_trial_2_users" | "friday_trial_10_users", overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ConfigureSessionPrototypeResult>> {
     return fetch_with_auth((localUsername, localToken) => {
         return game_fetch<ConfigureSessionPrototypeResult>("/sessions/configure_prototype", {
             configuration: configuration,
