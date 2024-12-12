@@ -1,0 +1,8 @@
+{
+  "name": "10_joao_silva_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "10_joao_silva_default_scenario.txt",
+    "content_type": "article"
+  }
+}

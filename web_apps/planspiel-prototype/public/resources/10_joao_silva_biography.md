@@ -1,0 +1,11 @@
+# Sojabauer und Betreiber konventioneller Landwirtschaft in Brasilien
+
+**Profil:** João Silva, 45 Jahre alt, ist ein Sojabauer aus dem Bundesstaat Mato Grosso, der in Brasilien eine große landwirtschaftliche Fläche betreibt. Er wirtschaftet konventionell und setzt auf industrielle Anbaumethoden mit hohem Einsatz von Pestiziden und Düngemitteln. João ist ein pragmatischer Unternehmer, der sich nicht nur um seine Ernten, sondern auch um die finanzielle Sicherheit seiner Familie sorgt. Seit Jahren hat er eine steigende Nachfrage nach seinen Produkten aus dem Ausland und profitiert von der stetigen Expansion des Agrarsektors in Brasilien. Gleichzeitig beobachtet er zunehmend die Auswirkungen des Klimawandels auf seine Landwirtschaft und stellt sich die Frage, ob die derzeitige Anbaumethode langfristig tragfähig ist.
+
+## Hintergrund und Persönlichkeit:
+
+João wuchs in einer ländlichen Gegend auf und hat die Herausforderungen und Chancen der Landwirtschaft in Brasilien seit seiner Kindheit kennengelernt. Als pragmatischer Unternehmer betrachtet er die Landwirtschaft als einen Bereich, der Wohlstand schafft, aber auch von ständiger Anpassung an wirtschaftliche und klimatische Veränderungen geprägt ist. João ist nicht nur ein harter Arbeiter, sondern auch ein Realist, der sich um die finanzielle Sicherheit seiner Familie sorgt und daher das wirtschaftliche Potenzial des Agrarsektors nutzt. Er zeigt sich offen für neue Technologien und Agrarpraktiken, allerdings nur dann, wenn sie kurzfristig eine Verbesserung seiner Erträge und Rentabilität versprechen.
+
+## Perspektive und Anliegen:
+
+João sorgt sich um die Auswirkungen des Klimawandels auf seine Ernten, insbesondere die steigenden Temperaturen, unvorhersehbaren Regenfälle und Dürren. Er fragt sich, ob seine bisherige Wirtschaftsweise langfristig noch tragfähig ist und ob der Druck, seine Produktion weiter zu steigern, nicht zu einem Risiko für seine finanzielle Sicherheit wird. Auf der anderen Seite sieht er die Chancen, die die Expansion des Agrarsektors in Brasilien bietet. Die Möglichkeit, mehr Land zu bewirtschaften und von der Nachfrage nach Soja im internationalen Markt zu profitieren, stellt für ihn einen Anreiz dar, weiterhin auf konventionelle Anbaumethoden zu setzen.

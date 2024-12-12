@@ -1,0 +1,8 @@
+{
+  "name": "3_richard_davis_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "3_richard_davis_default_scenario.txt",
+    "content_type": "article"
+  }
+}

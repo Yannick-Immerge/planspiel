@@ -39,5 +39,7 @@
       }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "2_ivan_petrov_default"
+  ]
 }

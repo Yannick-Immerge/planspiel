@@ -30,7 +30,16 @@
         "identifier": "3_richard_davis_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "3_richard_davis_meta",
+      "resource": {
+        "identifier": "3_richard_davis_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "3_richard_davis_default"
+  ]
 }

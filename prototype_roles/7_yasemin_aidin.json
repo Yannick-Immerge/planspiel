@@ -30,7 +30,16 @@
         "identifier": "7_yasemin_aidin_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "7_yasemin_aidin_meta",
+      "resource": {
+        "identifier": "7_yasemin_aidin_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "7_yasemin_aidin_default"
+  ]
 }

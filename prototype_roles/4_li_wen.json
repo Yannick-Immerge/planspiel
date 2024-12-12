@@ -39,5 +39,7 @@
       }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "4_li_wen_default"
+  ]
 }

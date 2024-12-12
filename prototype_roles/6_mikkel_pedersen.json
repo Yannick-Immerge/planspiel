@@ -30,7 +30,16 @@
         "identifier": "6_mikkel_pedersen_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "6_mikkel_pedersen_meta",
+      "resource": {
+        "identifier": "6_mikkel_pedersen_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "6_mikkel_pedersen_default"
+  ]
 }

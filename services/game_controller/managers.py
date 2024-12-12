@@ -54,6 +54,7 @@ class DiscussionPhase(Enum):
 
 
 class PrototypeConfiguration(Enum):
+    FRIDAY_TRIAL_10_USERS = "friday_trial_10_users"
     FRIDAY_TRIAL = "friday_trial"
     FRIDAY_TRIAL_2_USERS = "friday_trial_2_users"
 
@@ -688,11 +689,48 @@ class SessionManager:
         GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 2, "reduction_meat")
         GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 2, "reduction_waste")
 
+    def configure_prototype_friday_trial_10_users(self, session_id: str):
+        # Configure Users
+        session = self.get_session(session_id)
+        if len(session["memberUsernames"]) != 11:
+            raise ValueError("For the prototype configuration a session needs exactly 10 users and one administrator.")
+
+        user_map = [
+            ("1_ethan_miller", 1),
+            ("3_richard_davis", 1),
+            ("4_li_wen", 1),
+            ("5_leon_schulz", 1),
+            ("6_mikkel_pedersen", 1),
+
+            ("7_yasemin_aidin", 2),
+            ("9_aigerim_amanova", 2),
+            ("10_joao_silva", 2),
+            ("11_anais_fournier", 2),
+            ("12_kofi_owusu", 2)
+        ]
+        off = 0
+        for username in session["memberUsernames"]:
+            if username == session["administratorUsername"]:
+                continue
+            role_name, buergerrat = user_map[off]
+            USER_MANAGER.configure_user(username, role_name, buergerrat)
+            off += 1
+
+        # Configure Bürgerräte
+        game_state_id = session["gameState"]
+        GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 1, "fossil_fuel_taxes")
+        GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 1, "reduction_infra")
+        GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 2, "gases_agriculture")
+        GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 2, "reduction_meat")
+        GAME_STATE_MANAGER.add_parameter_to_buergerrat(game_state_id, 2, "reduction_waste")
+
     def configure_prototype(self, session_id: str, configuration: str):
         if configuration == PrototypeConfiguration.FRIDAY_TRIAL.value:
             self.configure_prototype_friday_trial(session_id)
         elif configuration == PrototypeConfiguration.FRIDAY_TRIAL_2_USERS.value:
             self.configure_prototype_friday_trial_2_users(session_id)
+        elif configuration == PrototypeConfiguration.FRIDAY_TRIAL_10_USERS.value:
+            self.configure_prototype_friday_trial_10_users(session_id)
 
 
 SESSION_MANAGER: SessionManager = SessionManager()

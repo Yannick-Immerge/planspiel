@@ -1,6 +1,6 @@
 # Fracking in Westsibirien: Motor der russischen Energieindustrie und regionaler Fortschritt
 
-### Surgut - 12.September 2024
+##### Surgut - 12.September 2024
 Die Fracking-Technologie bleibt ein unverzichtbarer Bestandteil der russischen Energieindustrie und trägt maßgeblich zur Stabilität der nationalen Wirtschaft bei. In Westsibirien, einem der weltweit wichtigsten Gasfördergebiete, wird das Verfahren zur Gewinnung von Schiefergas seit Jahren erfolgreich eingesetzt. Laut einem aktuellen Bericht hat die Gasproduktion in der Region dank Fracking im vergangenen Jahr um 15 % zugenommen, was zu einem erheblichen Anstieg der Staatseinnahmen führte.
 „Fracking hat es uns ermöglicht, auch schwer zugängliche Ressourcen effizient zu nutzen“, erklärt Sergej Ivanov, Geschäftsführer eines großen Energieunternehmens in Surgut. „Ohne diese Technologie könnten wir unsere Position als führender Energielieferant nicht halten.“
 Die wirtschaftlichen Vorteile sind nicht zu übersehen. Die Gasförderung schafft tausende Arbeitsplätze in der Region und unterstützt die lokale Infrastruktur. Viele Familien in Surgut und Umgebung sind auf die Einnahmen aus der Gasindustrie angewiesen. „Dank der Energieunternehmen können wir Schulen, Krankenhäuser und Straßen bauen“, betont der Bürgermeister von Surgut.

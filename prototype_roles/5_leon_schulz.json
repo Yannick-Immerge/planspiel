@@ -39,5 +39,7 @@
       }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "5_leon_schulz_default"
+  ]
 }

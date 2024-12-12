@@ -1,0 +1,8 @@
+{
+  "name": "8_yi_huang_default",
+  "conditions": [],
+  "resource": {
+    "identifier": "8_yi_huang_default_scenario.txt",
+    "content_type": "article"
+  }
+}

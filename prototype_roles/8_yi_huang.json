@@ -30,7 +30,16 @@
         "identifier": "8_yi_huang_article_picture.png",
         "content_type": "picture"
       }
+    },
+    {
+      "name": "8_yi_huang_meta",
+      "resource": {
+        "identifier": "8_yi_huang_meta.json",
+        "content_type": "metadata"
+      }
     }
   ],
-  "scenarios": []
+  "scenarios": [
+    "8_yi_huang_default"
+  ]
 }

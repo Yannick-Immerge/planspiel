@@ -3,7 +3,6 @@ depends_on
 Scenario
 Resource
 ScenarioCondition
-Metric
 User
 RoleTable
 Session
@@ -13,3 +12,4 @@ Parameter
 GameState
 Projection
 Voting
+Metric

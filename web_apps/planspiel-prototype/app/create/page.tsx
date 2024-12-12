@@ -63,7 +63,9 @@ export default function FormComponent() {
         return;
       }
     }
-    const configureResponse = await configureSessionPrototype("friday_trial");
+
+    const configureResponse = await configureSessionPrototype("friday_trial_10_users");
+
     if(!configureResponse.ok) {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;
