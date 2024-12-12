@@ -1,5 +1,7 @@
 // Game Controller
 
+import { PointOfInterest } from "../play/Map/Map"
+
 /**
  * Restricted View onto a user that needs no authentication.
  */
@@ -97,7 +99,8 @@ export interface RoleMetadata {
     age: number,
     nationality: string,
     address: string,
-    height: number
+    height: number,
+    poi: PointOfInterest[]
 }
 
 /**

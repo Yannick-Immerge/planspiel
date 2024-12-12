@@ -5,6 +5,7 @@ import {DiscussionPhase, GamePhase, GameState, UserView} from "@/app/api/models"
 import {
     getGameState,
     getSessionMemberViews,
+    hasUserPassword,
     transitionDiscussion,
     transitionGameState, viewSelf,
     viewUser
@@ -12,8 +13,9 @@ import {
 import WarningArea from "@/app/components/WarningArea";
 import MembersArea from "@/app/dashboard/MembersArea";
 import BuergerraeteArea from "@/app/dashboard/BuergerraeteArea";
-import TransitionArea from "@/app/dashboard/TransitionArea";
+import TransitionArea, { StateDescription } from "@/app/dashboard/TransitionArea";
 import DiscussionTransitionArea from "@/app/dashboard/DiscussionTransitionArea";
+import { GetAllStateDescriptions } from "./StateDescriptions";
 
 
 export default function Dashboard() {
@@ -47,6 +49,8 @@ export default function Dashboard() {
             return;
         }
 
+        
+
         setMembers(membersResponse.data.memberViews);
     }
 
@@ -60,6 +64,8 @@ export default function Dashboard() {
 
         setGameState(gameStateResponse.data.gameState);
     }
+
+
 
     const revalidate = () => {
         fetchUser();
@@ -113,29 +119,26 @@ export default function Dashboard() {
         performTransition(targetPhase);
     }
 
+    const [stateDescriptions, setStateDescriptions] = useState<StateDescription[]>([]);
+    useEffect (() => {setStateDescriptions(GetAllStateDescriptions())}, [])
+
     return (
-        <div>
-            <div className=" w-10/12 mx-auto">
-                <div className="h-60 text-center content-center">
-                    <h1 className="text-xl">Dashboard</h1>
-                    <p>Welcome to the dashboard: {user === null ? "Unidentified!" : user.username}</p>
-                </div>
-                <div className="flex h-80 justify-between gap-14">
-                    <div className="flex-1">
-                        <MembersArea members={members}/>
-                    </div>
-                    <div className="flex-1">
-                        <BuergerraeteArea gameState={gameState}/>
-                    </div>
-                </div>
-                <div className="flex h-80 justify-between gap-14">
-                    <div className="flex-1">
-                        <TransitionArea gameState={gameState} onTransitionAction={onTransitionAction}/>
-                    </div>
-                    <div className="flex-1">
+        <div className="bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
+            <div className="absolute left-[8.33%] top-5 text-5xl">Admin-Dashboard</div>
+            <div className="pt-20 w-full">
+                <div className="flex h-80 justify-between gap-10 mx-10">
+                    <div className="w-1/2">
+                    <div className="flex-1 rounded-2xl bg-[#5a53] p-5 shadow-[10px_10px_10px_rgba(0,0,0,0.4)] backdrop-blur-xl">    
+                        <TransitionArea stateDescriptions={stateDescriptions} gameState={gameState} onTransitionAction={onTransitionAction}/>
                         <DiscussionTransitionArea gameState={gameState} onDiscussionTransitionAction={onDiscussionTransitionAction}/>
                     </div>
+                        <MembersArea members={members}/>
+                    </div>
+                    <div className="w-1/2">
+                        <BuergerraeteArea gameState={gameState} users={members}/>
+                    </div>
                 </div>
+                
                 <WarningArea warning={warning}/>
             </div>
         </div>

@@ -43,7 +43,7 @@ export default function FormComponent() {
     const createResponse = await createSession(productKey, adminPassword); // TODO: Plain Text password
     if(!createResponse.ok || createResponse.data === null) {
       setProductKeyValid(false)
-      setMessage(`Error: ${createResponse.statusText}`);
+      //setMessage(`Error: ${createResponse.statusText}`);
       return;
     }
     setProductKeyValid(true)
@@ -51,19 +51,19 @@ export default function FormComponent() {
     // Login
     const loginResponse = await logIn(createResponse.data.administratorUsername, adminPassword);
     if(!loginResponse.ok) {
-      setMessage(`Error: ${loginResponse.statusText}`);
+      //setMessage(`Error: ${loginResponse.statusText}`);
       return;
     }
 
     // Create users
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 10; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
-        setMessage(`Error: ${userResponse.statusText}`);
+        //setMessage(`Error: ${userResponse.statusText}`);
         return;
       }
     }
-    const configureResponse = await configureSessionPrototype("friday_trial_2_users");
+    const configureResponse = await configureSessionPrototype("friday_trial");
     if(!configureResponse.ok) {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;
@@ -133,7 +133,6 @@ export default function FormComponent() {
               <div><a href="/login" className='pl-2 text-decoration-line: underline'>Zurück zum Login</a></div>
             </div>
           </div>
-        
       </div>
     </div>
   );

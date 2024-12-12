@@ -28,8 +28,6 @@ export default function CreateSessionInput() {
     const [validPwdMatch, setValidPwdMatch] = useState(false);
     const [focusOnPasswordMatch, setFocusPwdMatch] = useState(false);
 
-
-
     const [errMsg, setYellowMsg] = useState('');
     const [success, setSuccess] = useState(false);
 

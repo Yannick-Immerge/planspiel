@@ -15,6 +15,7 @@ import VotingArea from "@/app/play/VotingArea";
 import DiscussionArea from "@/app/play/DiscussionArea";
 import RoleDetailsArea from "@/app/play/RoleDetailsArea";
 import StatusArea from "@/app/play/StatusArea";
+import { ConfigurationPlaceholder } from "./KonfiguringWait";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -112,7 +113,8 @@ export default function Play() {
     }, []);
 
     return (
-        <div>
+        <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
+            {gameState?.phase == "configuring"? <ConfigurationPlaceholder /> : <></>}
             <div className="w-10/12 mx-auto">
                 <div className="h-40">
                     <StatusArea gameState={gameState}></StatusArea>
