@@ -99,8 +99,7 @@ export interface RoleMetadata {
     age: number,
     nationality: string,
     address: string,
-    height: number,
-    poi: PointOfInterest[]
+    height: number
 }
 
 /**

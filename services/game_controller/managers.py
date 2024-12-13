@@ -713,6 +713,7 @@ class SessionManager:
             if username == session["administratorUsername"]:
                 continue
             role_name, buergerrat = user_map[off]
+            print("____________________ Configuring user " + str(username) + " " + str(role_name) + " " + str(buergerrat))
             USER_MANAGER.configure_user(username, role_name, buergerrat)
             off += 1
 

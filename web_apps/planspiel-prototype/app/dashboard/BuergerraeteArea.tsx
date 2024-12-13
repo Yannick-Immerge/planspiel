@@ -2,7 +2,7 @@ import {GameState, UserView} from "@/app/api/models";
 import { ToCamelCase } from "./StringHelper";
 import { FilteredUserList } from "./DashboardHelpers";
 
-function GetGermanName(id: string) : string {
+export function GetGermanName(id: string) : string {
     if (id === "fossil_fuel_taxes") return "Besteuerung fossiler Brennstoffe"
     if (id === "reduction_infra") return "Rückbau der Infrastruktur für fossile Energieträger"
     if (id === "gases_agriculture") return "Verringerung agrarer Abgase"
