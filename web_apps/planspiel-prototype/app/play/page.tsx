@@ -2,7 +2,8 @@
 import {useEffect, useState} from "react";
 import {
     getGameState,
-    viewSelf
+    viewSelf,
+    viewUser
 } from "@/app/api/game_controller_interface";
 import {
     getRoleEntryInformation,
@@ -16,6 +17,7 @@ import DiscussionArea from "@/app/play/DiscussionArea";
 import RoleDetailsArea from "@/app/play/RoleDetailsArea";
 import StatusArea from "@/app/play/StatusArea";
 import { ConfigurationPlaceholder } from "./KonfiguringWait";
+import { getLocalUsername } from "../api/utility";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -41,7 +43,17 @@ export default function Play() {
             setGameState(null);
             return;
         }
+        
         setGameState(gameStateResponse.data.gameState);
+
+        const response = await viewSelf()
+        
+        if (!response || response.data === null) {
+            setThemen(["ViewUser failed"])
+            return;
+        }
+
+        setThemen(response.data?.userView.assignedBuergerrat == 1? gameStateResponse.data.gameState.buergerrat1.parameters : gameStateResponse.data.gameState.buergerrat2.parameters)
     };
 
     const fetchRoleEntries = async () => {
@@ -112,6 +124,23 @@ export default function Play() {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        getThemes();
+    }, []);
+
+    const getThemes = async () => {
+
+        if (!gameState) {
+            setThemen(["GameState is null"])
+            return;
+        }
+
+        
+    }
+    const [themen, setThemen] = useState<string[]>(["Thema 1" , "Thema 2"]);
+    
+        
+
     return (
         <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
             {gameState?.phase == "configuring"? <ConfigurationPlaceholder /> : <></>}
@@ -126,7 +155,7 @@ export default function Play() {
                         <VotingArea gameState={gameState}/>
                     </div>
                     <div className="flex-1">
-                        <RoleDetailsArea gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
+                        <RoleDetailsArea themen={themen} gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
                     </div>
                 </div>
                 <div className="h-10"></div>

@@ -43,7 +43,7 @@ export default function FormComponent() {
     const createResponse = await createSession(productKey, adminPassword); // TODO: Plain Text password
     if(!createResponse.ok || createResponse.data === null) {
       setProductKeyValid(false)
-      //setMessage(`Error: ${createResponse.statusText}`);
+      setMessage(`Error: ${createResponse.statusText}`);
       return;
     }
     setProductKeyValid(true)
@@ -51,7 +51,7 @@ export default function FormComponent() {
     // Login
     const loginResponse = await logIn(createResponse.data.administratorUsername, adminPassword);
     if(!loginResponse.ok) {
-      //setMessage(`Error: ${loginResponse.statusText}`);
+      setMessage(`Error: ${loginResponse.statusText}`);
       return;
     }
 
@@ -59,7 +59,7 @@ export default function FormComponent() {
     for (let i = 0; i < 10; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
-        //setMessage(`Error: ${userResponse.statusText}`);
+        setMessage(`Error: ${userResponse.statusText}`);
         return;
       }
     }
@@ -70,7 +70,8 @@ export default function FormComponent() {
         setMessage(`Error: ${configureResponse.statusText}`);
         return;
     }
-    setMessage("Session erfolgereich erstellt! Du kannst dich in Zukunft mit folgendem Benutzernamen anmelden: \"" + createResponse.data.administratorUsername + "\" Bitte merk ihn dir.");
+    setMessage("Session erfolgereich erstellt!");  
+    //setMessage("Session erfolgereich erstellt! Du kannst dich in Zukunft mit folgendem Benutzernamen anmelden: \"" + createResponse.data.administratorUsername + "\" Bitte merk ihn dir.");
   };
 
   
