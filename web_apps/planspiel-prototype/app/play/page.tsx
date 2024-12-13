@@ -142,7 +142,7 @@ export default function Play() {
         
 
     return (
-        <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
+        <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
             {gameState?.phase == "configuring"? <ConfigurationPlaceholder /> : <></>}
             <div className="w-10/12 mx-auto">
                 <div className="h-40">
@@ -154,7 +154,7 @@ export default function Play() {
                         <div className="h-10"></div>
                         <VotingArea gameState={gameState}/>
                     </div>
-                    <div className="flex-1">
+                    <div className="m-auto w-full">
                         <RoleDetailsArea themen={themen} gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
                     </div>
                 </div>

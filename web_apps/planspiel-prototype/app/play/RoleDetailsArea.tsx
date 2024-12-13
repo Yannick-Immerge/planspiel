@@ -8,6 +8,7 @@ import { getLocalUsername } from "../api/utility";
 import { useEffect, useState } from "react";
 import { viewUser } from "../api/game_controller_interface";
 import { GetGermanName } from "../dashboard/BuergerraeteArea";
+import EMailComponent from "./EMailComponent";
 
 const OsmMapNoSSR = dynamic(() => import("./Map/Map"), {ssr: false});
 
@@ -27,12 +28,10 @@ export default function RoleDetailsArea({themen, gameState, entries, scenarios} 
                 <p>Could not fetch role entries.</p>
             ) : (
                 <div>
-                    <div className="rounded-2xl bg-[#bfb2] w-1/3 p-5 backdrop-blur-xl">
+                    <div className="rounded-2xl bg-[#bfb2] w-2/3 p-5 backdrop-blur-xl m-auto">
                         <PictureComponent path={"resources/" + profilePic?.identifier} />
                         <div className="py-5"><MetadataComponent metadata={entries.metadata} /></div>
-                        <div>Du wurdest eingeladen, dich in einem Bürgerrat an einem Statement an die Vereinten Nationen zu beteiligen. Der Bürgerrat beschäftigt sich mit folgenden Punkten, die dich natürlich auch mit betreffen:</div>
-                        {themen?
-                        <div>{themen?.map((n, index) => <li key={index}>{GetGermanName(n)}</li>)}</div> : <></>}
+                        <EMailComponent nachname={entries.metadata.name.split(" ")[1]} themen={themen}/>
                     </div>
                     <div className="h-5"></div>
                     {gameState.phase === "identification2" || gameState.phase == "discussion2" ? (
@@ -40,12 +39,12 @@ export default function RoleDetailsArea({themen, gameState, entries, scenarios} 
                             <p></p>
                         ) : (
                             <div>
-                                <ResourceListComponent avoid={profilePic? profilePic.identifier : ""} resourceEntries={scenarios.resourceEntries} collapsible={true} heading="Check what has happened to your role:"/>
+                                <ResourceListComponent avoid={profilePic? profilePic.identifier : ""} resourceEntries={scenarios.resourceEntries} collapsible={true} heading="Das hat sich bei dir in den letzten Jahren getan:"/>
                                 <div className="h-5"></div>
                             </div>
                         )
                     ) : <div></div>}
-                    <ResourceListComponent avoid={profilePic? profilePic.identifier : ""} resourceEntries={entries.resourceEntries} collapsible={true} heading={"Hier ist etwas was du dir anschauen solltest:"} />
+                    <ResourceListComponent avoid={profilePic? profilePic.identifier : ""} resourceEntries={entries.resourceEntries} collapsible={true} heading={"Hier sind ein paar Sachen die zu deiner Rolle interessant sind:"} />
                 </div>
             )}
         </div>
