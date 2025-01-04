@@ -23,7 +23,7 @@ export default function VotingStatusItem({parameter, hasVoted, voteParameterActi
 
     return <div className="border-red-50 border-2 rounded-2xl p-3 my-3 text-center">
         <h1 className="text-lg">{GetGermanName(parameter)}</h1>
-        {hasVoted ? <p>You have already voted for the parameter.</p> : (
+        {hasVoted ? <p>Sie haben bereits abgestimmt.</p> : (
             parameterInfo === null ? (
                 <p>Cannot fetch parameter info for parameter.</p>
             ) : (

@@ -38,7 +38,7 @@ export default function TransitionArea({gameState, onTransitionAction, stateDesc
                     <TransitionButton phase={gameState.phase} onTransitionAction={onTransitionAction}/>
                 </div>
             ) : (
-                <p>Finish the discussion before continuing.</p>
+                <p>Beenden Sie die Diskussion bevor Sie weiter machen.</p>
             )}
 
         </div>

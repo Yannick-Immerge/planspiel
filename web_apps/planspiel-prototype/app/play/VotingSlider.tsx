@@ -26,7 +26,7 @@ export default function VotingSlider({parameter, voteParameterAction} : {paramet
             />
         </div>
         <div>
-            <StyledButton onClickAction={handleVote}>Lock In!</StyledButton>
+            <StyledButton onClickAction={handleVote}>Abstimmen</StyledButton>
         </div>
     </div>;
 }
