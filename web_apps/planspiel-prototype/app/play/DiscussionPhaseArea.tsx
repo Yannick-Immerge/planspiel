@@ -1,5 +1,6 @@
 import {GameState, UserView} from "@/app/api/models";
 
+// TODO: translate to german
 export default function DiscussionPhaseArea({user, gameState} : {user: UserView, gameState: GameState}) {
     switch(gameState.discussionPhase) {
         case "inactive":

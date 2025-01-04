@@ -28,7 +28,7 @@ export default function RoleDetailsArea({themen, gameState, entries, scenarios} 
                 <p>Could not fetch role entries.</p>
             ) : (
                 <div>
-                    <div className="rounded-2xl bg-[#bfb2] w-2/3 p-5 backdrop-blur-xl m-auto">
+                    <div className="rounded-2xl bg-[#bfb2] p-5 backdrop-blur-xl m-auto">
                         <PictureComponent path={"resources/" + profilePic?.identifier} />
                         <div className="py-5"><MetadataComponent metadata={entries.metadata} /></div>
                         <EMailComponent nachname={entries.metadata.name.split(" ")[1]} themen={themen}/>

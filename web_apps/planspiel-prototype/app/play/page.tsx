@@ -144,19 +144,14 @@ export default function Play() {
     return (
         <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
             {gameState?.phase == "configuring"? <ConfigurationPlaceholder /> : <></>}
-            <div className="w-10/12 mx-auto">
-                <div className="h-40">
-                    <StatusArea gameState={gameState}></StatusArea>
-                    </div>
-                <div className=" flex justify-between gap-14">
-                    <div className="pr-5">
-                        <DiscussionArea user={user} gameState={gameState}/>
-                        <div className="h-10"></div>
-                        <VotingArea gameState={gameState}/>
-                    </div>
-                    <div className="m-auto w-full">
-                        <RoleDetailsArea themen={themen} gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
-                    </div>
+            <div className="mx-auto flex max-md:flex-col">
+                <StatusArea gameState={gameState}></StatusArea>
+                <div id="infoArea" className="flex-col p-5">
+                    <DiscussionArea user={user} gameState={gameState}/>
+                    <VotingArea gameState={gameState}/>
+                </div>
+                <div className="max-w-2xl p-5 mx-auto">
+                    <RoleDetailsArea themen={themen} gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
                 </div>
                 <div className="h-10"></div>
                 <WarningArea warning={warning}/>

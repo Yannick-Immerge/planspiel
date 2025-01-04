@@ -8,7 +8,7 @@ export default function DiscussionArea({user, gameState} : {user: UserView | nul
     if(gameState.phase == "discussion1" || gameState.phase == "discussion2"){
         return (
             <div>
-                <h1 className="text-xl text-orange-500">Discussion Ongoing!</h1>
+                <h1 className="text-xl text-orange-500">Diskussion läuft</h1>
                 <DiscussionPhaseArea user={user} gameState={gameState}/>
             </div>
         );
