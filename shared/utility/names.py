@@ -1,49 +1,214 @@
 import random
-from typing import Any, Callable
+from typing import Callable, Literal
 
 _OPTIONS_NOUN = [
-    "Haus", "Känguru", "Notizbuch", "Veilchen", "Atom", "Molekül",
-    "Xylophon", "Zebra", "Feuer", "Flusspferd", "Riff", 
-    "Xenon", "Joghurt", "Element", "Licht", "Paradies", "Flüstern", 
-    "Abenteuer", "Blau", "Rätsel", "Zen", "Echo", "Märchen", 
-    "Neutron", "Elektron", "Bernstein", "Glück", "Charisma", 
-    "Zwielicht", "Kaleidoskop", "Lachen", "Leben", "Schicksal", "Erbe", "Königreich",
-    "Flimmern", "Erwachen", "Schimmern", "Herz", "Lächeln", 
-    "Vertrauen", "Eis", "Farbenspiel", "Meer", "Schiff", "Gespräch", "Mikrofon", 
-    "Seepferdchen", "Einhorn", "Klavier", "Brot", "Papier"
+    "Haus",
+    "Känguru",
+    "Notizbuch",
+    "Veilchen",
+    "Atom",
+    "Molekül",
+    "Xylophon",
+    "Zebra",
+    "Feuer",
+    "Flusspferd",
+    "Riff",
+    "Xenon",
+    "Joghurt",
+    "Element",
+    "Licht",
+    "Paradies",
+    "Flüstern",
+    "Abenteuer",
+    "Blau",
+    "Rätsel",
+    "Zen",
+    "Echo",
+    "Märchen",
+    "Neutron",
+    "Elektron",
+    "Bernstein",
+    "Glück",
+    "Charisma",
+    "Zwielicht",
+    "Kaleidoskop",
+    "Lachen",
+    "Leben",
+    "Schicksal",
+    "Erbe",
+    "Königreich",
+    "Flimmern",
+    "Erwachen",
+    "Schimmern",
+    "Herz",
+    "Lächeln",
+    "Vertrauen",
+    "Eis",
+    "Farbenspiel",
+    "Meer",
+    "Schiff",
+    "Gespräch",
+    "Mikrofon",
+    "Seepferdchen",
+    "Einhorn",
+    "Klavier",
+    "Brot",
+    "Papier",
 ]
 
 
 _OPTIONS_ADJECTIVE = [
-    "abenteuerliches", "altes", "ausgezeichnetes", "aufgeregtes", 
+    "abenteuerliches",
+    "altes",
+    "ausgezeichnetes",
+    "aufgeregtes",
     "blaues",
-    "cooles"
-    "dunkles", "dankbares",
-    "ehrliches", "elegantes", "erfahrenes", "eindeutiges", 
-    "feuriges", "freundliches", "fröhliches",
-    "grünes", "glückliches", "geduldiges", "geheimes", "glattes", "geschäftiges"
-    "heißes", "hervorragendes", "hohes", "helles", "hartes", 
-    "intelligentes", "interessantes"
-    "junges", "japanisches"
-    "klassisches", "kreatives", "kühles", "kaltes", "kluges", "klares", 
-    "lautes", "lebendiges", "langes", 
-    "modernes", "mutiges",
-    "neues", "nices"
-    "optimistisches", "offenes",
-    "pinkes", "plapperndes"
-    "qiuetschendes" 
-    "rotes", "ruhiges", "reiches", "rauhes",
-    "schönes", "starkes", "schnelles", "salziges", "süßes", "saueres", "selbstbewusstes", "stabiles", "sicheres", "scharfes", "sanftes", 
-    "treues", "tapferes"
-    "ungeduldiges", "uriges"
-    "verschwommenes",
-    "warmes", "weiches", 
-    "zahmes", "zitterndes"
+    "coolesdunkles",
+    "dankbares",
+    "ehrliches",
+    "elegantes",
+    "erfahrenes",
+    "eindeutiges",
+    "feuriges",
+    "freundliches",
+    "fröhliches",
+    "grünes",
+    "glückliches",
+    "geduldiges",
+    "geheimes",
+    "glattes",
+    "geschäftigesheißes",
+    "hervorragendes",
+    "hohes",
+    "helles",
+    "hartes",
+    "intelligentes",
+    "interessantesjunges",
+    "japanischesklassisches",
+    "kreatives",
+    "kühles",
+    "kaltes",
+    "kluges",
+    "klares",
+    "lautes",
+    "lebendiges",
+    "langes",
+    "modernes",
+    "mutiges",
+    "neues",
+    "nicesoptimistisches",
+    "offenes",
+    "pinkes",
+    "plapperndesqiuetschendesrotes",
+    "ruhiges",
+    "reiches",
+    "rauhes",
+    "schönes",
+    "starkes",
+    "schnelles",
+    "salziges",
+    "süßes",
+    "saueres",
+    "selbstbewusstes",
+    "stabiles",
+    "sicheres",
+    "scharfes",
+    "sanftes",
+    "treues",
+    "tapferesungeduldiges",
+    "urigesverschwommenes",
+    "warmes",
+    "weiches",
+    "zahmes",
+    "zitterndes",
+]
+
+_OPTIONS_PROPER_NOUN = [
+    "einstein",
+    "pascal",
+    "hertz",
+    "newton",
+    "planck",
+    "euler",
+    "curie",
+    "galilei",
+    "fermi",
+    "heisenberg",
+    "galileo",
+    "kepler",
+    "newton",
+    "tesla",
+    "darwin",
+    "hawking",
+    "bohr",
+    "faraday",
+    "maxwell",
+    "schrodinger",
+    "dirac",
+    "boyle",
+    "boltzmann",
+    "laplace",
+    "brahe",
+    "archimedes",
+    "copernicus",
+    "turing",
+    "lavoisier",
+    "gauss",
+    "noether",
+    "joule",
+    "lemaitre",
+    "oersted",
+    "ohm",
+    "marconi",
+    "alvarez",
+    "mendel",
+    "lovelace",
+    "feynman",
+    "sagan",
+    "edison",
+    "bragg",
+    "debroglie",
+    "avogadro",
+    "seaborg",
+    "hubble",
+    "meitner",
+    "chandrasekhar",
+    "pauli",
+    "watt",
+    "cavendish",
+    "gell-mann",
+    "wilkins",
+    "crick",
+    "watson",
+    "franklin",
+    "rutherford",
+    "hooke",
+    "snell",
+    "becquerel",
+    "raman",
+    "townes",
+    "zeeman",
 ]
 
 
-def generate_name(in_use: Callable[[str], bool]) -> str:
-    while True:
-        option = f"{random.sample(_OPTIONS_ADJECTIVE, 1)[0]}-{random.sample(_OPTIONS_NOUN, 1)[0]}"
-        if not in_use(option):
-            return option
+def generate_name(
+    in_use: Callable[[str], bool],
+    generation_type: Literal["two_words", "word_number"] = "word_number",
+) -> str:
+    """Generates a name based on a generation type."""
+    if generation_type == "two_words":
+        while True:
+            option = f"{random.sample(_OPTIONS_ADJECTIVE, 1)[0]}-{random.sample(_OPTIONS_NOUN, 1)[0]}"
+            if not in_use(option):
+                return option
+
+    elif generation_type == "word_number":
+        while True:
+            option = (
+                f"{random.sample(_OPTIONS_PROPER_NOUN, 1)[0]}-{random.randint(1, 100)}"
+            )
+            if not in_use(option):
+                return option
+
+    else:
+        raise ValueError(f"Unknown generation type: {generation_type}")
