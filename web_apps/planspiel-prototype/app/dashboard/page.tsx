@@ -126,7 +126,7 @@ export default function Dashboard() {
         <div className="bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
             <div className="absolute left-[8.33%] top-5 text-5xl">Admin-Dashboard</div>
             <div className="pt-20 w-full">
-                <div className="flex h-80 justify-between gap-10 mx-10">
+                <div className="flex justify-between gap-10 mx-10">
                     <div className="w-1/2">
                     <div className="flex-1 rounded-2xl bg-[#5a53] p-5 shadow-[10px_10px_10px_rgba(0,0,0,0.4)] backdrop-blur-xl">    
                         <TransitionArea stateDescriptions={stateDescriptions} gameState={gameState} onTransitionAction={onTransitionAction}/>

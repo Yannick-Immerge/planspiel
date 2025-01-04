@@ -14,7 +14,7 @@ export default function DiaryComponent({ path } : { path: string}) {
 
     return (
         <div className="flex justify-center">
-            <div className="w-8/12 bg-gray-300 rounded-md">
+            <div className="w-8/12 max-md:w-full bg-gray-300 rounded-md">
                 <div
                     className="p-4 border border-gray-300 rounded-md overflow-auto"
                     style={{backgroundImage: "url('/visualization/journal_bg.png')", backgroundSize: 'cover', backgroundPosition: "center"}}

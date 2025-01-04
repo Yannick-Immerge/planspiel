@@ -29,7 +29,7 @@ export default function FormComponent() {
 
   return (
     <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
-      <div className="p-10 w-1/3 m-auto backdrop-blur-xl rounded-2xl shadow-[10px_10px_10px_rgba(0,0,0,0.8)]">
+      <div className="p-10 w-1/3 max-lg:w-1/2 max-md:w-3/4 m-auto backdrop-blur-xl rounded-2xl shadow-[10px_10px_10px_rgba(0,0,0,0.8)]">
           <div className="pb-10 text-center text-3xl font-bold">Login</div>
           <TextEingabe 
             onKeyDown={handleEnterOnAuthentication}
@@ -55,6 +55,7 @@ export default function FormComponent() {
         <div className="mb-[5%]"></div>
         <div className="flex w-3/4 m-auto mb-5 mt-5">
           <button onClick={handleSubmit} className="bg-sky-500 hover:bg-sky-400 active:bg-sky-600 transition-all duration-200 m-auto rounded-full pt-4 pb-4 pl-8 pr-8 text-center">Login</button>
+          <div id="spacer" className="w-5"></div>
           <button onClick={() => {window.location.replace("/create")}} className="transition-all duration-200 m-auto hover:bg-sky-700 bg-sky-800 rounded-full border-0 pt-4 pb-4 pl-8 pr-8">Neue Session</button>
         </div>
       </div>

@@ -6,7 +6,7 @@ export default function DiscussionTransitionArea({gameState, onDiscussionTransit
         <div></div>
     ) : (
         <div>
-            <h1 className="text-lg">Discussion is in Phase: {gameState.discussionPhase}</h1>
+            <h1 className="text-lg">Diskussion ist in der Phase: {gameState.discussionPhase}</h1>
             <div className="h-3"></div>
             <div className="mx-auto">
                 <DiscussionTransitionButton phase={gameState.discussionPhase}
