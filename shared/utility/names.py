@@ -193,22 +193,32 @@ _OPTIONS_PROPER_NOUN = [
 
 def generate_name(
     in_use: Callable[[str], bool],
-    generation_type: Literal["two_words", "word_number"] = "word_number",
+    generation_type: Literal["two_words", "word_number"] = "two_words",
+    max_length: int = 20,
+    max_tries: int = 1000,
 ) -> str:
-    """Generates a name based on a generation type."""
-    if generation_type == "two_words":
-        while True:
-            option = f"{random.sample(_OPTIONS_ADJECTIVE, 1)[0]}-{random.sample(_OPTIONS_NOUN, 1)[0]}"
-            if not in_use(option):
-                return option
+    """Generates a name based on a generation type.
 
-    elif generation_type == "word_number":
-        while True:
+    Args:
+        in_use (Callable[[str], bool]): A function that checks if a name is in use.
+        generation_type (Literal["two_words", "word_number"], optional): The name generation type. Defaults to "two_words".
+        max_length (int, optional): The maximum length of the generated name. Defaults to 20.
+        max_tries (int, optional): The maximum number of tries to generate a valid name. Defaults to 1000.
+    """
+    def is_valid(option: str) -> bool:
+        return not in_use(option) and len(option) <= max_length
+
+    for _ in range(max_tries):
+        if generation_type == "two_words":
+            option = f"{random.sample(_OPTIONS_ADJECTIVE, 1)[0]}-{random.sample(_OPTIONS_NOUN, 1)[0]}"
+        elif generation_type == "word_number":
             option = (
                 f"{random.sample(_OPTIONS_PROPER_NOUN, 1)[0]}-{random.randint(1, 100)}"
             )
-            if not in_use(option):
-                return option
+        else:
+            raise ValueError(f"Unknown generation type: {generation_type}")
 
-    else:
-        raise ValueError(f"Unknown generation type: {generation_type}")
+        if is_valid(option):
+            return option
+
+    raise RuntimeError(f"Could not generate a valid name after {max_tries} tries.")
