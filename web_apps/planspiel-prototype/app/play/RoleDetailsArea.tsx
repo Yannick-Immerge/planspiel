@@ -1,9 +1,9 @@
 import {GameState} from "@/app/api/models";
 import {GetRoleEntryInformationResult, GetScenarioInformationResult} from "@/app/api/data_controller_interface";
 import MetadataComponent from "@/app/components/MetadataComponent";
-import ResourceListComponent from "@/app/components/ResourceListComponent";
+import ResourceListComponent from "@/app/play/ProfileComponents/ResourceListComponent";
 import dynamic from "next/dynamic";
-import PictureComponent from "../components/PictureComponent";
+import PictureComponent from "./ProfileComponents/PictureComponent";
 import { getLocalUsername } from "../api/utility";
 import { useEffect, useState } from "react";
 import { viewUser } from "../api/game_controller_interface";
@@ -13,6 +13,9 @@ import EMailComponent from "./EMailComponent";
 const OsmMapNoSSR = dynamic(() => import("./Map/Map"), {ssr: false});
 
 export default function RoleDetailsArea({themen, gameState, entries, scenarios} : {themen: string[], gameState: GameState | null, entries: GetRoleEntryInformationResult | null, scenarios: GetScenarioInformationResult | null}) {
+
+    if (entries === undefined || entries?.resourceEntries === undefined) return (<></>)
+
     if (gameState === null) {
         return <p>Could not fetch game state.</p>;
     }

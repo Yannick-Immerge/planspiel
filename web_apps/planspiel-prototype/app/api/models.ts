@@ -107,7 +107,7 @@ export interface RoleMetadata {
  */
 export interface Resource {
     identifier: string,
-    contentType: "picture" | "article" | "diary" | "metadata"
+    contentType: "info" | "picture" | "article" | "diary" | "metadata" | "titlecard" | "profile_picture"
 }
 
 /**

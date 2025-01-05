@@ -4,10 +4,17 @@
   "demographic": {},
   "entries": [
     {
+      "name": "11_anais_fournier_profile_picture",
+      "resource": {
+        "identifier": "11_anais_fournier_profile_picture.png",
+        "content_type": "profile_picture"
+      }
+    },
+    {
       "name": "11_anais_fournier_picture",
       "resource": {
-        "identifier": "11_anais_fournier_picture.png",
-        "content_type": "picture"
+        "identifier": "11_anais_fournier_titlecard.png",
+        "content_type": "titlecard"
       }
     },
     {

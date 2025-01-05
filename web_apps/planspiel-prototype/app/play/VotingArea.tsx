@@ -27,7 +27,7 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
         }, 500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, );
 
     const voteParameterAction = (parameter: string, votedValue: number) => {
         const pushVoteParameter = async (parameter: string, votedValue: number) => {

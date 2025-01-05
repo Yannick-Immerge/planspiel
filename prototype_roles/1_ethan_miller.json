@@ -4,10 +4,17 @@
   "description": "",
   "entries": [
     {
-      "name": "1_ethan_miller_picture",
+      "name": "1_ethan_miller_profile_picture",
       "resource": {
-        "identifier": "1_ethan_miller_picture.png",
-        "content_type": "picture"
+        "identifier": "1_ethan_miller_profile_picture.png",
+        "content_type": "profile_picture"
+      }
+    },
+    {
+      "name": "1_ethan_miller_titlecard",
+      "resource": {
+        "identifier": "1_ethan_miller_titlecard.png",
+        "content_type": "titlecard"
       }
     },
     {

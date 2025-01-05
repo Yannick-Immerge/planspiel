@@ -10,7 +10,7 @@ import {
     GetRoleEntryInformationResult,
     getScenarioInformation, GetScenarioInformationResult
 } from "@/app/api/data_controller_interface";
-import {GameState, UserView} from "@/app/api/models";
+import {GameState, Resource, RoleEntry, RoleMetadata, UserView} from "@/app/api/models";
 import WarningArea from "@/app/components/WarningArea";
 import VotingArea from "@/app/play/VotingArea";
 import DiscussionArea from "@/app/play/DiscussionArea";
@@ -18,13 +18,21 @@ import RoleDetailsArea from "@/app/play/RoleDetailsArea";
 import StatusArea from "@/app/play/StatusArea";
 import { ConfigurationPlaceholder } from "./KonfiguringWait";
 import { getLocalUsername } from "../api/utility";
+import { BsPersonVcard } from "react-icons/bs";
+import { MdOutlineMail } from "react-icons/md";
+import { GoCommentDiscussion } from "react-icons/go";
+import PersonProfile from "./ProfileComponents/PersonProfile";
+import EMailProvider from "./EMailProvider";
+import { metadata } from "../layout";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
     const [gameState, setGameState] = useState<GameState | null>(null);
-    const [roleEntries, setRoleEntries] = useState<GetRoleEntryInformationResult | null>(null);
+    const [roleEntries, setRoleEntries] = useState<Resource[] | null>(null);
+    const [roleMetadata, setRoleMetadata] = useState<RoleMetadata | null>(null);
     const [scenarios, setScenarios] = useState<GetScenarioInformationResult | null>(null);
     const [warning, setWarning] = useState<string | null>(null);
+    const [activePanel, setActivePanel] = useState<"profile" | "voting" | "email">("profile")
 
     const fetchUser = async () => {
         const viewResponse = await viewSelf();
@@ -74,7 +82,8 @@ export default function Play() {
             setRoleEntries(null);
             return;
         }
-        setRoleEntries(roleEntriesResponse.data);
+        setRoleEntries(roleEntriesResponse.data.resourceEntries);
+        setRoleMetadata(roleEntriesResponse.data.metadata)
     };
 
     const fetchScenarios = async () => {
@@ -117,12 +126,18 @@ export default function Play() {
     }
 
     useEffect(() => {
+        revalidate();
+    }, []);
+    // This is the old version, revalidating every 500 Milliseconds
+    /*
+    useEffect(() => {
         const interval = setInterval(() => {
             revalidate();
         }, 500);
 
         return () => clearInterval(interval);
     }, []);
+    */
 
     useEffect(() => {
         getThemes();
@@ -139,22 +154,44 @@ export default function Play() {
     }
     const [themen, setThemen] = useState<string[]>(["Thema 1" , "Thema 2"]);
     
-        
+    if (gameState == undefined || gameState.phase == "configuring" )
+        return (
+        <>
+            <link rel="icon" href="/icon.png"/>
+            <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
+                <ConfigurationPlaceholder />
+            </div>
+        </>
+    );
 
     return (
         <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
-            {gameState?.phase == "configuring"? <ConfigurationPlaceholder /> : <></>}
-            <div className="mx-auto flex max-md:flex-col">
-                <StatusArea gameState={gameState}></StatusArea>
-                <div id="infoArea" className="flex-col p-5">
+            
+            {activePanel == "profile"? 
+                    <PersonProfile gameState={gameState} metadata={roleMetadata} roleEntries={roleEntries}/> : 
+            <></>}
+
+            {activePanel == "voting"? <>
                     <DiscussionArea user={user} gameState={gameState}/>
-                    <VotingArea gameState={gameState}/>
+                    {(gameState.phase == "discussion1" || gameState.phase == "discussion2") && gameState.discussionPhase === "voting"?
+                        <VotingArea gameState={gameState}/> : <></>
+                    }
+            </> : <></>}
+
+            {activePanel == "email"? 
+                    <EMailProvider nachname={roleMetadata?.name? roleMetadata?.name : "Dame"} themen={themen}/> : 
+            <></>}
+
+            <div className="fixed w-full h-[10%] left-0 bottom-0 bg-sky-600 shadow-[0px_0px_20px_rgba(0,0,0,0.5)] flex">
+                <div onClick={() => setActivePanel("profile")} className="w-1/3 content-center">
+                    <BsPersonVcard color={activePanel === "profile"? "white" : "black"} className="m-auto w-[60%] h-[60%] transition-all transition-duration-200"/>
                 </div>
-                <div className="max-w-2xl p-5 mx-auto">
-                    <RoleDetailsArea themen={themen} gameState={gameState} entries={roleEntries} scenarios={scenarios}/>
+                <div onClick={() => setActivePanel("voting")} className="w-1/3 content-center">
+                    <GoCommentDiscussion color={activePanel === "voting"? "white" : "black"} className="m-auto w-[60%] h-[60%] transition-all transition-duration-200"/>
                 </div>
-                <div className="h-10"></div>
-                <WarningArea warning={warning}/>
+                <div onClick={() => setActivePanel("email")} className="w-1/3 content-center">
+                    <MdOutlineMail color={activePanel === "email"? "white" : "black"} className="m-auto w-[60%] h-[60%] transition-all transition-duration-200"/>
+                </div>
             </div>
         </div>
     );

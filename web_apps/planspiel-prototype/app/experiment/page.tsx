@@ -1,4 +1,4 @@
-import ResourceListComponent from "@/app/components/ResourceListComponent";
+import ResourceListComponent from "@/app/play/ProfileComponents/ResourceListComponent";
 import {Resource} from "@/app/api/models";
 
 export default function Experiment() {
