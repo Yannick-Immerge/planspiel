@@ -35,31 +35,11 @@ export interface Session {
  */
 export interface Buergerrat {
     parameters: string[]
-    configuration1: Record<string, number> | null
-    configuration2: Record<string, number> | null
+    configuration: Record<string, number> | null
 }
 
 
-export type GamePhase = "configuring" | "identification1" | "discussion1" | "identification2" | "discussion2" | "debriefing"
-export type DiscussionPhase = "inactive" | "preparing" | "introduction" | "free" | "closing" | "voting" | "completed"
-
-export function getNextDiscussionPhase(phase: DiscussionPhase) : DiscussionPhase | null {
-    switch (phase){
-        case "inactive":
-        case "completed":
-            return null;
-        case "preparing":
-            return "introduction";
-        case "introduction":
-            return "free"
-        case "free":
-            return "closing"
-        case "closing":
-            return "voting"
-        case "voting":
-            return "completed"
-    }
-}
+export type GamePhase = "configuring" | "identification" | "discussion" | "voting" | "debriefing"
 
 
 /**
@@ -70,14 +50,10 @@ export interface GameState {
     buergerrat1: Buergerrat,
     buergerrat2: Buergerrat,
     phase: GamePhase,
-    projections1: Record<string, number> | null,
-    projections2: Record<string, number> | null
-    discussionPhase: DiscussionPhase,
-    discussionSpeaker1: string | null
-    discussionSpeaker2: string | null
+    projection: Record<string, number> | null
 }
 
-export type VotingStatus = {parameter: string, hasVoted: boolean}[]
+export type VotingStatus = { parameter: string, hasVoted: boolean }[]
 
 
 // Data Controller
