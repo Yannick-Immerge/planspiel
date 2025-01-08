@@ -19,7 +19,7 @@ export default function ArticleComponent({ path, pathimage } : { path: string, p
                     className="p-4 overflow-auto"
 
                 >
-                    <div className="prose max-w-none text-xs text-black">
+                    <div className="prose max-w-none text-sm text-black">
                         <ReactMarkdown>{markdown}</ReactMarkdown>
                     </div>
                 </div>

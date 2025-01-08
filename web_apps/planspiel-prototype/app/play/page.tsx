@@ -118,7 +118,7 @@ export default function Play() {
         setScenarios(scenariosResponse.data);
     };
 
-    const revalidate = async () => {
+    const fetchAll = async () => {
         fetchUser();
         fetchGameState();
         fetchRoleEntries();
@@ -126,18 +126,8 @@ export default function Play() {
     }
 
     useEffect(() => {
-        revalidate();
-    }, []);
-    // This is the old version, revalidating every 500 Milliseconds
-    /*
-    useEffect(() => {
-        const interval = setInterval(() => {
-            revalidate();
-        }, 500);
-
-        return () => clearInterval(interval);
-    }, []);
-    */
+        fetchAll();
+    }, [gameState == undefined || gameState.phase == "configuring" ]);
 
     useEffect(() => {
         getThemes();

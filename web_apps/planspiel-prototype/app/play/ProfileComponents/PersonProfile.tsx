@@ -9,49 +9,17 @@ import ArticleComponent from './ArticleComponent';
 
 export default function PersonProfile ({gameState, metadata, roleEntries}: {gameState: GameState, metadata: RoleMetadata | null, roleEntries: Resource[] | null}) {
 
-    const [profilePicPath, setProfilePic] = useState<string>("resources/0_unknown_profile_picture.png");
-    const [titlecardPath, setTitleCard] = useState<string>("images/EarthTint.png");
-    const [articlePicturePath, setArticlePicturePath] = useState<string | null>(null)
-    const [infoArticle, setInfoArticle] = useState<Resource | null>(null)
-
-    useEffect(() => {
-        // Trying to set profile picture
-        const result = roleEntries?.find(n => n.contentType === "profile_picture");
-        if (result) {
-            setProfilePic("resources/" + result.identifier)
-        }
-
-        const titlecard = roleEntries?.find(n => n.contentType === "titlecard");
-        if (titlecard) {
-            setTitleCard("resources/" + titlecard.identifier)
-        }
-
-        const articlePicture = roleEntries?.find(n => n.contentType === "picture");
-        if (articlePicture) {
-            setArticlePicturePath("resources/" + articlePicture.identifier);
-        }
-
-        const info = roleEntries?.find(n => n.contentType === "info");
-        if (info) {
-            setInfoArticle(info);
-        }
-    }, [])
-
     console.log(roleEntries?.length)
 
   return (
     <div className="w-full h-full">
-        <Titlecard url={titlecardPath} />
-        <ProfilePicture url={profilePicPath}/>
+        <Titlecard url={(roleEntries? ("resources/" + roleEntries.find(n => n.contentType === "titlecard")?.identifier) : "images/EarthTint.png")} />
+        <ProfilePicture url={"resources/" + (roleEntries? roleEntries.find(n => n.contentType === "profile_picture")?.identifier : "0_unknown_profile_picture.png")}/>
         <MetadataArea roleMetadata={metadata}/>
-        {infoArticle? <ResourceComponent resource={infoArticle} /> : <></>}
-        <PostsArea roleEntries={roleEntries} articlePicturePath={articlePicturePath}/>
+        {roleEntries?.filter(n => n.contentType === "info").map((n, index) => <ResourceComponent key={index} resource={n}/>)}
+        <PostsArea roleEntries={roleEntries} />
     </div>
   )
-}
-
-function RoleInfoArea({roleInfoPath} : {roleInfoPath: string}) {
-    
 }
 
 function GetStatus(name:string) : string {
@@ -61,7 +29,7 @@ function GetStatus(name:string) : string {
     return "Here comes " + name.split(" ")[0] + "!"
 }
 
-function PostsArea({roleEntries, articlePicturePath} : {roleEntries: Resource[] | null, articlePicturePath: string|null}) {
+function PostsArea({roleEntries} : {roleEntries: Resource[] | null}) {
     if (!roleEntries) return (<></>);
 
     return (<>
