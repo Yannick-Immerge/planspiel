@@ -27,7 +27,7 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
         }, 500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, );
 
     const voteParameterAction = (parameter: string, votedValue: number) => {
         const pushVoteParameter = async (parameter: string, votedValue: number) => {
@@ -44,7 +44,7 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
 
     if((gameState.phase == "discussion1" || gameState.phase == "discussion2") && gameState.discussionPhase === "voting") {
         return <div>
-            <h1 className="text-lg">Your Voting:</h1>
+            <h1 className="text-lg">Deine Stimme:</h1>
             {votingStatus === null ? <p>Could not fetch voting state.</p> : (
                 <div>
                     {votingStatus.map((item, index) => (

@@ -11,24 +11,24 @@
       }
     },
     {
-      "name": "5_leon_schulz_picture_biography",
+      "name": "5_leon_schulz_biography",
       "resource": {
-        "identifier": "5_leon_schulz_picture_biography.txt",
+        "identifier": "5_leon_schulz_biography.txt",
         "content_type": "info"
       }
     },
     {
-      "name": "5_leon_schulz_picture_article",
-      "resource": {
-        "identifier": "5_leon_schulz_picture.md",
-        "content_type": "article"
-      }
-    },
-    {
-      "name": "5_leon_schulz_article_picture.png",
+      "name": "5_leon_schulz_article_picture",
       "resource": {
         "identifier": "5_leon_schulz_article_picture.png",
         "content_type": "picture"
+      }
+    },
+    {
+      "name": "5_leon_schulz_article",
+      "resource": {
+        "identifier": "5_leon_schulz_article.md",
+        "content_type": "article"
       }
     },
     {

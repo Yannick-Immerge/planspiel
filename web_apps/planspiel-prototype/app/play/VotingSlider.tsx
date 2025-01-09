@@ -21,12 +21,12 @@ export default function VotingSlider({parameter, voteParameterAction} : {paramet
             type="range"
             min={parameter.min_value}
             max={parameter.max_value}
-            value={parameter.min_value}
+            value={value}
             onChange={handleChange}
             />
         </div>
         <div>
-            <StyledButton onClickAction={handleVote}>Lock In!</StyledButton>
+            <StyledButton onClickAction={handleVote}>Abstimmen</StyledButton>
         </div>
     </div>;
 }

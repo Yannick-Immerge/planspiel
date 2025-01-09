@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCheckCircle } from 'react-icons/fa';
 import TextEingabe from '../login/TextEingabe';
-import { TryCreateSession } from './page';
+import { createSession } from '../api/game_controller_interface';
+import { Encode } from '../components/AuthenticationHelper';
 
 const USER_REGEX = /^[a-zA-Z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[€+&!@#$% _\-\?]).{8,28}$/;
@@ -13,41 +14,26 @@ export default function CreateSessionInput() {
     const codeRef = useRef<HTMLInputElement>(null);
     const errRef = useRef<HTMLInputElement>(null);
 
-    const [sessionKey, setSessionKey] = useState("")
+    const [sessionKey, setShownUsername] = useState("")
 
     const [accessCode, setAccessCode] = useState("");
-    const [validCode, setValidAccessCode] = useState(false);
-    const [codeFocus, setFocusCode] = useState(false);
-
-    const [userName, setUserName] = useState("");
-    const [validName, setValidName] = useState(false);
-    const [nameFocus, setFocusName] = useState(false);
-    const [nameError, setNameError] = useState("");
+    const [validAccessCode, setValidAccessCode] = useState(false);
+    const [focusOnAccessCode, setFocusAccessCode] = useState(false);
 
     const [password, setPassword] = useState("");
     const [validPwd, setValidPwd] = useState(false);
-    const [pwdFocus, setFocusPwd] = useState(false);
+    const [focusOnPassword, setFocusPwd] = useState(false);
 
     const [passwordMatch, setPasswordMatch] = useState("");
     const [validPwdMatch, setValidPwdMatch] = useState(false);
-    const [pwdMatchFocus, setFocusPwdMatch] = useState(false);
+    const [focusOnPasswordMatch, setFocusPwdMatch] = useState(false);
 
-
-
-    const [errMsg, setErrMsg] = useState('');
+    const [errMsg, setYellowMsg] = useState('');
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (codeRef.current) codeRef.current.focus();
     }, [])
-
-    useEffect(() => {// Test if username input has the right formatting
-        let result = USER_REGEX.test(userName);
-        console.log(result);
-        console.log(userName);
-        setNameError("Dein Benutzername sollte zwischen 4 und 24 Zeichen lang sein und nur Buchstaben, Zahlen und _ enthalten.");
-        setValidName(result);
-    }, [userName]);
 
     useEffect(() => { // Test if Password input has the right formatting
         const result = PWD_REGEX.test(password);
@@ -70,34 +56,31 @@ export default function CreateSessionInput() {
     }) 
 
     useEffect(() => {
-        setErrMsg('');
-    }, [userName, password, passwordMatch]);
+        setYellowMsg('');
+    }, [password, passwordMatch]);
 
     const changeAccessCode = (event: React.ChangeEvent<HTMLInputElement>) => {setAccessCode(event.target.value)}
-    const changeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {setUserName(event.target.value)}
     const changePassword = (event: React.ChangeEvent<HTMLInputElement>) => {setPassword(event.target.value)}
     const changePasswordMatch = (event: React.ChangeEvent<HTMLInputElement>) => {setPasswordMatch(event.target.value)}
 
-    const submitForm = async () => {
-        if (sessionKey != "") {
-            setErrMsg("Deine Session existiert bereits unter dem Session Code: ")
-            return;
-        }
-
-        const response = await TryCreateSession({prodKey: accessCode})
-            .then((result) => { if (result) {
-                setErrMsg("Deine Session wurde erfolgreich erstellt! Der Session Code ist");
-                setSessionKey(result)
-            } else {
-                setErrMsg("Es gab ein Problem mit deinem Session key. Geh sicher dass du ihn richtig abgetippt hast und deine Lizenz noch gültig ist.");
-                setSessionKey("")
-            }})
+    const tryCreateSession = async () => {
+        setYellowMsg("Versuche anzumelden...");
+        await createSession(accessCode, Encode(passwordMatch))
+            .then((result) => { if (result.ok) {
+                                    setYellowMsg("Deine Session wurde erfolgreich erstellt! Du kannst dich jetzt mit deinem neuen Passwort unter dem folgenden Benutzernamen anmelden:")
+                                    setShownUsername(result.data?.administratorUsername? result.data?.administratorUsername : "ERROR");
+                                } else {
+                                    setYellowMsg("Das hat leider nicht geklappt. Stell sicher dass du den Produktschlüssel richtig abgetippt hast.");
+                                }
+                                
+                            })
+            .catch((error) => { setYellowMsg(`Es gab ein Problem mit dem Server: ${error}. Bitte versuche es später erneut.`) })
     }
 
     const handleKeyDown = async (event: React.KeyboardEvent) => {
         
       if (event.key === 'Enter') {
-        if (validPwdMatch && validCode && validName && validPwd) submitForm();
+        if (validPwdMatch && validAccessCode && validPwd) tryCreateSession();
       }
     }
 
@@ -110,48 +93,35 @@ export default function CreateSessionInput() {
                     <TextEingabe
                         onKeyDown={handleKeyDown}
                         describedby='randomId1'
-                        userFocus={codeFocus}
-                        onFocus={() => setFocusCode(true)} 
-                        onBlur={() => setFocusCode(false)}  
-                        validInput={validCode}
+                        userFocus={focusOnAccessCode}
+                        onFocus={() => setFocusAccessCode(true)} 
+                        onBlur={() => setFocusAccessCode(false)}  
+                        validInput={validAccessCode}
                         onChange={changeAccessCode} 
                         input={accessCode} 
                         type="text" 
                         text="Freischaltcode deiner Schule" 
                         correction='Der Freischaltcode sollte ein Format wie "ab12-cd34-ef56" haben.'
-                        icon={validCode? <FaCheckCircle /> : null}/>
+                        icon={null}/>
                     </div>
-                    <TextEingabe 
-                        onKeyDown={handleKeyDown}
-                        describedby='randomID2'
-                        userFocus={nameFocus}
-                        onFocus={() => setFocusName(true)}
-                        onBlur={() => setFocusName(false)}
-                        validInput={validName}
-                        onChange={changeUserName} 
-                        input={userName} 
-                        type="text" 
-                        text="Dein Benutzername (Fur zukünftige Anmeldungen)" 
-                        correction={nameError}
-                        icon={validName? <FaCheckCircle /> : null}/>
                         
                     <TextEingabe 
                         onKeyDown={handleKeyDown}
                         describedby='randomID3'
-                        userFocus={pwdFocus}
+                        userFocus={focusOnPassword}
                         onFocus={() => setFocusPwd(true)}
                         onBlur={() => setFocusPwd(false)}
                         validInput={validPwd}
                         onChange={changePassword} 
                         input={password} 
                         type="password" 
-                        text="Dein Passwort" 
+                        text="Dein Admin-Passwort" 
                         correction='Bitte wähle ein Passwort mit mindestens 8 Zeichen, Kleinbuchstaben, Großbuchstaben und mindestens einem Sonderzeichen und einer Zahl'
                         icon={validPwd? <FaCheckCircle /> : null}/>
                     <TextEingabe 
                         onKeyDown={handleKeyDown}
                         describedby='randomID4'
-                        userFocus={pwdMatchFocus}
+                        userFocus={focusOnPasswordMatch}
                         onFocus={() => setFocusPwdMatch(true)}
                         onBlur={() => setFocusPwdMatch(false)}
                         validInput={validPwdMatch}
@@ -163,7 +133,7 @@ export default function CreateSessionInput() {
                         icon={validPwdMatch? <FaCheckCircle /> : null}/>
                     
                     <div className="flex-1">
-                        {sessionKey == ""? <button onKeyUp={submitForm} onClick={submitForm} disabled={!(validPwdMatch && validCode && validName && validPwd)} className="disabled:bg-slate-500 hover:bg-sky-400 bg-sky-500 rounded-full border-0 mt-10 pt-5 pb-5 pl-10 pr-10">Session Aktivieren</button> : <div></div>}
+                        {sessionKey == ""? <button onClick={tryCreateSession} disabled={!(validPwdMatch && validAccessCode && validPwd)} className="disabled:bg-slate-500 hover:bg-sky-400 bg-sky-500 rounded-full border-0 mt-10 pt-5 pb-5 pl-10 pr-10 transition-all active:bg-sky-600 duration-100">Session Aktivieren</button> : <div></div>}
                     </div>
                     <div className="text-amber-400">
                         {errMsg}

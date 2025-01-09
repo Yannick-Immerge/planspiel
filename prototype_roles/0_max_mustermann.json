@@ -11,6 +11,13 @@
       }
     },
     {
+      "name": "0_max_mustermann_poi",
+      "resource": {
+        "identifier": "0_max_mustermann_poi.json",
+        "content_type": "poi"
+      }
+    },
+    {
       "name": "0_max_mustermann_diary",
       "resource": {
         "identifier": "0_max_mustermann_diary.txt",

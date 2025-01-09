@@ -1,7 +1,7 @@
 import itertools
 import json
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Self
 
 import pydantic
 
@@ -14,6 +14,19 @@ _ROLE_NAMES_PATH = _BASE_PATH / "role_names.txt"
 _RESOURCES_PATH = _BASE_PATH / "resources"
 _CONDITIONS_PATH = _BASE_PATH / "conditions"
 _SCENARIOS_PATH = _BASE_PATH / "scenarios"
+
+_CONTENT_TYPES = {
+    "diary": {"md", "txt"},
+    "article": {"md", "txt"},
+    "picture": {"png", "jpg"},
+    "profile_picture": {"png", "jpg"},
+    "profile_picture_old": {"png", "jpg"},
+    "titlecard": {"png", "jpg"},
+    "info": {"txt"},
+    "metadata": {"json"},
+    "fact": {"md", "txt"},
+    "post": {"md", "txt"}
+}
 
 
 def load_role_names() -> list[str]:
@@ -80,6 +93,23 @@ def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[Sc
 class ResourceDefinition(pydantic.BaseModel):
     identifier: str
     content_type: str
+
+    @pydantic.field_validator("content_type", mode="after")
+    @classmethod
+    def ensure_content_type(cls, value) -> str:
+        if value not in _CONTENT_TYPES:
+            raise ValueError(f"Unsupported content type: {value}.")
+        return value
+
+    @pydantic.model_validator(mode="after")
+    def ensure_suffixes(self) -> Self:
+        parts = self.identifier.split(".")
+        if len(parts) < 2:
+            raise ValueError("Resource file has to have a file ending.")
+        suffix = parts[-1]
+        if suffix not in _CONTENT_TYPES[self.content_type]:
+            raise ValueError(f"Unsupported suffix: {suffix} for resource of content type: {self.content_type}.")
+        return self
 
 
 class ScenarioDefinition(pydantic.BaseModel):
@@ -246,7 +276,7 @@ def collect_queries() -> list[PostQuery]:
         role_query,
         role_entry_query,
         scenario_query,
-        #depends_on_query
+        # depends_on_query
     ]
 
 
