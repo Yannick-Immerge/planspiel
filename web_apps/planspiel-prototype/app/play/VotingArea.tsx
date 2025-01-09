@@ -42,10 +42,10 @@ export default function VotingArea({gameState}: { gameState: GameState | null}) 
         return <p>Could not fetch relevant information.</p>;
     }
 
-    if((gameState.phase == "discussion1" || gameState.phase == "discussion2") && gameState.discussionPhase === "voting") {
+    if(gameState.phase == "voting") {
         return <div>
             <h1 className="text-lg">Deine Stimme:</h1>
-            {votingStatus === null ? <p>Could not fetch voting state.</p> : (
+            {votingStatus === null ? <p>Die Abstimmung ist gerade nicht verfügbar.</p> : (
                 <div>
                     {votingStatus.map((item, index) => (
                         <VotingStatusItem key={index} parameter={item.parameter} hasVoted={item.hasVoted} voteParameterAction={voteParameterAction}/>

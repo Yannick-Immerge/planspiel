@@ -170,7 +170,7 @@ class GameStateManager:
     def get_configuration(self, game_state_id: int, buergerrat: int) -> dict[str, float] | None:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT parameter, choice1 FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
+        query = f"SELECT parameter, choice FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
         configuration = {row[0]: row[1] for row in execute_query(query)}
         if None in configuration.values():
             configuration = None
@@ -341,9 +341,9 @@ class GameStateManager:
                  f"WHERE User.username = {_dbs(username)};")
         game_state_id = execute_query(query)[0][0]
         query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION.value:
-            raise RuntimeError("Game is not in discussion phase.")
+        phase = execute_query(query)[0][0]
+        if phase != GamePhase.DISCUSSION.value and phase != GamePhase.VOTING.value:
+            raise RuntimeError(f"Game is not in discussion nor in voting phase {phase}.")
         query = f"SELECT COUNT(*) FROM Voting WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)} AND voted_value IS NOT NULL;"
         n = execute_query(query)[0][0]
         return n > 0
@@ -356,9 +356,9 @@ class GameStateManager:
                  f"WHERE User.username = {_dbs(username)};")
         game_state_id = execute_query(query)[0][0]
         query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION.value:
-            raise RuntimeError("Game is not in discussion phase.")
+        phase = execute_query(query)[0][0]
+        if phase != GamePhase.VOTING.value:
+            raise RuntimeError("Game is not in voting phase.")
         query = f"UPDATE Voting SET voted_value = {_dbf(voted_value)} WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
         execute_post_query(PostQuery(query, ()))
 

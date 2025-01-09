@@ -2,28 +2,20 @@
 import {useEffect, useState} from "react";
 import {
     getGameState,
-    viewSelf,
-    viewUser
+    viewSelf
 } from "@/app/api/game_controller_interface";
 import {
     getRoleEntryInformation,
-    GetRoleEntryInformationResult,
     getScenarioInformation, GetScenarioInformationResult
 } from "@/app/api/data_controller_interface";
-import {GameState, Resource, RoleEntry, RoleMetadata, UserView} from "@/app/api/models";
-import WarningArea from "@/app/components/WarningArea";
+import {GameState, Resource, RoleMetadata, UserView} from "@/app/api/models";
 import VotingArea from "@/app/play/VotingArea";
-import DiscussionArea from "@/app/play/DiscussionArea";
-import RoleDetailsArea from "@/app/play/RoleDetailsArea";
-import StatusArea from "@/app/play/StatusArea";
 import { ConfigurationPlaceholder } from "./KonfiguringWait";
-import { getLocalUsername } from "../api/utility";
 import { BsPersonVcard } from "react-icons/bs";
 import { MdOutlineMail } from "react-icons/md";
 import { GoCommentDiscussion } from "react-icons/go";
 import PersonProfile from "./ProfileComponents/PersonProfile";
 import EMailProvider from "./EMailProvider";
-import { metadata } from "../layout";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -104,7 +96,7 @@ export default function Play() {
             setScenarios(null);
             return;
         }
-        if(gameStateResponse.data.gameState.phase == "configuring" || gameStateResponse.data.gameState.phase == "identification1" || gameStateResponse.data.gameState.phase == "discussion1"){
+        if(gameStateResponse.data.gameState.phase == "configuring" || gameStateResponse.data.gameState.phase == "identification" || gameStateResponse.data.gameState.phase == "discussion"){
             setScenarios(null);
             return;
         }
@@ -161,12 +153,9 @@ export default function Play() {
                     <PersonProfile gameState={gameState} metadata={roleMetadata} roleEntries={roleEntries}/> : 
             <></>}
 
-            {activePanel == "voting"? <>
-                    <DiscussionArea user={user} gameState={gameState}/>
-                    {(gameState.phase == "discussion1" || gameState.phase == "discussion2") && gameState.discussionPhase === "voting"?
-                        <VotingArea gameState={gameState}/> : <></>
-                    }
-            </> : <></>}
+            {activePanel == "voting"?
+                   <VotingArea gameState={gameState}/> :
+            <></>}
 
             {activePanel == "email"? 
                     <EMailProvider nachname={roleMetadata?.name? roleMetadata?.name : "Dame"} themen={themen}/> : 
