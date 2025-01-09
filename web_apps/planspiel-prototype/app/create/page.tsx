@@ -56,7 +56,9 @@ export default function FormComponent() {
     }
 
     // Create users
-    for (let i = 0; i < 10; i++) {
+    let n_users = 2;
+
+    for (let i = 0; i < n_users; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
         setMessage(`Error: ${userResponse.statusText}`);
@@ -64,7 +66,17 @@ export default function FormComponent() {
       }
     }
 
-    const configureResponse = await configureSessionPrototype("friday_trial_10_users");
+    let configureResponse;
+    switch (n_users) {
+      case 10:
+        configureResponse = await configureSessionPrototype("friday_trial_10_users");
+        break;
+      case 2:
+        configureResponse = await configureSessionPrototype("friday_trial_2_users");
+        break;
+      default:
+        configureResponse = await configureSessionPrototype("friday_trial");
+    }
 
     if(!configureResponse.ok) {
         setMessage(`Error: ${configureResponse.statusText}`);
