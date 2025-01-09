@@ -16,7 +16,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/database_populator/Dockerfile
-    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel-app/database_populator:latest
+    image: local/planspiel-app/database_populator:latest
     restart: no
     environment:
       DATABASE_HOST: database
@@ -28,7 +28,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/data_controller/Dockerfile
-    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel-app/data_controller:latest
+    image: local/planspiel-app/data_controller:latest
     restart: always
     environment:
       PLANSPIEL_DATA_CONTROLLER_PORT: 5001
@@ -43,7 +43,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/game_controller/Dockerfile
-    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel-app/game_controller:latest
+    image: local/planspiel-app/game_controller:latest
     restart: always
     environment:
       PLANSPIEL_GAME_CONTROLLER_PORT: 5002
@@ -58,7 +58,7 @@ services:
 #    build:
 #      context: ..
 #      dockerfile: deploy/planspiel_prototype/Dockerfile
-#    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel-app/planspiel_prototype:latest
+#    image: local/planspiel-app/planspiel_prototype:latest
 #    restart: always
 #    environment:
 #      NEXT_PUBLIC_AWS_INSTANCE_ADDR_HTTP: "http://localhost"

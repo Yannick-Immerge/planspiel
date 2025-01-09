@@ -36,21 +36,10 @@ class UserStatus(Enum):
 
 class GamePhase(Enum):
     CONFIGURING = "configuring"
-    IDENTIFICATION_1 = "identification1"
-    DISCUSSION_1 = "discussion1"
-    IDENTIFICATION_2 = "identification2"
-    DISCUSSION_2 = "discussion2"
-    DEBRIEFING = "debriefing"
-
-
-class DiscussionPhase(Enum):
-    INACTIVE = "inactive"
-    PREPARING = "preparing"
-    INTRODUCTION = "introduction"
-    FREE = "free"
-    CLOSING = "closing"
+    IDENTIFICATION = "identification"
+    DISCUSSION = "discussion"
     VOTING = "voting"
-    COMPLETED = "completed"
+    DEBRIEFING = "debriefing"
 
 
 class PrototypeConfiguration(Enum):
@@ -161,7 +150,7 @@ class GameStateManager:
         return n > 0
 
     def add_game_state(self) -> int:
-        query = f"INSERT INTO GameState(phase, discussion_phase) VALUES ({_dbs(GamePhase.CONFIGURING.value)}, {_dbs(DiscussionPhase.INACTIVE.value)});"
+        query = f"INSERT INTO GameState(phase) VALUES ({_dbs(GamePhase.CONFIGURING.value)});"
         execute_post_query(PostQuery(query, ()))
         game_state_id = get_last_row_id()
         query = "SELECT simple_name FROM Metric"
@@ -178,67 +167,54 @@ class GameStateManager:
                  f"WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};")
         return [row[0] for row in execute_query(query)]
 
-    def get_configurations(self, game_state_id: int, buergerrat: int) -> tuple[dict[str, float] | None, dict[str, float] | None]:
+    def get_configuration(self, game_state_id: int, buergerrat: int) -> dict[str, float] | None:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT parameter, choice1 FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
-        configuration1 = {row[0]: row[1] for row in execute_query(query)}
-        query = f"SELECT parameter, choice2 FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
-        configuration2 = {row[0]: row[1] for row in execute_query(query)}
-        if None in configuration1.values():
-            configuration1 = None
-        if None in configuration2.values():
-            configuration2 = None
-        return configuration1, configuration2
+        query = f"SELECT parameter, choice FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
+        configuration = {row[0]: row[1] for row in execute_query(query)}
+        if None in configuration.values():
+            configuration = None
+        return configuration
 
     def get_buergerraete(self, game_state_id: int) -> tuple[dict, dict]:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        configs_buergerrat1 = self.get_configurations(game_state_id, 1)
-        configs_buergerrat2 = self.get_configurations(game_state_id, 2)
+        config_buergerrat1 = self.get_configuration(game_state_id, 1)
+        config_buergerrat2 = self.get_configuration(game_state_id, 2)
 
         return ({
             "index": 1,
             "parameters": self.get_controlled_parameters(game_state_id, 1),
-            "configuration1": configs_buergerrat1[0],
-            "configuration2": configs_buergerrat1[1]
+            "configuration": config_buergerrat1
         }, {
             "index": 2,
             "parameters": self.get_controlled_parameters(game_state_id, 2),
-            "configuration1": configs_buergerrat2[0],
-            "configuration2": configs_buergerrat2[1]
+            "configuration": config_buergerrat2
         })
 
-    def get_projections(self, game_state_id: int) -> tuple[dict[str, float] | None, dict[str, float] | None]:
+    def get_projections(self, game_state_id: int) -> dict[str, float] | None:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT metric, projected_value1, projected_value2 FROM Projection WHERE game_state = {_dbi(game_state_id)};"
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)};"
         result = execute_query(query)
-        projections1 = {row[0]: row[1] for row in result}
-        projections2 = {row[0]: row[2] for row in result}
-        if None in projections1.values():
-            projections1 = None
-        if None in projections2.values():
-            projections2 = None
-        return projections1, projections2
+        projections = {row[0]: row[1] for row in result}
+        if None in projections.values():
+            projections = None
+        return projections
 
     def get_game_state(self, game_state_id: int):
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, discussion_phase, discussion_speaker1, discussion_speaker2 FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase, discussion_speaker1, discussion_speaker2 = execute_query(query)[0]
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0]
         buergerrat1, buergerrat2 = self.get_buergerraete(game_state_id)
-        projections1, projections2 = self.get_projections(game_state_id)
+        projection = self.get_projections(game_state_id)
         return {
             "id": game_state_id,
             "buergerrat1": buergerrat1,
             "buergerrat2": buergerrat2,
             "phase": phase,
-            "projections1": projections1,
-            "projections2": projections2,
-            "discussionPhase": discussion_phase,
-            "discussionSpeaker1": discussion_speaker1,
-            "discussionSpeaker2": discussion_speaker2
+            "projection": projection
         }
 
     def are_users_configured(self, game_state_id: int) -> bool:
@@ -268,14 +244,9 @@ class GameStateManager:
         params2 = self.get_controlled_parameters(game_state_id, 2)
         return len(params1) > 0 and len(params2) > 0
 
-    def set_choice(self, game_state_id: int, buergerrat: int, index: int, parameter: str, value: float):
-        if index == 1:
-            choice_attr = "choice1"
-        elif index == 2:
-            choice_attr = "choice2"
-        else:
-            raise ValueError("Only 0 and 1 are allowed for the choice index.")
-        query = (f"UPDATE controls SET {choice_attr} = {_dbf(value)} "
+    def set_choice(self, game_state_id: int, buergerrat: int, parameter: str, value: float):
+
+        query = (f"UPDATE controls SET choice = {_dbf(value)} "
                  f"WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)} AND parameter = {_dbs(parameter)};")
         execute_post_query(PostQuery(query, ()))
 
@@ -298,12 +269,11 @@ class GameStateManager:
                     query = f"INSERT INTO Voting(user, parameter) VALUES ({_dbs(username)}, {_dbs(parameter)});"
                     execute_post_query(PostQuery(query, ()))
 
-    def make_projections(self, game_state_id: int, index: int):
+    def make_projections(self, game_state_id: int):
         # TODO: Make projections CORRECT & DYNAMIC
         fixed_projections = [("energy_prod_coal", 50), ("energy_prod_wind", 50), ("sea_level", 10)]
-        projected_value_attr = "projected_value1" if index == 1 else "projected_value2"
         for metric, projected_value in fixed_projections:
-            query = f"UPDATE Projection SET {projected_value_attr} = {_dbf(projected_value)} WHERE game_state = {_dbi(game_state_id)} AND metric = {_dbs(metric)};"
+            query = f"UPDATE Projection SET projected_value = {_dbf(projected_value)} WHERE game_state = {_dbi(game_state_id)} AND metric = {_dbs(metric)};"
             execute_post_query(PostQuery(query, ()))
 
     def ready_to_transition(self, game_state_id: int, target_phase: str):
@@ -311,35 +281,28 @@ class GameStateManager:
             raise ValueError(f"No game state with id {game_state_id}.")
         query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
         phase = execute_query(query)[0][0]
-        print(f"Can transition from {phase} -> {target_phase}?")
-        if phase == GamePhase.CONFIGURING.value and target_phase == GamePhase.IDENTIFICATION_1.value:
+        if phase == GamePhase.CONFIGURING.value and target_phase == GamePhase.IDENTIFICATION.value:
             return self.are_users_configured(game_state_id) and self.are_buergerraete_configured(game_state_id)
-        elif phase ==GamePhase.IDENTIFICATION_1.value and target_phase == GamePhase.DISCUSSION_1.value:
+        elif phase == GamePhase.IDENTIFICATION.value and target_phase == GamePhase.DISCUSSION.value:
             return True
-        elif phase ==GamePhase.DISCUSSION_1.value and target_phase == GamePhase.IDENTIFICATION_2.value:
-            return self.discussion_is_completed(game_state_id)
-        elif phase == GamePhase.IDENTIFICATION_2.value and target_phase == GamePhase.DISCUSSION_2.value:
+        elif phase == GamePhase.DISCUSSION.value and target_phase == GamePhase.VOTING.value:
             return True
-        elif phase == GamePhase.DISCUSSION_2.value and target_phase == GamePhase.DEBRIEFING.value:
-            return self.discussion_is_completed(game_state_id)
+        elif phase == GamePhase.VOTING.value and target_phase == GamePhase.DEBRIEFING.value:
+            return self.voting_have_all_voted(game_state_id)
         else:
             return False
 
     def transition(self, game_state_id: int, target_phase: str):
         if not self.ready_to_transition(game_state_id, target_phase):
             raise RuntimeError("Not yet ready to transition (Are all users & buergerraete configured?).")
-        if target_phase == GamePhase.IDENTIFICATION_1.value:
+        if target_phase == GamePhase.IDENTIFICATION.value:
+            pass
+        elif target_phase == GamePhase.DISCUSSION.value:
             self.setup_voting(game_state_id)
-        elif target_phase == GamePhase.DISCUSSION_1.value:
-            self.discussion_initialize(game_state_id)
-        elif target_phase == GamePhase.IDENTIFICATION_2.value:
-            self.discussion_deactivate(game_state_id)
-            self.make_projections(game_state_id, 1)
-        elif target_phase == GamePhase.DISCUSSION_2.value:
-            self.discussion_initialize(game_state_id)
+        elif target_phase == GamePhase.VOTING.value:
+            pass
         elif target_phase == GamePhase.DEBRIEFING.value:
-            self.discussion_deactivate(game_state_id)
-            self.make_projections(game_state_id, 2)
+            self.make_projections(game_state_id)
         query = f"UPDATE GameState SET phase = {_dbs(target_phase)} WHERE id = {_dbi(game_state_id)};"
         execute_post_query(PostQuery(query, ()))
 
@@ -350,7 +313,7 @@ class GameStateManager:
                  f"FROM ScenarioCondition INNER JOIN depends_on ON ScenarioCondition.name = depends_on.scenario_condition "
                  f"WHERE depends_on.scenario = {_dbs(name)}")
         all_conditions = {row[0]: (row[1], row[2]) for row in execute_query(query)}
-        query = f"SELECT metric, projected_value1 FROM Projection WHERE game_state = {_dbi(game_state_id)}"
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)}"
         projected_metrics = {row[0]: row[1] for row in execute_query(query)}
 
         for metric in all_conditions:
@@ -361,162 +324,47 @@ class GameStateManager:
                 return False
         return True
 
-    def discussion_initialize(self, game_state_id: int):
+    def voting_have_all_voted(self, game_state_id: int) -> bool:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"UPDATE GameState SET discussion_phase = {_dbs(DiscussionPhase.PREPARING.value)} WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, ()))
-
-    def discussion_deactivate(self, game_state_id: int):
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"UPDATE GameState SET discussion_phase = {_dbs(DiscussionPhase.INACTIVE.value)} WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, ()))
-
-    def discussion_is_completed(self, game_state_id: int):
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, discussion_phase, discussion_speaker1, discussion_speaker2 FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase, discussion_speaker1, discussion_speaker2 = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        return discussion_phase == DiscussionPhase.COMPLETED.value
-
-    def discussion_have_all_spoken(self, game_state_id: int) -> bool:
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, discussion_phase, discussion_speaker1, discussion_speaker2 FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase, discussion_speaker1, discussion_speaker2 = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        if discussion_phase != DiscussionPhase.INTRODUCTION.value and discussion_phase != DiscussionPhase.CLOSING.value:
-            raise RuntimeError(f"The speaker is not controlled in discussion phase: {discussion_phase}.")
-        query = f"SELECT session_id FROM Session WHERE game_state = {_dbi(game_state_id)};"
-        session_id = execute_query(query)[0][0]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 1;"
-        speakers1 = [row[0] for row in execute_query(query)]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 2;"
-        speakers2 = [row[0] for row in execute_query(query)]
-        return discussion_speaker1 == speakers1[-1] and discussion_speaker2 == speakers2[-1]
-
-    def discussion_next_speaker(self, game_state_id: int):
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, discussion_phase, discussion_speaker1, discussion_speaker2 FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase, discussion_speaker1, discussion_speaker2 = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        if discussion_phase != DiscussionPhase.INTRODUCTION.value and discussion_phase != DiscussionPhase.CLOSING.value:
-            raise RuntimeError(f"The speaker is not controlled in discussion phase: {discussion_phase}.")
-        query = f"SELECT session_id FROM Session WHERE game_state = {_dbi(game_state_id)};"
-        session_id = execute_query(query)[0][0]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 1;"
-        speakers1 = [row[0] for row in execute_query(query)]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 2;"
-        speakers2 = [row[0] for row in execute_query(query)]
-        next_speaker1 = 0 if discussion_speaker1 is None else (speakers1.index(discussion_speaker1) + 1)
-        next_speaker2 = 0 if discussion_speaker2 is None else (speakers2.index(discussion_speaker2) + 1)
-        if next_speaker1 >= len(speakers1) or next_speaker2 >= len(speakers2):
-            raise RuntimeError(f"Already reached last speaker {discussion_speaker1} of {speakers1}.")
-        query = f"UPDATE GameState SET discussion_speaker1 = {_dbs(speakers1[next_speaker1])}, discussion_speaker2 = {_dbs(speakers2[next_speaker2])} WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, ()))
-
-    def discussion_ready_to_transition(self, game_state_id: int, target_phase: str) -> bool:
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, discussion_phase, discussion_speaker1, discussion_speaker2 FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase, discussion_speaker1, discussion_speaker2 = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        if discussion_phase == DiscussionPhase.INACTIVE.value:
-            raise RuntimeError(f"Unexpected discussion phase: {discussion_phase}.")
-        if discussion_phase == DiscussionPhase.PREPARING.value and target_phase == DiscussionPhase.INTRODUCTION.value:
-            return True
-        elif discussion_phase == DiscussionPhase.INTRODUCTION.value and target_phase == DiscussionPhase.FREE.value:
-            return self.discussion_have_all_spoken(game_state_id)
-        elif discussion_phase == DiscussionPhase.FREE.value and target_phase == DiscussionPhase.CLOSING.value:
-            return True
-        elif discussion_phase == DiscussionPhase.CLOSING.value and target_phase == DiscussionPhase.VOTING.value:
-            return self.discussion_have_all_spoken(game_state_id)
-        elif discussion_phase == DiscussionPhase.VOTING.value and target_phase == DiscussionPhase.COMPLETED.value:
-            index = 1 if phase == GamePhase.DISCUSSION_1.value else 2
-            return self.discussion_have_all_voted(game_state_id, index)
-        else:
-            return False
-
-    def discussion_transition(self, game_state_id: int, target_phase: str):
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        if not self.discussion_ready_to_transition(game_state_id, target_phase):
-            raise RuntimeError(f"Not ready to transition discussion -> {target_phase}. Did all users speak?")
-        if target_phase == DiscussionPhase.INTRODUCTION.value:
-            pass
-        elif target_phase == DiscussionPhase.FREE.value:
-            query = f"UPDATE GameState SET discussion_speaker1 = NULL, discussion_speaker2 = NULL WHERE id = {_dbi(game_state_id)};"
-            execute_post_query(PostQuery(query, ()))
-        elif target_phase == DiscussionPhase.CLOSING.value:
-            pass
-        elif target_phase == DiscussionPhase.VOTING.value:
-            query = f"UPDATE GameState SET discussion_speaker1 = NULL, discussion_speaker2 = NULL WHERE id = {_dbi(game_state_id)};"
-            execute_post_query(PostQuery(query, ()))
-        elif target_phase == DiscussionPhase.COMPLETED.value:
-            query = f"SELECT phase FROM GameState WHERE id = {game_state_id};"
-            phase = execute_query(query)[0][0]
-            index = 1 if phase == GamePhase.DISCUSSION_1.value else 2
-            self.discussion_determine_result(game_state_id, index)
-        query = f"UPDATE GameState SET discussion_phase = {_dbs(target_phase)} WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, ()))
-
-    def discussion_have_all_voted(self, game_state_id: int, index: int) -> bool:
-        if not self.has_game_state(game_state_id):
-            raise ValueError(f"No game state with id {game_state_id}.")
-        voted_value_attr = "voted_value1" if index == 1 else "voted_value2"
         query = (f"SELECT COUNT(*) "
                  f"FROM Session INNER JOIN (User INNER JOIN Voting ON User.username = Voting.user) ON User.member_of = Session.session_id "
-                 f"WHERE Session.game_state = {_dbi(game_state_id)} AND Voting.{voted_value_attr} IS NULL;")
+                 f"WHERE Session.game_state = {_dbi(game_state_id)} AND Voting.voted_value IS NULL;")
         n = execute_query(query)[0][0]
         return n == 0
 
-    def discussion_has_voted(self, username: str, parameter: str) -> bool:
+    def voting_has_voted(self, username: str, parameter: str) -> bool:
         if not USER_MANAGER.has_user(username):
             raise NameError(f"No user with username {username}.")
         query = (f"SELECT GameState.id "
                  f"FROM GameState INNER JOIN (Session INNER JOIN User ON Session.session_id = User.member_of) ON GameState.id = Session.game_state "
                  f"WHERE User.username = {_dbs(username)};")
         game_state_id = execute_query(query)[0][0]
-        query = f"SELECT phase, discussion_phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        if discussion_phase != DiscussionPhase.VOTING.value:
-            raise RuntimeError("Discussion is not in voting phase.")
-        voted_value_attr = "voted_value1" if phase == GamePhase.DISCUSSION_1.value else "voted_value2"
-        query = f"SELECT COUNT(*) FROM Voting WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)} AND {voted_value_attr} IS NOT NULL;"
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0][0]
+        if phase != GamePhase.DISCUSSION.value and phase != GamePhase.VOTING.value:
+            raise RuntimeError(f"Game is not in discussion nor in voting phase {phase}.")
+        query = f"SELECT COUNT(*) FROM Voting WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)} AND voted_value IS NOT NULL;"
         n = execute_query(query)[0][0]
         return n > 0
 
-    def discussion_vote(self, username: str, parameter: str, voted_value: float):
+    def voting_vote(self, username: str, parameter: str, voted_value: float):
         if not USER_MANAGER.has_user(username):
             raise NameError(f"No user with username {username}.")
         query = (f"SELECT GameState.id "
                  f"FROM GameState INNER JOIN (Session INNER JOIN User ON Session.session_id = User.member_of) ON GameState.id = Session.game_state "
                  f"WHERE User.username = {_dbs(username)};")
         game_state_id = execute_query(query)[0][0]
-        query = f"SELECT phase, discussion_phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, discussion_phase = execute_query(query)[0]
-        if phase != GamePhase.DISCUSSION_1.value and phase != GamePhase.DISCUSSION_2.value:
-            raise RuntimeError("Game is not in discussion phase.")
-        if discussion_phase != DiscussionPhase.VOTING.value:
-            raise RuntimeError("Discussion is not in voting phase.")
-        voted_value_attr = "voted_value1" if phase == GamePhase.DISCUSSION_1.value else "voted_value2"
-        query = f"UPDATE Voting SET {voted_value_attr} = {_dbf(voted_value)} WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
+        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase = execute_query(query)[0][0]
+        if phase != GamePhase.VOTING.value:
+            raise RuntimeError("Game is not in voting phase.")
+        query = f"UPDATE Voting SET voted_value = {_dbf(voted_value)} WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
         execute_post_query(PostQuery(query, ()))
 
-    def discussion_determine_result(self, game_state_id: int, index: int):
+    def voting_determine_result(self, game_state_id: int):
         # TODO: Average for now
-        voted_value_attr = "voted_value1" if index == 1 else "voted_value2"
-        choice_attr = "choice1" if index == 1 else "choice2"
-        query = (f"SELECT Voting.parameter, Voting.{voted_value_attr}, User.buergerrat "
+        query = (f"SELECT Voting.parameter, Voting.voted_value, User.buergerrat "
                  f"FROM Voting INNER JOIN (User INNER JOIN Session ON User.member_of = Session.session_id) ON Voting.user = User.username "
                  f"WHERE Session.game_state = {_dbi(game_state_id)};")
         votes_br1 = {}
@@ -532,7 +380,7 @@ class GameStateManager:
                 avrg = sum(values)
                 if len(values) > 0:
                     avrg /= len(values)
-                query = (f"UPDATE controls SET {choice_attr} = {_dbf(avrg)} "
+                query = (f"UPDATE controls SET choice = {_dbf(avrg)} "
                          f"WHERE game_state = {_dbi(game_state_id)} AND parameter = {_dbs(parameter)} AND buergerrat = {_dbi(buergerrat)};")
                 execute_post_query(PostQuery(query, ()))
 
