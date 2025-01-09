@@ -1,0 +1,45 @@
+{
+  "name": "2_sam_johnson",
+  "description": "Fracking Arbeiter in Kanada",
+  "demographic": {},
+  "entries": [
+    {
+      "name": "2_sam_johnson_picture",
+      "resource": {
+        "identifier": "2_sam_johnson_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "2_sam_johnson_biography",
+      "resource": {
+        "identifier": "2_sam_johnson_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "2_sam_johnson_article",
+      "resource": {
+        "identifier": "2_sam_johnson_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "2_sam_johnson_article_picture.png",
+      "resource": {
+        "identifier": "2_sam_johnson_article_picture.png",
+        "content_type": "picture"
+      }
+    },
+    {
+      "name": "2_sam_johnson_meta",
+      "resource": {
+        "identifier": "2_sam_johnson_meta.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": [
+    "2_sam_johnson_default"
+  ]
+}

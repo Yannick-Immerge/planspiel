@@ -49,29 +49,29 @@ export default function DiscussionTransitionButton({phase, onDiscussionTransitio
         ) : phase === "inactive" ? (
             <p>Unexpected discussion state!</p>
         ) : phase === "preparing" ? (
-            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("introduction")}>Start the Introductions!</StyledButton>
+            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("introduction")}>Starte die Introduktion!</StyledButton>
         ) : phase === "introduction" ? (
             ready ? (
-                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("free")}>Start the Free Discussion!</StyledButton>
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("free")}>Starte die freie Diskussion!</StyledButton>
             ) : (
-                <StyledButton onClickAction={() => nextSpeakerAction()}>Next speaker!</StyledButton>
+                <StyledButton onClickAction={() => nextSpeakerAction()}>Nächstes Sprecher!</StyledButton>
             )
         ) : phase === "free" ? (
-            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("closing")}>Start the Closing Words!</StyledButton>
+            <StyledButton onClickAction={() => handleDiscussionTransitionRequest("closing")}>Beenden Sie jetzt die Diskussion.</StyledButton>
         ) : phase === "closing" ? (
             ready ? (
-                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("voting")}>Start the Voting!</StyledButton>
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("voting")}>Starte die Abstimmung!</StyledButton>
             ) : (
-                <StyledButton onClickAction={() => nextSpeakerAction()}>Next speaker!</StyledButton>
+                <StyledButton onClickAction={() => nextSpeakerAction()}>Nächstes Sprecher!</StyledButton>
             )
         ) : phase === "voting" ? (
             ready ? (
-                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("completed")}>Finish the Discussion!</StyledButton>
+                <StyledButton onClickAction={() => handleDiscussionTransitionRequest("completed")}>Die Diskussion ist beendet.</StyledButton>
             ) : (
-                <p>Wait for all votes!</p>
+                <p>Warten Sie, bis alle abstimmen!</p>
             )
         ) : (
-            <p>The discussion has been completed!</p>
+            <p>Die Diskussion ist beendet.</p>
         )}
     </div>
 }

@@ -1,23 +1,19 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MockupGetUserIDs } from "./MockupGetUserIDs"
 import { TbZzz } from "react-icons/tb"
 import { LuUserCheck, LuUserX } from 'react-icons/lu'
 import { FaPoo, FaStopwatch } from 'react-icons/fa'
 import TextEingabe from '../login/TextEingabe'
+import { configureSessionPrototype, setSessionStatus, viewUser } from '../api/game_controller_interface'
+import { getSessionUsername } from '../api/utility'
+import { UserView } from '../api/models'
+import { CreateUserButton, GetUsersInSession } from './DashboardHelpers'
 
-interface UserStatus {
-    userID: number,
-    name: string,
-    burger: number,
-    status: number, // 0 - No User Attached   1 - User Attached   2 - User Attached & Online
-}
-
-interface User {
-    id: number,
-    username: string,
-    address: {suite: string},
+export interface UserViewIDWrapper {
+    userView: UserView
+    id: number
 }
 
 const TIME_REGEX = /^[0-9]{2}\:[0-9]{2}$/;
@@ -32,6 +28,33 @@ function GetProperTimeAmountString(props: {time: Date}) {
 }
 
 const page = () => {
+    const [user, setUser] = useState<UserView | undefined>();
+    const [enoughUsers, setEnoughUsers] = useState(true);
+    const [nachrichtenzeile, setNachrichtenzeile] = useState("")
+
+    useEffect(() => {
+        const username = getSessionUsername();
+        if(username === undefined) {
+            window.location.replace("../login");
+            return;
+        }
+        const fetchUserInfo = async () => {
+            let response = await viewUser(username);
+            if (!response.data) {
+                window.location.replace("../login");
+                return;
+            }
+            const user = response.data.userView;
+            setUser(user);
+            if (user.administrator) {
+                setNachrichtenzeile("Willkommen, Admin!");
+            } else {
+                window.location.replace("../login");
+                return;
+            }
+        }
+        fetchUserInfo();
+    }, []);
 
     const startTime = GetProperTimeString({time: new Date(new Date().getTime() + 45*60000)});
     const [endeBurgerrat, setEndeBurgerrat] = useState(startTime)
@@ -41,13 +64,22 @@ const page = () => {
         setEndeBurgerrat(event.target.value)
     }
 
-    const users : UserStatus[] = [{name: "", userID: 0, status: 0, burger: 0}];
+    const users : UserViewIDWrapper[] = [{userView: {username: "AusgangsUser", status: "disabled", assignedRoleId: undefined, assignedBuergerrat: undefined, administrator: false}, id: 0}];
     const [userStati, setUserStati] = useState(users)
 
-    const refreshUserStati = async () => {
-        await MockupGetUserIDs()
-            .then((result) => setUserStati(result))
-    }
+    useEffect(() => {
+        const intervalID = setInterval(async () => {
+                await GetUsersInSession()
+                    .then((result) => {
+                        setUserStati(result.filter((n) => {return !n.userView.administrator}));
+                        setEnoughUsers(userStati.length > 9);
+                    })
+                    .catch((error) => setNachrichtenzeile(error))
+            }, 1000);
+            
+        return () => clearInterval(intervalID);
+    }, []);
+    
 
     const reformatEndeBurgerrat = async () => {
         if (TIME_REGEX.test(endeBurgerrat)) {
@@ -86,8 +118,6 @@ const page = () => {
         )
     }
 
-    refreshUserStati();
-
     const handleEnter = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter') reformatEndeBurgerrat()
     }
@@ -95,16 +125,17 @@ const page = () => {
   return (
     <div className="bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
         <div className="pl-5 pt-2 flex text-left">
-            <div className='leading-[2rem] pt-2 pb-2 pr-3 text-2xl'>Session:  </div>
-            <div className='text-amber-300 pt-2 pb-2 pl-4 pr-4 text-3xl rounded-full shadow-[0px_10px_10px_rgba(0,0,0,0.5)] backdrop-blur-xl'>Globale-Herde-47</div>
+            <div className='leading-[2rem] pt-2 pb-2 pr-3 text-2xl'>{nachrichtenzeile}</div>
         </div>
         <div className="mt-5 flex w-full">
             <div className="w-full ml-6 mr-3">
-                <FilteredUserList userStati={userStati} desiredStatus={2} description="benutzer online"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"online"} description="benutzer online"/>
 
-                <FilteredUserList userStati={userStati} desiredStatus={1} description="benutzer offline"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"offline"} description="benutzer offline"/>
 
-                <FilteredUserList userStati={userStati} desiredStatus={0} description="noch nicht vergebene Profile"/>
+                <FilteredUserList userStati={userStati} desiredStatus={"disabled"} description="noch nicht vergebene Profile"/>
+
+                <CreateUserButton disabled={enoughUsers}/>
             </div>
             <div className="w-full ml-3 mr-3 bg-[#ffa2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
                 <div className="text-2xl">
@@ -115,7 +146,7 @@ const page = () => {
                 </div>
                 <div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {userStati.filter((n) => { return n.status != 0 && n.burger === 0;}).map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {userStati.filter((n) => { return n.userView.status != "disabled" && n.userView.assignedBuergerrat === 2;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
                 <div>
@@ -131,7 +162,7 @@ const page = () => {
                 </div>
                 <div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {userStati.filter((n) => { return n.status != 0 && n.burger === 1;}).map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {userStati.filter((n) => { return n.userView.status != "disabled" && n.userView.assignedBuergerrat === 1;}).map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
                 <div>
@@ -162,43 +193,53 @@ const page = () => {
             <div onClick={() => {}} className="select-none mt-0 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full hover:bg-amber-500 active:mt-3 transition-all duration-100">
                 Bürgerräte Starten
             </div>
+            <div onClick={() => {configureSessionPrototype()}} className="select-none mt-0 shadow-[inset_0px_-10px_10px_rgba(0,0,0,0.5)] text-xl content-center m-auto bg-amber-600 w-[150px] h-[150px] rounded-full hover:bg-amber-500 active:mt-3 transition-all duration-100">
+                Session aktivieren
+            </div>
         </div>
     </div>
   )
 }
 
-function GetIconFromStatus(props: {status: number}) : React.ReactElement {
-    if (props.status == 0) return <LuUserX />
-    if (props.status == 1) return <TbZzz />
-    if (props.status == 2) return <LuUserCheck />
-    else return <FaPoo />
-}
 
-function FilteredUserList(props: {userStati: UserStatus[], desiredStatus: number, description: string}) {
-    const filteredUsers = props.userStati.filter((n) => {return n.status === props.desiredStatus});
+
+function FilteredUserList(props: {userStati: UserViewIDWrapper[], desiredStatus: "online" | "offline" | "disabled", description: string}) {
+    const filteredUsers = props.userStati.filter((n) => {return n.userView.status === props.desiredStatus});
     return (
         <div className="bg-[#faf2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
                     <div>
                         {filteredUsers.length} {props.description}{filteredUsers.length == 0? "" : ":"}
                     </div>
                     <div className="bg-[#0002] ml-5 mr-5 rounded-2xl">
-                        {filteredUsers.map((n) => <UserEntry key={n.userID} user={n}/>)}
+                        {filteredUsers.map((n) => <UserEntry key={n.id} user={n.userView}/>)}
                     </div>
                 </div>
     )
 }
 
-function UserEntry(props: {user: UserStatus}) {
+function UserEntry(props: {user: UserView}) {
     return (
         <div className="text-left flex">
             <div className="absolute translate-y-[25%] pl-2">
                 {GetIconFromStatus({status: props.user.status})}
             </div>
-            <div className='pl-10'>
-                {props.user.name}
-            </div>
+            {GetFormatTextFromStatus({status: props.user.status, text: props.user.username})}
         </div>
     )
+}
+
+function GetIconFromStatus(props: {status: "online" | "offline" | "disabled"}) : React.ReactElement {
+    if (props.status === "disabled") return <LuUserX color="#aaaa"/>
+    if (props.status === "offline") return <TbZzz color="#aaaa"/>
+    if (props.status === "online") return <LuUserCheck color="#a3e635"/>
+    else return <FaPoo />
+}
+
+function GetFormatTextFromStatus(props: {status: "online" | "offline" | "disabled", text: string}) : React.ReactElement {
+    if (props.status === "disabled") return <div className='pl-10 text-[#aaaa]'>{props.text}</div>
+    if (props.status === "offline") return <div className='pl-10 text-[#aaaa]'>{props.text}</div>
+    if (props.status === "online") return <div className='pl-10 text-lime-400'>{props.text}</div>
+    else return <div className='pl-10 text-amber-400'>{"Disallowed Status!"}</div>
 }
 
 export default page

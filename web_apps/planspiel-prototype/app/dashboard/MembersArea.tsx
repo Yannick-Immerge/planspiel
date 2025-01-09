@@ -1,18 +1,28 @@
 import {UserView} from "@/app/api/models";
+import { FilteredUserList } from "./DashboardHelpers";
+import { hasUserPassword } from "../api/game_controller_interface";
+import { useEffect, useState } from "react";
 
 export default function MembersArea({members} : {members: UserView[] | null}) {
-    return members === null ? (
-        <div></div>
-    ) : (
+    if (members === null) return <></>;
+
+    
+    
+
+    return (
         <div>
-            <h1 className="text-lg">Session Members</h1>
-            <ul>
-                {
-                    members.map((view, index) => (
-                        <li key={index}>{view.administrator ? `Admin ${view.username}\n` : `User ${view.username} playing as ${view.assignedRoleId} in Bürgerrat ${view.assignedBuergerrat}`}</li>
-                    ))
-                }
-            </ul>
+            <FilteredUserList
+                userStati={members}
+                applyFilter={(n) => !n.administrator && n.status == "online"}
+                description="Benutzer online"
+                includeBrgrrt={true}
+                />
+            <FilteredUserList
+                userStati={members}
+                applyFilter={(n) => !n.administrator && n.status == "offline"}
+                description="Benutzer offline"
+                includeBrgrrt={true}
+                />
         </div>
     )
 }

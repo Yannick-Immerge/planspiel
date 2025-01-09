@@ -1,0 +1,18 @@
+[
+    {
+      "icon":"🏠",
+      "description":"In dieser kleinen Wohnung lebt Max mit seinen Eltern und einem kleinen Hund.",
+      "geo": {
+        "lat":50.74,
+        "lng":6.15
+      }
+    },
+    {
+      "icon":"☕",
+      "description":"Hier trinkt Max gerne Sonntags einen Kaffee.",
+      "geo": {
+        "lat": 50.7488, 
+        "lng": 6.16451
+      }
+    }
+  ]
