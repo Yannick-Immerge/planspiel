@@ -1,18 +1,16 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {DiscussionPhase, GamePhase, GameState, UserView} from "@/app/api/models";
+import {GamePhase, GameState, UserView} from "@/app/api/models";
 import {
     getGameState,
     getSessionMemberViews,
-    transitionDiscussion,
     transitionGameState, viewSelf,
 } from "@/app/api/game_controller_interface";
 import WarningArea from "@/app/components/WarningArea";
 import MembersArea from "@/app/dashboard/MembersArea";
 import BuergerraeteArea from "@/app/dashboard/BuergerraeteArea";
 import TransitionArea, { StateDescription } from "@/app/dashboard/TransitionArea";
-import DiscussionTransitionArea from "@/app/dashboard/DiscussionTransitionArea";
 import { GetAllStateDescriptions } from "./StateDescriptions";
 
 
@@ -94,25 +92,6 @@ export default function Dashboard() {
         performTransition(targetPhase);
     }
 
-    const onDiscussionTransitionAction = (targetPhase: DiscussionPhase) => {
-        const performTransition = async (targetPhase: DiscussionPhase) => {
-            const result = await transitionDiscussion(targetPhase);
-            if(!result.ok || result.data === null) {
-                setWarning(result.statusText);
-                return;
-            }
-
-            const gameStateResult = await getGameState();
-            if(!gameStateResult.ok || gameStateResult.data === null) {
-                setWarning(result.statusText);
-                return;
-            }
-
-            setGameState(gameStateResult.data.gameState);
-        }
-        performTransition(targetPhase);
-    }
-
     const [stateDescriptions, setStateDescriptions] = useState<StateDescription[]>([]);
     useEffect (() => {setStateDescriptions(GetAllStateDescriptions())}, [])
 
@@ -126,7 +105,6 @@ export default function Dashboard() {
                     <div className="w-1/2">
                     <div className="flex-1 rounded-2xl bg-[#5a53] p-5 shadow-[10px_10px_10px_rgba(0,0,0,0.4)] backdrop-blur-xl">    
                         <TransitionArea stateDescriptions={stateDescriptions} gameState={gameState} onTransitionAction={onTransitionAction}/>
-                        <DiscussionTransitionArea gameState={gameState} onDiscussionTransitionAction={onDiscussionTransitionAction}/>
                     </div>
                         <MembersArea members={members}/>
                     </div>

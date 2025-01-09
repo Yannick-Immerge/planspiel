@@ -6,7 +6,7 @@ import {
     fail,
     getServerAddrHttp
 } from "@/app/api/utility";
-import {DiscussionPhase, GamePhase, GameState, Session, SessionView, UserView, VotingStatus} from "@/app/api/models";
+import {GamePhase, GameState, Session, SessionView, UserView, VotingStatus} from "@/app/api/models";
 
 export const GAME_CONTROLLER_SERVER_PORT = "5002";
 
@@ -85,20 +85,6 @@ export interface ReadyToTransitionGameStateResult {
 
 export interface IsScenarioApplicableResult {
     isScenarioApplicable: boolean
-}
-
-export interface HaveAllSpokenResult {
-    haveAllSpoken: boolean
-}
-
-export interface NextSpeakerResult {
-}
-
-export interface ReadyToTransitionDiscussionResult {
-    readyToTransition: boolean
-}
-
-export interface TransitionDiscussionResult {
 }
 
 export interface HasVotedResult {
@@ -345,47 +331,9 @@ export async function isScenarioApplicable(name: string, overrideUsername?: stri
     }, overrideUsername, overrideToken);
 }
 
-export async function haveAllSpoken(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<HaveAllSpokenResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<HaveAllSpokenResult>("/game_state/discussion/have_all_spoken", {
-            username: localUsername,
-            token: localToken
-        });
-    }, overrideUsername, overrideToken)
-}
-
-export async function nextSpeaker(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<NextSpeakerResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<NextSpeakerResult>("/game_state/discussion/next_speaker", {
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
-export async function readyToTransitionDiscussion(targetPhase: DiscussionPhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ReadyToTransitionDiscussionResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<ReadyToTransitionDiscussionResult>("/game_state/discussion/ready_to_transition", {
-            targetPhase: targetPhase,
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
-export async function transitionDiscussion(targetPhase: DiscussionPhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<TransitionDiscussionResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<TransitionDiscussionResult>("/game_state/discussion/transition", {
-            targetPhase: targetPhase,
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
 export async function hasVoted(parameter: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<HasVotedResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<HasVotedResult>("/game_state/discussion/has_voted", {
+        return game_fetch<HasVotedResult>("/game_state/voting/has_voted", {
             parameter: parameter,
             username: localUsername,
             token: localToken
@@ -396,7 +344,7 @@ export async function hasVoted(parameter: string, overrideUsername?: string, ove
 export async function vote(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<VoteResult>> {
     console.log("Voting 3")
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<VoteResult>("/game_state/discussion/vote", {
+        return game_fetch<VoteResult>("/game_state/voting/vote", {
             parameter: parameter,
             votedValue: votedValue,
             username: localUsername,
