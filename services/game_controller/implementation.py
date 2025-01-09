@@ -150,12 +150,21 @@ def impl_game_state_transition(target_phase: str, administrator_username: str, a
     return {}
 
 
-def impl_game_state_is_scenario_applicable(name: str, username: str, token: str):
+def impl_game_state_is_fact_applicable(name: str, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
     session_id = USER_MANAGER.get_session(username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
-        "isScenarioApplicable": GAME_STATE_MANAGER.is_scenario_applicable(game_state_id, name)
+        "isFactApplicable": GAME_STATE_MANAGER.is_fact_applicable(game_state_id, name)
+    }
+
+
+def impl_game_state_is_post_applicable(name: str, username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    session_id = USER_MANAGER.get_session(username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "isPostApplicable": GAME_STATE_MANAGER.is_post_applicable(game_state_id, name)
     }
 
 

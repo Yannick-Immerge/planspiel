@@ -5,8 +5,7 @@ import uuid
 from enum import Enum
 
 from shared.architecture.rest import AuthError
-from shared.data_model.context import initialize_db_context_default, execute_query, PostQuery, \
-    execute_post_query, get_last_row_id
+from shared.data_model.context import execute_query, PostQuery, execute_post_query, get_last_row_id
 
 
 def _dbs(v: str | None):
@@ -306,12 +305,30 @@ class GameStateManager:
         query = f"UPDATE GameState SET phase = {_dbs(target_phase)} WHERE id = {_dbi(game_state_id)};"
         execute_post_query(PostQuery(query, ()))
 
-    def is_scenario_applicable(self, game_state_id: int, name: str) -> bool:
+    def is_fact_applicable(self, game_state_id: int, name: str) -> bool:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
-                 f"FROM ScenarioCondition INNER JOIN depends_on ON ScenarioCondition.name = depends_on.scenario_condition "
-                 f"WHERE depends_on.scenario = {_dbs(name)}")
+                 f"FROM ScenarioCondition INNER JOIN Fact_depends_on ON ScenarioCondition.name = Fact_depends_on.scenario_condition "
+                 f"WHERE Fact_depends_on.fact = {_dbs(name)}")
+        all_conditions = {row[0]: (row[1], row[2]) for row in execute_query(query)}
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)}"
+        projected_metrics = {row[0]: row[1] for row in execute_query(query)}
+
+        for metric in all_conditions:
+            if metric not in projected_metrics or projected_metrics[metric] is None:
+                raise RuntimeError(f"Metric {metric} has not been projected in this session.")
+            min_value, max_value = all_conditions[metric]
+            if not (min_value <= projected_metrics[metric] <= max_value):
+                return False
+        return True
+
+    def is_post_applicable(self, game_state_id: int, name: str) -> bool:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
+                 f"FROM ScenarioCondition INNER JOIN Post_depends_on ON ScenarioCondition.name = Post_depends_on.scenario_condition "
+                 f"WHERE Post_depends_on.post = {_dbs(name)}")
         all_conditions = {row[0]: (row[1], row[2]) for row in execute_query(query)}
         query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)}"
         projected_metrics = {row[0]: row[1] for row in execute_query(query)}

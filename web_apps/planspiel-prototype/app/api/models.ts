@@ -63,54 +63,39 @@ export type VotingStatus = { parameter: string, hasVoted: boolean }[]
 /**
  * A Role object.
  */
-export interface Role {
-    name: string,
-    description: string,
-    entries: string[],
-    scenarios: string[]
+export interface RoleData {
+    metadata: RoleMetadata,
+    profilePictureIdentifier: string,
+	profilePictureOldIdentifier: string,
+	titlecardIdentifier: string,
+	infoIdentifier: string,
+	facts: Fact[],
+	posts: Post[]
 }
 
 export interface RoleMetadata {
     name: string,
-    age: number,
-    nationality: string,
-    address: string,
-    height: number
+	birthday: string,
+	living: string,
+	status: string
 }
 
-/**
- * A Resource object.
- */
-export interface Resource {
-    identifier: string,
-    contentType: "info" | "picture" | "article" | "diary" | "metadata" | "titlecard" | "profile_picture"
-}
-
-/**
- * A RoleEntry object.
- */
-export interface RoleEntry {
+export interface Fact {
     name: string,
-    belongsTo: string,
-    resource: Resource
+    textIdentifier: string,
+	hyperlink: string,
+	isScenario: boolean
 }
 
-export interface ScenarioCondition {
-    name: string,
-    metric: string,
-    min_value: number | null,
-    max_value: number | null
-}
+export type PostType = "by_me" | "i_liked" | "got_tagged"
 
-
-/**
- * A Scenario object.
- */
-export interface Scenario {
+export interface Post {
     name: string,
-    belongsTo: string,
-    resource: Resource
-    conditions: ScenarioCondition[]
+    type: PostType,
+	textDeIdentifier: string,
+	textOrigIdentifier: string,
+	imageIdentifiers: string[],
+	isScenario: boolean
 }
 
 /**
