@@ -28,6 +28,8 @@ export default function FormComponent() {
   }
 
   return (
+    <>
+    <title>Planet Council Login</title>
     <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
       <div className="p-10 w-1/3 max-lg:w-1/2 max-md:w-3/4 m-auto backdrop-blur-xl rounded-2xl shadow-[10px_10px_10px_rgba(0,0,0,0.8)]">
           <div className="pb-10 text-center text-3xl font-bold">Login</div>
@@ -60,5 +62,6 @@ export default function FormComponent() {
         </div>
       </div>
     </div>
+    </>
   );
 }
