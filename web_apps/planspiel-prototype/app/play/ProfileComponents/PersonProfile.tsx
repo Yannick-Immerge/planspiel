@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { GameState, Resource, RoleMetadata } from '../../api/models'
+import { GameState, Post, RoleData, RoleMetadata } from '../../api/models'
 import { FaMap } from 'react-icons/fa';
 import { metadata } from '@/app/layout';
 import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
-import ResourceComponent from './ResourceComponent';
+import PostComponent from './PostComponent';
 import ArticleComponent from './ArticleComponent';
+import MarkdownComponent from './DiaryComponent';
 
-export default function PersonProfile ({gameState, metadata, roleEntries}: {gameState: GameState, metadata: RoleMetadata | null, roleEntries: Resource[] | null}) {
+export default function PersonProfile ({gameState, roleData}: {gameState: GameState, roleData: RoleData | null}) {
 
-    console.log(roleEntries?.length)
+    if (!roleData) return (<div>Profil konnte nicht geladen werden. Versuch, die Seite neu zu laden, ansonsten wende dich an unser support team.</div>)
 
-  return (
+    // TODO Die Projektsionsphase fehlt wo das Profilbild ausgetauscht wird und die Szenarios stimmen
+
+    return (
     <div className="w-full h-full">
-        <Titlecard url={(roleEntries? ("resources/" + roleEntries.find(n => n.contentType === "titlecard")?.identifier) : "images/EarthTint.png")} />
-        <ProfilePicture url={"resources/" + (roleEntries? roleEntries.find(n => n.contentType === "profile_picture")?.identifier : "0_unknown_profile_picture.png")}/>
-        <MetadataArea roleMetadata={metadata}/>
-        {roleEntries?.filter(n => n.contentType === "info").map((n, index) => <ResourceComponent key={index} resource={n}/>)}
-        <PostsArea roleEntries={roleEntries} />
+        <Titlecard url={"resources/" + roleData.titlecardIdentifier} />
+        <ProfilePicture url={"resources/" + (roleData.profilePictureIdentifier)}/>
+        <MetadataArea roleMetadata={roleData.metadata}/>
+        <MarkdownComponent path={roleData.infoIdentifier}/>
+        <PostsArea posts={roleData.posts} />
     </div>
   )
 }
@@ -29,18 +32,17 @@ function GetStatus(name:string) : string {
     return "Here comes " + name.split(" ")[0] + "!"
 }
 
-function PostsArea({roleEntries} : {roleEntries: Resource[] | null}) {
-    if (!roleEntries) return (<></>);
+function PostsArea({posts} : {posts: Post[] | null}) {
+    if (!posts) return (<div>Dein Feed konnte nicht geladen werden. Versuche es später erneut.</div>);
 
     return (<>
         <div className='text-2xl p-5 text-[#ffffff90]'>
             Für dich interessant:
         </div>
-        {roleEntries
-            .filter((n) => {return n.contentType != "profile_picture" && n.contentType != "titlecard" && n.contentType != "info"})
+        {posts
             .map((n, index) => 
             <div key={index} className="py-2">
-                <ResourceComponent resource={n}/>
+                <PostComponent post={n}/>
             </div>)
             }
             <div className="h-40 w-full bg-sky-900">
@@ -49,22 +51,48 @@ function PostsArea({roleEntries} : {roleEntries: Resource[] | null}) {
     </>)
 }
 
+function GetAge(birthday: Date) : number {
+    const today = new Date();
+    let age = today.getFullYear() - birthday.getFullYear();
+    if (today.getMonth() < birthday.getMonth()) age--;
+    else if (today.getMonth() == birthday.getMonth() && today.getDate() < birthday.getDate()) {
+        age--;
+    }
+    return age;
+}
+
+function GetPrettyDateString(birthday: Date) : string {
+    // Deutsches Formatting DD.MM.YYYY
+    return `${birthday.getDate()}.${birthday.getMonth()}. ${birthday.getFullYear()}`;
+}
+
 function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
+
+    if (!roleMetadata) return (<div>Deine Metadaten konnten nicht geladen werden. Versuche es später erneut.</div>)
+
+    const birthday : Date = new Date(roleMetadata.birthday);
+    
+    const age : number = GetAge(birthday);
+
+    const dateString : string = GetPrettyDateString(birthday);
+
+    const birthdayString : string = `${dateString} (${age})`;
+
     return (
         <div className="w-full border-solid border-white pt-7 pb-4 px-5 bg-sky-800 shadow-[0px_-10px_20px_rgba(0,0,0,0.8)]" style={{borderTopWidth: "2px"}}>
             <div className="w-full text-3xl">
-                {roleMetadata?.name}
+                {roleMetadata.name}
             </div>
             <div className="w-full flextext-xl text-[#ffffff90]">
-                {GetStatus(roleMetadata?.name? roleMetadata.name : "")}
+                {roleMetadata.status}
             </div>
             <div className="flex pt-3">
                 <GrMapLocation className="" color="white"/>
-                <div className="pl-2 text-sm">{roleMetadata?.address}</div>
+                <div className="pl-2 text-sm">{roleMetadata.living}</div>
             </div>
             <div className="flex py-2">
                 <LiaBirthdayCakeSolid className="" color="white"/>
-                <div className="pl-2 text-sm">3. Januar {2025-(roleMetadata?.age? roleMetadata?.age : 50)} ({roleMetadata?.age})</div>
+                <div className="pl-2 text-sm">{birthdayString}</div>
             </div>
         </div>)
 }
