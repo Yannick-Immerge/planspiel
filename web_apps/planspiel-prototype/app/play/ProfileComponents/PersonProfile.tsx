@@ -6,7 +6,7 @@ import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import PostComponent from './PostComponent';
 import ArticleComponent from './ArticleComponent';
-import MarkdownComponent from './DiaryComponent';
+import MarkdownComponent from './MarkdownComponent';
 
 export default function PersonProfile ({gameState, roleData}: {gameState: GameState, roleData: RoleData | null}) {
 
@@ -20,7 +20,7 @@ export default function PersonProfile ({gameState, roleData}: {gameState: GameSt
         <ProfilePicture url={"resources/" + (roleData.profilePictureIdentifier)}/>
         <MetadataArea roleMetadata={roleData.metadata}/>
         <MarkdownComponent path={roleData.infoIdentifier}/>
-        <PostsArea posts={roleData.posts} />
+        <PostsArea posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
   )
 }
@@ -32,7 +32,7 @@ function GetStatus(name:string) : string {
     return "Here comes " + name.split(" ")[0] + "!"
 }
 
-function PostsArea({posts} : {posts: Post[] | null}) {
+function PostsArea({posts, roleMetadata} : {posts: Post[] | null, roleMetadata: RoleMetadata}) {
     if (!posts) return (<div>Dein Feed konnte nicht geladen werden. Versuche es später erneut.</div>);
 
     return (<>
@@ -42,7 +42,7 @@ function PostsArea({posts} : {posts: Post[] | null}) {
         {posts
             .map((n, index) => 
             <div key={index} className="py-2">
-                <PostComponent post={n}/>
+                <PostComponent post={n} roleMetadata={roleMetadata}/>
             </div>)
             }
             <div className="h-40 w-full bg-sky-900">

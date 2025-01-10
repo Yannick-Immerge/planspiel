@@ -1,10 +1,10 @@
-import { Post } from "@/app/api/models";
-import MarkdownComponent from "./DiaryComponent";
+import { Post, RoleMetadata } from "@/app/api/models";
+import MarkdownComponent, { TranslatableMarkdownComponent } from "./MarkdownComponent";
 import { useState } from "react";
 
 
-export default function PostComponent({ post } : { post: Post}) {
-    const [showingTranslated, showTranslated] = useState<boolean>(false);
+export default function PostComponent({ post, roleMetadata } : { post: Post, roleMetadata: RoleMetadata}) {
+    const [showDE, setShowDE] = useState<boolean>(false);
     let comp = undefined;
 
     let postFormat : string = "";
@@ -26,9 +26,12 @@ export default function PostComponent({ post } : { post: Post}) {
     }
 
     return (
-    <div className={postFormat + " " + "bg-stone-200 b-l-8 border-solid p-5"}>
+    <div className={postFormat + " " + "bg-stone-200 b-l-8 rounded-2xl border-solid p-5"}>
         <div>{descText}</div>
-        <MarkdownComponent path={showingTranslated? post.textDeIdentifier : post.textOrigIdentifier}/>
+        <div>{showDE? ("Übersetzt von: " + roleMetadata.language) : ""}</div>
+        <div onClick={() => setShowDE(!showDE)} className="rounded-xl text-decoration-line: underline">{showDE? "Original anzeigen" : "Übersetzen"}</div>
+        
+        <TranslatableMarkdownComponent pathDE={post.textDeIdentifier} pathOrig={post.textOrigIdentifier} showDE={showDE} />
         
     </div>)
 }
