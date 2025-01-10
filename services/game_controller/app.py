@@ -143,7 +143,7 @@ def game_state_is_fact_applicable():
     return safe_call(impl_game_state_is_fact_applicable, params["name"], params["username"], params["token"])
 
 @app.route("/game/game_state/is_post_applicable", methods=["POST"])
-def game_state_is_fact_applicable():
+def game_state_is_post_applicable():
     params = request.get_json()
     return safe_call(impl_game_state_is_post_applicable, params["name"], params["username"], params["token"])
 
