@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from 'react'
 import { GameState, Post, RoleData, RoleMetadata } from '../../api/models'
-import { FaMap } from 'react-icons/fa';
-import { metadata } from '@/app/layout';
 import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import PostComponent from './PostComponent';
-import ArticleComponent from './ArticleComponent';
 import MarkdownComponent from './MarkdownComponent';
 
 export default function PersonProfile ({gameState, roleData}: {gameState: GameState, roleData: RoleData | null}) {
