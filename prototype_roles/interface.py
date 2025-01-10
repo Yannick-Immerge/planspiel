@@ -186,7 +186,7 @@ class FactDefinition:
             data = json.load(file)
         if data is None:
             raise RuntimeError(f"Could not load metadata for fact at {definition_path}.")
-        self.metadata = PostDefinitionMetadata(**data)
+        self.metadata = FactDefinitionMetadata(**data)
         if not (definition_path / "text.md").exists():
             raise RuntimeError(f"The fact definition at {definition_path} doesnt contain a text.md file.")
         self.text_identifier = f"{prefix}/text.md"
@@ -197,7 +197,7 @@ class FactDefinition:
     def collect_queries(self) -> list[PostQuery]:
         # Fact <- Fact_depends_on
         queries = []
-        query = (f"INSERT INTO Post(name, belongs_to, text_identifier, hyperlink, is_scenario) "
+        query = (f"INSERT INTO Fact(name, belongs_to, text_identifier, hyperlink, is_scenario) "
                  f"VALUES ({_dbs(self.name)}, {_dbs(self.belongs_to)}, {_dbs(self.text_identifier)}, "
                  f"{_dbs(self.metadata.hyperlink)}, {_dbb(self.metadata.isScenario)})")
         queries.append(PostQuery(query, ()))

@@ -16,8 +16,8 @@ export default function PersonProfile ({gameState, roleData}: {gameState: GameSt
 
     return (
     <div className="w-full h-full">
-        <Titlecard url={"resources/" + roleData.titlecardIdentifier} />
-        <ProfilePicture url={"resources/" + (roleData.profilePictureIdentifier)}/>
+        <Titlecard url={roleData.titlecardIdentifier} />
+        <ProfilePicture url={roleData.profilePictureIdentifier}/>
         <MetadataArea roleMetadata={roleData.metadata}/>
         <MarkdownComponent path={roleData.infoIdentifier}/>
         <PostsArea posts={roleData.posts} roleMetadata={roleData.metadata} />

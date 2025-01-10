@@ -541,6 +541,7 @@ class SessionManager:
         for username in session["memberUsernames"]:
             if username == session["administratorUsername"]:
                 continue
+            print(role_names)
             role_name = role_names[off]
             buergerrat = off + 1
             USER_MANAGER.configure_user(username, role_name, buergerrat)
