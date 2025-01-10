@@ -1,8 +1,7 @@
-import itertools
 import json
 import re
 from pathlib import Path
-from typing import Iterable, Self
+from typing import Iterable
 
 import pydantic
 
@@ -127,7 +126,7 @@ class PostDefinition:
 
     def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
         self.name = definition_path.name
-        prefix += f"{prefix}/{self.name}"
+        prefix = f"{prefix}/{self.name}"
         self.belongs_to = belongs_to
         with open(definition_path / "post.json", "rt") as file:
             data = json.load(file)
@@ -180,7 +179,7 @@ class FactDefinition:
 
     def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
         self.name = definition_path.name
-        prefix += f"{prefix}/{self.name}"
+        prefix = f"{prefix}/{self.name}"
         self.belongs_to = belongs_to
         with open(definition_path / "fact.json", "rt") as file:
             data = json.load(file)
@@ -295,7 +294,7 @@ def load_roles(role_names: Iterable[str]) -> list[RoleDefinition]:
         path = _BASE_PATH / role_name
         if not path.exists() or not path.is_dir():
             raise RuntimeError(f"Expected role definition folder at {path}.")
-        roles.append(RoleDefinition(path, "resources"))
+        roles.append(RoleDefinition(path, "roles"))
     return roles
 
 
