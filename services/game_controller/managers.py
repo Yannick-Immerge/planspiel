@@ -535,15 +535,17 @@ class SessionManager:
         if len(session["memberUsernames"]) != 3:
             raise ValueError("For the prototype configuration a session needs exactly 2 users and one administrator.")
 
-        query_1 = "SELECT 11_anais_fournier FROM RoleTable"
-        query_2 = "SELECT 6_mikkel_pedersen FROM RoleTable"
-
-        role_name_1 = execute_query(query_1)[0][0]
-        role_name_2 = execute_query(query_2)[0][0]
-
-        usernames = [username for username in session["memberUsernames"] if username != session["administratorUsername"]]
-        USER_MANAGER.configure_user(usernames[0], role_name_1, 1)
-        USER_MANAGER.configure_user(usernames[1], role_name_2, 2)
+        query = f"SELECT name FROM RoleTable"  # TODO: Hard code assigned roles
+        role_names = [row[0] for row in execute_query(query)]
+        off = 0
+        for username in session["memberUsernames"]:
+            if username == session["administratorUsername"]:
+                continue
+            print(role_names)
+            role_name = role_names[off]
+            buergerrat = off + 1
+            USER_MANAGER.configure_user(username, role_name, buergerrat)
+            off += 1
 
         # Configure Bürgerräte
         game_state_id = session["gameState"]
