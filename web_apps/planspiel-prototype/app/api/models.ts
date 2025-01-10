@@ -55,7 +55,23 @@ export interface GameState {
     projection: Record<string, number> | null
 }
 
-export type VotingStatus = { parameter: string, hasVoted: boolean }[]
+
+export interface ParameterVotingStatus {
+    parameter: string,
+    votedValue: number
+}
+
+
+export interface UserVotingStatus {
+    roleName: string,
+    parameterStatuses: ParameterVotingStatus[]
+}
+
+
+export interface VotingStatus {
+    buergerrat: number,
+    userStatuses: UserVotingStatus[]
+}
 
 
 // Data Controller
