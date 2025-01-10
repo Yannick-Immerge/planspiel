@@ -186,7 +186,7 @@ class FactDefinition:
             data = json.load(file)
         if data is None:
             raise RuntimeError(f"Could not load metadata for fact at {definition_path}.")
-        self.metadata = PostDefinitionMetadata(**data)
+        self.metadata = FactDefinitionMetadata(**data)
         if not (definition_path / "text.md").exists():
             raise RuntimeError(f"The fact definition at {definition_path} doesnt contain a text.md file.")
         self.text_identifier = f"{prefix}/text.md"
