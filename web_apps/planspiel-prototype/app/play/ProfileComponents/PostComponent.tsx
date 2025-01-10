@@ -26,7 +26,7 @@ export default function PostComponent({ post, roleMetadata } : { post: Post, rol
     }
 
     return (
-    <div className={postFormat + " " + "bg-stone-200 b-l-8 rounded-2xl border-solid p-5"}>
+    <div className={postFormat + " " + "bg-stone-200 m-5 b-l-8 rounded-2xl border-solid p-5"}>
         <div>{descText}</div>
         <div>{showDE? ("Übersetzt von: " + roleMetadata.language) : ""}</div>
         <div onClick={() => setShowDE(!showDE)} className="rounded-xl text-decoration-line: underline">{showDE? "Original anzeigen" : "Übersetzen"}</div>
