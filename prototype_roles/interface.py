@@ -252,7 +252,7 @@ class RoleDefinition:
         for child in fact_folder.iterdir():
             if not child.is_dir():
                 raise RuntimeError(f"Expected only folders in {fact_folder} but {child} is not a folder.")
-            self.facts.append(FactDefinition(child, prefix, self.name))
+            self.facts.append(FactDefinition(child, prefix + "/facts", self.name))
 
         post_folder = definition_path / "posts"
         if not post_folder.exists() or not post_folder.is_dir():
@@ -261,7 +261,7 @@ class RoleDefinition:
         for child in post_folder.iterdir():
             if not child.is_dir():
                 raise RuntimeError(f"Expected only folders in {post_folder} but {child} is not a folder.")
-            self.posts.append(PostDefinition(child, prefix, self.name))
+            self.posts.append(PostDefinition(child, prefix + "/posts", self.name))
 
     def collect_required_conditions(self) -> list[str]:
         total = []
