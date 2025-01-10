@@ -83,8 +83,12 @@ export interface ReadyToTransitionGameStateResult {
     readyToTransition: boolean
 }
 
-export interface IsScenarioApplicableResult {
-    isScenarioApplicable: boolean
+export interface IsFactApplicableResult {
+    isFactApplicable: boolean
+}
+
+export interface IsPostApplicableResult {
+    isPostApplicable: boolean
 }
 
 export interface HasVotedResult {
@@ -321,9 +325,19 @@ export async function transitionGameState(targetPhase: GamePhase, overrideAdmini
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }
 
-export async function isScenarioApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsScenarioApplicableResult>> {
+export async function isFactApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsFactApplicableResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<IsScenarioApplicableResult>("/game_state/is_scenario_applicable", {
+        return game_fetch<IsFactApplicableResult>("/game_state/is_fact_applicable", {
+            name: name,
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideUsername, overrideToken);
+}
+
+export async function isPostApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsPostApplicableResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<IsPostApplicableResult>("/game_state/is_post_applicable", {
             name: name,
             username: localUsername,
             token: localToken
@@ -342,7 +356,6 @@ export async function hasVoted(parameter: string, overrideUsername?: string, ove
 }
 
 export async function vote(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<VoteResult>> {
-    console.log("Voting 3")
     return fetch_with_auth((localUsername, localToken) => {
         return game_fetch<VoteResult>("/game_state/voting/vote", {
             parameter: parameter,
