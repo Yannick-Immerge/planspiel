@@ -6,26 +6,7 @@ from datetime import timedelta, datetime
 from enum import Enum
 
 from shared.architecture.rest import AuthError
-from shared.data_model.context import execute_query, PostQuery, execute_post_query, get_last_row_id
-
-
-def _dbs(v: str | None):
-    if v is None:
-        return "NULL"
-    else:
-        return f"\"{v}\""
-
-def _dbi(v: int | None):
-    if v is None:
-        return "NULL"
-    else:
-        return f"{v}"
-
-def _dbf(v: float | None):
-    if v is None:
-        return "NULL"
-    else:
-        return f"{v}"
+from shared.data_model.context import get_last_row_id, execute, Query
 
 
 class UserStatus(Enum):
@@ -51,44 +32,44 @@ class PrototypeConfiguration(Enum):
 class UserManager:
 
     def has_user(self, username: str) -> bool:
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s;"
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def has_password(self, username: str) -> bool:
         if not self.has_user(username):
             raise NameError(f"There is no user with username: {username}.")
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash IS NOT NULL"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s AND password_hash IS NOT NULL"
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def is_user_admin(self, username: str) -> bool:
         query = (f"SELECT COUNT(*) FROM User INNER JOIN Session "
                  f"ON User.member_of = Session.session_id AND User.username = Session.administrator "
-                 f"WHERE User.username = {_dbs(username)};")
-        n = execute_query(query)[0][0]
+                 f"WHERE User.username = %s;")
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def is_user_configured(self, username: str) -> bool:
         if self.is_user_admin(username):
             return False
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND plays_as IS NOT NULL;"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s AND plays_as IS NOT NULL;"
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def add_user(self, username: str, password_hash: str | None, member_of: str):
         if self.has_user(username):
             raise NameError(f"A user with given username: {username} already exists.")
         query = (f"INSERT INTO User(username, password_hash, member_of) "
-                 f"VALUES ({_dbs(username)}, {_dbs(password_hash)}, {_dbs(member_of)});")
-        execute_post_query(PostQuery(query, ()))
+                 f"VALUES (%s, %s, %s);")
+        execute(Query(query,(username, password_hash, member_of)), commit=True)
 
     def verify_or_create_user_password(self, username: str, password_hash: str) -> bool:
         if not self.has_user(username):
             raise NameError(f"No user with username: {username}")
         if self.has_password(username):
-            query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash = {_dbs(password_hash)};"
-            n = execute_query(query)[0][0]
+            query = f"SELECT COUNT(*) FROM User WHERE username = %s AND password_hash = %s;"
+            n = execute(Query(query, (username, password_hash)), commit=True)[0][0]
             return n > 0
         else:
             self.update_user_password(username, password_hash)
@@ -103,20 +84,20 @@ class UserManager:
             raise RuntimeError(f"Cannot configure user: {username}: Already assigned a role.")
         if buergerrat != 1 and buergerrat != 2:
             raise ValueError("Buergerrat must be 1 or 2.")
-        query = f"UPDATE User SET plays_as = {_dbs(plays_as)}, buergerrat = {_dbi(buergerrat)} WHERE username = {_dbs(username)};"
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE User SET plays_as = %s, buergerrat = %s WHERE username = %s;"
+        execute(Query(query, (plays_as, buergerrat, username)), commit=True)
 
     def update_user_password(self, username: str, password_hash: str):
         if not self.has_user(username):
             raise NameError(f"Unknown username: {username}.")
-        query = f"UPDATE User SET password_hash = {_dbs(password_hash)} WHERE username = {_dbs(username)};"
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE User SET password_hash = %s WHERE username = %s;"
+        execute(Query(query, (password_hash, username)), commit=True)
 
     def view_user(self, username: str, status: UserStatus) -> dict:
         if not self.has_user(username):
             raise NameError(f"No user with username: {username}")
-        query = f"SELECT plays_as, buergerrat FROM User WHERE username = {_dbs(username)};"
-        assigned_role_id, assigned_buergerrat = execute_query(query)[0]
+        query = f"SELECT plays_as, buergerrat FROM User WHERE username = %s;"
+        assigned_role_id, assigned_buergerrat = execute(Query(query, (username,)))[0]
         return {
             "username": username,
             "status": status.value,
@@ -130,48 +111,50 @@ class UserManager:
             raise NameError(f"No user with username: {username}")
         if not self.is_user_admin(username):
             raise RuntimeError(f"User {username} is not the administrator of this session.")
-        query = f"SELECT member_of FROM User WHERE username = {_dbs(username)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT member_of FROM User WHERE username = %s;"
+        return execute(Query(query, (username,)))[0][0]
 
     def get_session(self, username: str) -> str:
         if not self.has_user(username):
             raise NameError(f"No user with username: {username}")
-        query = f"SELECT member_of FROM User WHERE username = {_dbs(username)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT member_of FROM User WHERE username = %s;"
+        return execute(Query(query, (username,)))[0][0]
 
 
 USER_MANAGER: UserManager = UserManager()
 
 
 class GameStateManager:
+
     def has_game_state(self, game_state_id: int) -> bool:
-        query = f"SELECT COUNT(*) FROM GameState WHERE id = {_dbi(game_state_id)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM GameState WHERE id = %s;"
+        n = execute(Query(query, (game_state_id,)))[0][0]
         return n > 0
 
     def add_game_state(self) -> int:
-        query = f"INSERT INTO GameState(phase) VALUES ({_dbs(GamePhase.CONFIGURING.value)});"
-        execute_post_query(PostQuery(query, ()))
+        query = f"INSERT INTO GameState(phase) VALUES (%s);"
+        execute(Query(query, (GamePhase.CONFIGURING.value,)), commit=True)
+
         game_state_id = get_last_row_id()
         query = "SELECT simple_name FROM Metric"
-        metrics = [row[0] for row in execute_query(query)]
+        metrics = [row[0] for row in execute(Query(query, ()))]
         for metric in metrics:
-            query = f"INSERT INTO Projection(game_state, metric) VALUES ({_dbi(game_state_id)}, {_dbs(metric)});"
-            execute_post_query(PostQuery(query, ()))
+            query = f"INSERT INTO Projection(game_state, metric) VALUES (%s, %s);"
+            execute(Query(query, (game_state_id, metric)), commit=True)
         return game_state_id
 
     def get_controlled_parameters(self, game_state_id: int, buergerrat: int) -> list:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT parameter FROM controls "
-                 f"WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};")
-        return [row[0] for row in execute_query(query)]
+                 f"WHERE game_state = %s AND buergerrat = %s;")
+        return [row[0] for row in execute(Query(query, (game_state_id, buergerrat)))]
 
     def get_configuration(self, game_state_id: int, buergerrat: int) -> dict[str, float] | None:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT parameter, choice FROM controls WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)};"
-        configuration = {row[0]: row[1] for row in execute_query(query)}
+        query = f"SELECT parameter, choice FROM controls WHERE game_state = %s AND buergerrat = %s;"
+        configuration = {row[0]: row[1] for row in execute(Query(query, (game_state_id, buergerrat)))}
         if None in configuration.values():
             configuration = None
         return configuration
@@ -195,8 +178,8 @@ class GameStateManager:
     def get_projections(self, game_state_id: int) -> dict[str, float] | None:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)};"
-        result = execute_query(query)
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = %s;"
+        result = execute(Query(query, (game_state_id,)))
         projections = {row[0]: row[1] for row in result}
         if None in projections.values():
             projections = None
@@ -205,8 +188,8 @@ class GameStateManager:
     def get_game_state(self, game_state_id: int):
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase, voting_end FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, voting_end = execute_query(query)[0]
+        query = f"SELECT phase, voting_end FROM GameState WHERE id = %s;"
+        phase, voting_end = execute(Query(query, (game_state_id,)))[0]
         buergerrat1, buergerrat2 = self.get_buergerraete(game_state_id)
         projection = self.get_projections(game_state_id)
         return {
@@ -221,12 +204,12 @@ class GameStateManager:
     def are_users_configured(self, game_state_id: int) -> bool:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT session_id FROM Session WHERE game_state = {_dbi(game_state_id)};"
-        session_id = execute_query(query)[0][0]
+        query = f"SELECT session_id FROM Session WHERE game_state = %s;"
+        session_id = execute(Query(query, (game_state_id,)))[0][0]
         query = (f"SELECT COUNT(*) "
                  f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
-                 f"WHERE Session.session_id = {_dbs(session_id)} AND User.plays_as IS NULL AND User.username != Session.administrator;")
-        n = execute_query(query)[0][0]
+                 f"WHERE Session.session_id = %s AND User.plays_as IS NULL AND User.username != Session.administrator;")
+        n = execute(Query(query, (session_id,)))[0][0]
         return n == 0
 
     def add_parameter_to_buergerrat(self, game_state_id: int, buergerrat: int, parameter: str):
@@ -234,9 +217,8 @@ class GameStateManager:
             raise ValueError(f"No game state with id {game_state_id}.")
         if buergerrat != 1 and buergerrat != 2:
             raise ValueError("Buergerrat must be 1 or 2.")
-        query = (f"INSERT INTO controls(game_state, buergerrat, parameter) VALUES "
-                 f"({_dbi(game_state_id)}, {_dbi(buergerrat)}, {_dbs(parameter)});")
-        execute_post_query(PostQuery(query, ()))
+        query = f"INSERT INTO controls(game_state, buergerrat, parameter) VALUES (%s, %s, %s);"
+        execute(Query(query, (game_state_id, buergerrat, parameter)), commit=True)
 
     def are_buergerraete_configured(self, game_state_id: int) -> bool:
         if not self.has_game_state(game_state_id):
@@ -247,46 +229,45 @@ class GameStateManager:
 
     def set_choice(self, game_state_id: int, buergerrat: int, parameter: str, value: float):
 
-        query = (f"UPDATE controls SET choice = {_dbf(value)} "
-                 f"WHERE game_state = {_dbi(game_state_id)} AND buergerrat = {_dbi(buergerrat)} AND parameter = {_dbs(parameter)};")
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE controls SET choice = %s WHERE game_state = %s AND buergerrat = %s AND parameter = %s;"
+        execute(Query(query, (value, game_state_id, buergerrat, parameter)))
 
     def setup_voting(self, game_state_id: int):
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT Parameter.simple_name, Parameter.min_value "
                  f"FROM controls INNER JOIN Parameter ON controls.parameter = Parameter.simple_name "
-                 f"WHERE controls.game_state = {_dbi(game_state_id)} AND controls.buergerrat = 1;")
-        all_parameters_br1 = execute_query(query)
+                 f"WHERE controls.game_state = %s AND controls.buergerrat = 1;")
+        all_parameters_br1 = execute(Query(query, (game_state_id,)))
         query = (f"SELECT Parameter.simple_name, Parameter.min_value "
                  f"FROM controls INNER JOIN Parameter ON controls.parameter = Parameter.simple_name "
-                 f"WHERE controls.game_state = {_dbi(game_state_id)} AND controls.buergerrat = 2;")
-        all_parameters_br2 = execute_query(query)
-        query = f"SELECT session_id FROM Session WHERE game_state = {_dbi(game_state_id)};"
-        session_id = execute_query(query)[0][0]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 1;"
-        users_br1 = [row[0] for row in execute_query(query)]
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)} AND buergerrat = 2;"
-        users_br2 = [row[0] for row in execute_query(query)]
+                 f"WHERE controls.game_state = %s AND controls.buergerrat = 2;")
+        all_parameters_br2 = execute(Query(query, (game_state_id,)))
+        query = f"SELECT session_id FROM Session WHERE game_state = %s;"
+        session_id = execute(Query(query, (game_state_id,)))[0][0]
+        query = f"SELECT username FROM User WHERE member_of = %s AND buergerrat = 1;"
+        users_br1 = [row[0] for row in execute(Query(query, (session_id,)))]
+        query = f"SELECT username FROM User WHERE member_of = %s AND buergerrat = 2;"
+        users_br2 = [row[0] for row in execute(Query(query, (session_id,)))]
         for users, all_parameters in [(users_br1, all_parameters_br1), (users_br2, all_parameters_br2)]:
             for username in users:
                 for parameter, min_value in all_parameters:
                     query = (f"INSERT INTO Voting(user, parameter, voted_value, has_committed) "
-                             f"VALUES ({_dbs(username)}, {_dbs(parameter)}, {_dbf(min_value)}, FALSE);")
-                    execute_post_query(PostQuery(query, ()))
+                             f"VALUES (%s, %s, %s, FALSE);")
+                    execute(Query(query, (username, parameter, min_value)), commit=True)
 
     def make_projections(self, game_state_id: int):
         # TODO: Make projections CORRECT & DYNAMIC
         fixed_projections = [("energy_prod_coal", 50), ("energy_prod_wind", 50), ("sea_level", 10)]
         for metric, projected_value in fixed_projections:
-            query = f"UPDATE Projection SET projected_value = {_dbf(projected_value)} WHERE game_state = {_dbi(game_state_id)} AND metric = {_dbs(metric)};"
-            execute_post_query(PostQuery(query, ()))
+            query = f"UPDATE Projection SET projected_value = %s WHERE game_state = %s AND metric = %s;"
+            execute(Query(query, (projected_value, game_state_id, metric)), commit=True)
 
     def ready_to_transition(self, game_state_id: int, target_phase: str):
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0][0]
+        query = f"SELECT phase FROM GameState WHERE id = %s;"
+        phase = execute(Query(query, (game_state_id,)))[0][0]
         if phase == GamePhase.CONFIGURING.value and target_phase == GamePhase.IDENTIFICATION.value:
             return self.are_users_configured(game_state_id) and self.are_buergerraete_configured(game_state_id)
         elif phase == GamePhase.IDENTIFICATION.value and target_phase == GamePhase.DISCUSSION.value:
@@ -309,18 +290,18 @@ class GameStateManager:
             self.voting_set_timer(game_state_id)
         elif target_phase == GamePhase.DEBRIEFING.value:
             self.make_projections(game_state_id)
-        query = f"UPDATE GameState SET phase = {_dbs(target_phase)} WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE GameState SET phase = %s WHERE id = %s;"
+        execute(Query(query, (target_phase, game_state_id)), commit=True)
 
     def is_fact_applicable(self, game_state_id: int, name: str) -> bool:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
                  f"FROM ScenarioCondition INNER JOIN Fact_depends_on ON ScenarioCondition.name = Fact_depends_on.scenario_condition "
-                 f"WHERE Fact_depends_on.fact = {_dbs(name)}")
-        all_conditions = {row[0]: (row[1], row[2]) for row in execute_query(query)}
-        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)}"
-        projected_metrics = {row[0]: row[1] for row in execute_query(query)}
+                 f"WHERE Fact_depends_on.fact = %s;")
+        all_conditions = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = %s;"
+        projected_metrics = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
 
         for metric in all_conditions:
             if metric not in projected_metrics or projected_metrics[metric] is None:
@@ -335,10 +316,10 @@ class GameStateManager:
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
                  f"FROM ScenarioCondition INNER JOIN Post_depends_on ON ScenarioCondition.name = Post_depends_on.scenario_condition "
-                 f"WHERE Post_depends_on.post = {_dbs(name)}")
-        all_conditions = {row[0]: (row[1], row[2]) for row in execute_query(query)}
-        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = {_dbi(game_state_id)}"
-        projected_metrics = {row[0]: row[1] for row in execute_query(query)}
+                 f"WHERE Post_depends_on.post = %s;")
+        all_conditions = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
+        query = f"SELECT metric, projected_value FROM Projection WHERE game_state = %s;"
+        projected_metrics = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
 
         for metric in all_conditions:
             if metric not in projected_metrics or projected_metrics[metric] is None:
@@ -353,59 +334,59 @@ class GameStateManager:
             raise ValueError(f"No game state with id {game_state_id}.")
         query = (f"SELECT COUNT(*) "
                  f"FROM Session INNER JOIN (User INNER JOIN Voting ON User.username = Voting.user) ON User.member_of = Session.session_id "
-                 f"WHERE Session.game_state = {_dbi(game_state_id)} AND NOT Voting.has_committed;")
-        n = execute_query(query)[0][0]
+                 f"WHERE Session.game_state = %s AND NOT Voting.has_committed;")
+        n = execute(Query(query, (game_state_id,)))[0][0]
         return n == 0
 
     def voting_has_committed(self, username: str, parameter: str) -> bool:
-        query = f"SELECT has_committed FROM Voting WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT has_committed FROM Voting WHERE user = %s AND parameter = %s;"
+        return execute(Query(query, (username, parameter)))[0][0]
 
     def voting_update(self, username: str, parameter: str, voted_value: float):
         if not USER_MANAGER.has_user(username):
             raise NameError(f"No user with username {username}.")
         query = (f"SELECT GameState.id "
                  f"FROM GameState INNER JOIN (Session INNER JOIN User ON Session.session_id = User.member_of) ON GameState.id = Session.game_state "
-                 f"WHERE User.username = {_dbs(username)};")
-        game_state_id = execute_query(query)[0][0]
-        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0][0]
+                 f"WHERE User.username = %s;")
+        game_state_id = execute(Query(query, (username,)))[0][0]
+        query = f"SELECT phase FROM GameState WHERE id = %s;"
+        phase = execute(Query(query, (game_state_id,)))[0][0]
         if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value:
             raise RuntimeError("Game is not in voting nor discussion phase.")
         if self.voting_has_committed(username, parameter):
             raise RuntimeError(f"User {username} has already committed a vote for {parameter}.")
-        query = f"UPDATE Voting SET voted_value = {_dbf(voted_value)} WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE Voting SET voted_value = %s WHERE user = %s AND parameter = %s;"
+        execute(Query(query, (voted_value, username, parameter)), commit=True)
 
     def voting_commit(self, username: str, parameter: str):
         if not USER_MANAGER.has_user(username):
             raise NameError(f"No user with username {username}.")
         query = (f"SELECT GameState.id "
                  f"FROM GameState INNER JOIN (Session INNER JOIN User ON Session.session_id = User.member_of) ON GameState.id = Session.game_state "
-                 f"WHERE User.username = {_dbs(username)};")
-        game_state_id = execute_query(query)[0][0]
-        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0][0]
+                 f"WHERE User.username = %s;")
+        game_state_id = execute(Query(query, (username,)))[0][0]
+        query = f"SELECT phase FROM GameState WHERE id = %s;"
+        phase = execute(Query(query, (game_state_id,)))[0][0]
         if phase != GamePhase.VOTING.value:
             raise RuntimeError("Game is not in voting phase.")
         if self.voting_has_committed(username, parameter):
             raise RuntimeError(f"User {username} has already committed a vote for {parameter}.")
-        query = f"UPDATE Voting SET has_committed = TRUE WHERE user = {_dbs(username)} AND parameter = {_dbs(parameter)};"
-        execute_post_query(PostQuery(query, ()))
+        query = f"UPDATE Voting SET has_committed = TRUE WHERE user = %s AND parameter = %s;"
+        execute(Query(query, (username, parameter)), commit=True)
 
     def voting_get_status(self, game_state_id: int, buergerrat: int) -> dict:
-        query = f"SELECT phase, voting_end FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase, voting_end = execute_query(query)[0]
+        query = f"SELECT phase, voting_end FROM GameState WHERE id = %s;"
+        phase, voting_end = execute(Query(query, (game_state_id,)))[0]
         if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value:
             raise RuntimeError("Game is not in voting nor in discussion phase.")
         query = (f"SELECT User.username, User.plays_as "
                  f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
-                 f"WHERE User.buergerrat = {_dbi(buergerrat)} AND Session.game_state = {_dbi(game_state_id)};")
-        usernames = execute_query(query)
+                 f"WHERE User.buergerrat = %s AND Session.game_state = %s;")
+        usernames = execute(Query(query, (buergerrat, game_state_id)))
         user_statuses = []
         for username, role_name in usernames:
-            query = f"SELECT parameter, voted_value FROM Voting WHERE user = {_dbs(username)};"
-            parameters = execute_query(query)
+            query = f"SELECT parameter, voted_value FROM Voting WHERE user = %s;"
+            parameters = execute(Query(query, (username,)))
             parameter_statuses = []
             for parameter, voted_value in parameters:
                 parameter_statuses.append({
@@ -424,17 +405,17 @@ class GameStateManager:
 
     def voting_set_timer(self, game_state_id: int):
         voting_end = datetime.now() + timedelta(minutes=5)
-        query = f"UPDATE GameState SET voting_end = %s WHERE id = {_dbi(game_state_id)};"
-        execute_post_query(PostQuery(query, (voting_end,)))
+        query = f"UPDATE GameState SET voting_end = %s WHERE id = %s;"
+        execute(Query(query, (voting_end, game_state_id)))
 
     def voting_determine_result(self, game_state_id: int):
         # TODO: Average for now
         query = (f"SELECT Voting.parameter, Voting.voted_value, User.buergerrat "
                  f"FROM Voting INNER JOIN (User INNER JOIN Session ON User.member_of = Session.session_id) ON Voting.user = User.username "
-                 f"WHERE Session.game_state = {_dbi(game_state_id)};")
+                 f"WHERE Session.game_state = %s;")
         votes_br1 = {}
         votes_br2 = {}
-        for parameter, value, buergerrat in execute_query(query):
+        for parameter, value, buergerrat in execute(Query(query, (game_state_id,))):
             target = votes_br1 if buergerrat == 1 else votes_br2
             if parameter not in target:
                 target[parameter] = []
@@ -445,9 +426,8 @@ class GameStateManager:
                 avrg = sum(values)
                 if len(values) > 0:
                     avrg /= len(values)
-                query = (f"UPDATE controls SET choice = {_dbf(avrg)} "
-                         f"WHERE game_state = {_dbi(game_state_id)} AND parameter = {_dbs(parameter)} AND buergerrat = {_dbi(buergerrat)};")
-                execute_post_query(PostQuery(query, ()))
+                query = f"UPDATE controls SET choice = %s WHERE game_state = %s AND parameter = %s AND buergerrat = %s;"
+                execute(Query(query, (avrg, game_state_id, parameter, buergerrat)), commit=True)
 
 
 GAME_STATE_MANAGER: GameStateManager = GameStateManager()
@@ -455,19 +435,19 @@ GAME_STATE_MANAGER: GameStateManager = GameStateManager()
 
 class SessionManager:
     def has_product_key(self, key_value: str) -> bool:
-        query = f"SELECT COUNT(*) FROM ProductKey WHERE key_value = {_dbs(key_value)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM ProductKey WHERE key_value = %s;"
+        n = execute(Query(query, (key_value,)))[0][0]
         return n > 0
 
     def get_number_of_sessions_with_product_key(self, key_value: str) -> int:
-        query = f"SELECT COUNT(*) FROM Session WHERE product_key = {_dbs(key_value)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM Session WHERE product_key = %s;"
+        return execute(Query(query, (key_value,)))[0][0]
 
     def is_product_key_valid_for_new_session(self, key_value: str) -> bool:
         if not self.has_product_key(key_value):
             raise ValueError(f"Unknown product key: {key_value}.")
-        query = f"SELECT num_sessions, expires FROM ProductKey WHERE key_value = {_dbs(key_value)};"
-        num_sessions, expires = execute_query(query)[0]
+        query = f"SELECT num_sessions, expires FROM ProductKey WHERE key_value = %s;"
+        num_sessions, expires = execute(Query(query, (key_value,)))[0]
         used_sessions = self.get_number_of_sessions_with_product_key(key_value)
         # TODO: Expiration check
         return used_sessions < num_sessions
@@ -475,13 +455,12 @@ class SessionManager:
     def add_product_key(self, key_value: str, num_sessions: int):
         if self.has_product_key(key_value):
             raise ValueError(f"The product key {key_value} has already been registered.")
-        query = (f"INSERT INTO ProductKey(key_value, num_sessions, expires) "
-                 f"VALUES ({_dbs(key_value)}, {_dbi(num_sessions)}, NULL);")
-        execute_post_query(PostQuery(query, ()))
+        query = f"INSERT INTO ProductKey(key_value, num_sessions, expires) VALUES (%s, %s, NULL);"
+        execute(Query(query, (key_value, num_sessions)), commit=True)
 
     def has_session(self, session_id: str) -> bool:
-        query = f"SELECT COUNT(*) FROM Session WHERE session_id = {_dbs(session_id)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM Session WHERE session_id = %s;"
+        n = execute(Query(query, (session_id,)))[0][0]
         return n > 0
 
     def add_session(self, session_id: str, product_key: str, administrator_username: str, administrator_password_hash: str):
@@ -494,8 +473,8 @@ class SessionManager:
         # First create Session then Administrator (b/c of reference checks)
         game_state = GAME_STATE_MANAGER.add_game_state()
         query = (f"INSERT INTO Session(session_id, product_key, administrator, game_state, session_status) "
-                         f"VALUES ({_dbs(session_id)}, {_dbs(product_key)}, {_dbs(administrator_username)}, {_dbi(game_state)}, \"active\");")
-        execute_post_query(PostQuery(query, ()))
+                 f"VALUES (%s, %s, %s, %s, %s);")
+        execute(Query(query, (session_id, product_key, administrator_username, game_state, "active")), commit=True)
         USER_MANAGER.add_user(administrator_username, administrator_password_hash, session_id)
 
     def add_session_member(self, session_id: str, username: str):
@@ -506,42 +485,42 @@ class SessionManager:
     def list_session_members(self, session_id: str) -> list[str]:
         if not self.has_session(session_id):
             raise NameError(f"There is no session with id: {session_id}.")
-        query = f"SELECT username FROM User WHERE member_of = {_dbs(session_id)};"
-        return [row[0] for row in execute_query(query)]
+        query = f"SELECT username FROM User WHERE member_of = %s;"
+        return [row[0] for row in execute(Query(query, (session_id,)))]
 
     def get_responsible_administrator(self, username: str) -> str:
         if not USER_MANAGER.has_user(username):
             raise NameError(f"There is no user with username: {username}.")
         query = (f"SELECT Session.administrator FROM User INNER JOIN Session "
                  f"ON User.member_of = Session.session_id "
-                 f"WHERE User.username = {_dbs(username)}")
-        return execute_query(query)[0][0]
+                 f"WHERE User.username = %s;")
+        return execute(Query(query, (username,)))[0][0]
 
     def get_session_administrator(self, session_id: str) -> str:
         if not self.has_session(session_id):
             raise NameError(f"There is no session with id: {session_id}.")
-        query = f"SELECT administrator FROM Session WHERE session_id = {_dbs(session_id)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT administrator FROM Session WHERE session_id = %s;"
+        return execute(Query(query, (session_id,)))[0][0]
 
     def set_session_status(self, session_id: str, session_status: str):
         # TODO: Session status
         pass
 
     def view_session(self, session_id: str):
-        query = f"SELECT session_status FROM Session WHERE session_id = {_dbs(session_id)};"
+        query = f"SELECT session_status FROM Session WHERE session_id = %s;"
         return {
             "id": session_id,
-            "status": execute_query(query)[0][0]
+            "status": execute(Query(query, (session_id,)))[0][0]
         }
 
     def get_session(self, session_id: str):
-        query = f"SELECT administrator, session_status, game_state FROM Session WHERE session_id = {_dbs(session_id)};"
-        administrator_username, status, game_state = execute_query(query)[0]
+        query = f"SELECT administrator, session_status, game_state FROM Session WHERE session_id = %s;"
+        administrator_username, status, game_state = execute(Query(query, (session_id,)))[0]
         member_usernames = self.list_session_members(session_id)
         return {
             "id": session_id,
             "administratorUsername": administrator_username,
-            "status": execute_query(query)[0][0],
+            "status": status,
             "memberUsernames": member_usernames,
             "gameState": game_state
         }
@@ -549,8 +528,8 @@ class SessionManager:
     def get_game_state_id(self, session_id: str) -> int:
         if not self.has_session(session_id):
             raise NameError(f"There is no session with session id: {session_id}.")
-        query = f"SELECT game_state FROM Session WHERE session_id = {_dbs(session_id)};"
-        return execute_query(query)[0][0]
+        query = f"SELECT game_state FROM Session WHERE session_id = %s;"
+        return execute(Query(query, (session_id,)))[0][0]
 
     def configure_prototype_friday_trial(self, session_id: str):
         # Configure Users
@@ -559,7 +538,7 @@ class SessionManager:
             raise ValueError("For the prototype configuration a session needs exactly 10 users and one administrator.")
 
         query = f"SELECT name FROM RoleTable"  # TODO: Hard code assigned roles
-        role_names = [row[0] for row in execute_query(query)]
+        role_names = [row[0] for row in execute(Query(query, ()))]
         off = 0
         for username in session["memberUsernames"]:
             if username == session["administratorUsername"]:
@@ -584,7 +563,7 @@ class SessionManager:
             raise ValueError("For the prototype configuration a session needs exactly 2 users and one administrator.")
 
         query = f"SELECT name FROM RoleTable"  # TODO: Hard code assigned roles
-        role_names = [row[0] for row in execute_query(query)]
+        role_names = [row[0] for row in execute(Query(query, ()))]
         off = 0
         for username in session["memberUsernames"]:
             if username == session["administratorUsername"]:
