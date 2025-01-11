@@ -2,8 +2,8 @@
 import {useEffect, useState} from "react";
 import {Parameter} from "@/app/api/models";
 import {getParameter} from "@/app/api/data_controller_interface";
-import VotingSlider from "@/app/play/VotingSlider";
-import { GetGermanName } from "../dashboard/BuergerraeteArea";
+import VotingSlider from "@/app/play/VotingComponents/VotingSlider";
+import { GetGermanName } from "../../dashboard/BuergerraeteArea";
 
 export default function VotingStatusItem({parameter, hasVoted, voteParameterAction} : {parameter: string, hasVoted: boolean, voteParameterAction: (parameter: string, votedValue: number) => void}) {
     const [parameterInfo, setParameterInfo] = useState<Parameter | null>(null);

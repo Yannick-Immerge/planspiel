@@ -6,13 +6,13 @@ import {
 } from "@/app/api/game_controller_interface";
 
 import {GameState, RoleData, UserView} from "@/app/api/models";
-import VotingArea from "@/app/play/VotingArea";
+import VotingArea from "@/app/play/VotingComponents/VotingArea";
 import { ConfigurationPlaceholder } from "./KonfiguringWait";
 import { BsPersonVcard } from "react-icons/bs";
 import { MdOutlineMail } from "react-icons/md";
 import { GoCommentDiscussion } from "react-icons/go";
 import PersonProfile from "./ProfileComponents/PersonProfile";
-import EMailProvider from "./EMailProvider";
+import EMailProvider from "./EMailComponents/EMailProvider";
 import { getRole } from "../api/data_controller_interface";
 
 export default function Play() {
@@ -21,7 +21,7 @@ export default function Play() {
     const [roleData, setRoleData] = useState<RoleData | null>(null);
     //const [scenarios, setScenarios] = useState<GetScenarioInformationResult | null>(null);
     const [warning, setWarning] = useState<string | null>(null);
-    const [activePanel, setActivePanel] = useState<"profile" | "voting" | "email">("profile")
+    const [activePanel, setActivePanel] = useState<"profile" | "voting" | "email">("voting")
 
     const fetchUser = async () => {
         const viewResponse = await viewSelf();
@@ -42,15 +42,7 @@ export default function Play() {
         }
         
         setGameState(gameStateResponse.data.gameState);
-
-        const response = await viewSelf()
-        
-        if (!response || response.data === null) {
-            setThemen(["ViewUser failed"])
-            return;
-        }
-
-        setThemen(response.data?.userView.assignedBuergerrat == 1? gameStateResponse.data.gameState.buergerrat1.parameters : gameStateResponse.data.gameState.buergerrat2.parameters)
+        return;
     };
 
     const fetchRoleEntries = async () => {
@@ -115,11 +107,17 @@ export default function Play() {
 
     useEffect(() => {
         fetchAll();
-    }, [gameState == undefined || gameState.phase == "configuring" ]);
+    },[]);
 
     useEffect(() => {
         getThemes();
     }, []);
+
+    useEffect(() => {
+        const interval = setInterval(() => { fetchGameState() }, 5000);
+
+        return () => clearInterval(interval);
+    }, [])
 
     const getThemes = async () => {
 
@@ -150,7 +148,7 @@ export default function Play() {
             <></>}
 
             {activePanel == "voting"?
-                   <VotingArea gameState={gameState}/> :
+                   <VotingArea gameState={gameState} roleData={roleData}/> :
             <></>}
 
             {activePanel == "email"? 

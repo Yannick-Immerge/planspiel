@@ -35,7 +35,7 @@ export function TranslatableMarkdownComponent({ pathDE, pathOrig, showDE } : { p
     }, []);
 
     return (
-        <div className="w-full h-full text-sm prose text-black">
+        <div className="w-full h-full text-sm text-black">
             <ReactMarkdown>{showDE? markdownDE : markdownOrig}</ReactMarkdown>
         </div>
     )
