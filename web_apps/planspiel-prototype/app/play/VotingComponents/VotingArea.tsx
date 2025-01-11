@@ -33,8 +33,10 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
             const remainingSecondsString = differenceSeconds < 10? ("0" + differenceSeconds) : differenceSeconds;
             const remainingMinutesString = differenceMinutes < 10? ("0" + differenceMinutes) : differenceMinutes;
             setTimeRemainingString(remainingMinutesString + ":" + remainingSecondsString)
-        }, 200)
-    }, [])
+        }, 200);
+
+        return () => clearInterval(interval);
+    }, []);
 
     // Der Voting Status wird alle 5 Sekunden erfragt.
     useEffect(() => {
