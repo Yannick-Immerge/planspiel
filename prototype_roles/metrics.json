@@ -1,19 +1,37 @@
 [
   {
-    "simpleName": "sea_level",
-    "description": "Describes the average offset of the sea levels from the current value.",
-    "minValue": -10,
-    "maxValue": 30
-  },
-  {
-    "simpleName": "energy_prod_coal",
-    "description": "Describes how much energy is being produced by means of coal in GWh",
+    "simpleName": "gases_agriculture",
+    "description": "Methan und Lachgas aus der Landwirtschaft: 0 - 100 % [der mgl. Reduktion]",
     "minValue": 0,
     "maxValue": 100
   },
   {
-    "simpleName": "energy_prod_wind",
-    "description": "Describes how much energy is being produced by means of wind in GWh",
+    "simpleName": "reduction_meat",
+    "description": "Reduktion von tierischen Produkten: 10 - 40 % [der Ernährung]",
+    "minValue": 10,
+    "maxValue": 40
+  },
+  {
+    "simpleName": "reduction_waste",
+    "description": "Reduktion von tierischen Abfällen: 10 - 40 % [der prod. Lebensmittel]",
+    "minValue": 10,
+    "maxValue": 40
+  },
+  {
+    "simpleName": "fossil_fuel_taxes",
+    "description": "Steuer auf fossile Brennstoffe: -15 - 100 % [der mgl. Besteuerung] ",
+    "minValue": -15,
+    "maxValue": 100
+  },
+  {
+    "simpleName": "reduction_infra",
+    "description": "Reduktion neuer Infrastruktur für Kohle, Öl und Erdgas: 0 - 100 % [der mgl. Reduktion]",
+    "minValue": 0,
+    "maxValue": 100
+  },
+  {
+    "simpleName": "global",
+    "description": "Durchschnitt, der die gesamte ökologische Entwicklung beschreibt [0 ganz schlecht - 100 sehr gut]",
     "minValue": 0,
     "maxValue": 100
   }
