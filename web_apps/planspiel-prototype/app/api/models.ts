@@ -93,9 +93,13 @@ export interface RoleData {
 
 export interface RoleMetadata {
     name: string,
+    gender: "m" | "w" | "d",
 	birthday: string,
 	living: string,
-	status: string
+	status: string,
+    language: string,
+    flag: string,
+    job: string
 }
 
 export interface Fact {
@@ -110,6 +114,7 @@ export type PostType = "by_me" | "i_liked" | "got_tagged"
 export interface Post {
     name: string,
     type: PostType,
+    author: string,
 	textDeIdentifier: string,
 	textOrigIdentifier: string,
 	imageIdentifiers: string[],

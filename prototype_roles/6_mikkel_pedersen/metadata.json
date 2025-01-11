@@ -3,6 +3,8 @@
   "birthday": "Geburtstag im format MM/DD/YYYY",
   "living": "Adresse",
   "status": "Status",
-  "gender": "m, w oder d",
-  "language": "Name der Muttersprache hier eingeben, zB Französisch"
+  "gender": "m",
+  "language": "Name der Muttersprache hier eingeben, zB Französisch",
+  "flag": "🇫🇷🇷",
+  "job": "Metzgerin und Leiterin bei der Tafel \\\" Aliments pour Lyon\\\""
 }

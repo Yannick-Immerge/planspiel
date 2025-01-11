@@ -95,6 +95,7 @@ def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[Sc
 
 class PostDefinitionMetadata(pydantic.BaseModel):
     type: str
+    author: str
     isScenario: bool
     conditions: list[str]
 
@@ -140,10 +141,11 @@ class PostDefinition:
     def collect_queries(self) -> list[Query]:
         # Post <- PostImage <- Post_depends_on
         queries = []
-        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, is_scenario) "
-                 f"VALUES (%s, %s, %s, %s, %s, %s);")
+        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, author, is_scenario) "
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s);")
         queries.append(Query(query, (self.name, self.belongs_to, self.text_de_identifier,
-                                     self.text_orig_identifier, self.metadata.type, self.metadata.isScenario)))
+                                     self.text_orig_identifier, self.metadata.type, self.metadata.author,
+                                     self.metadata.isScenario)))
         for image_identifier in self.image_identifiers:
             query = (f"INSERT INTO PostImage(image_identifier, post) "
                      f"VALUES (%s, %s);")
@@ -199,9 +201,20 @@ class FactDefinition:
 
 class RoleMetadata(pydantic.BaseModel):
     name: str
+    gender: str
     birthday: str
     living: str
     status: str
+    language: str
+    flag: str
+    job: str
+
+    @pydantic.field_validator("gender", mode="after")
+    @classmethod
+    def validate_gender(cls, value: str) -> str:
+        if value not in ["m", "w", "d"]:
+            raise ValueError(f"{value} is not allowed to specify the gender.")
+        return value
 
 
 class RoleDefinition:
@@ -264,11 +277,13 @@ class RoleDefinition:
     def collect_queries(self) -> list[Query]:
         # RoleTable <- [Fact... ] <- [Post... ]
         queries = []
-        query = (f"INSERT INTO RoleTable(name, meta_name, meta_birthday, meta_living, meta_status, "
+        query = (f"INSERT INTO RoleTable(name, meta_name, meta_gender, meta_birthday, meta_living, meta_status, "
+                 f"meta_language, meta_flag, meta_job, "
                  f"profile_picture_identifier, profile_picture_old_identifier, titlecard_identifier, info_identifier) "
-                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);")
-        queries.append(Query(query, (self.name, self.metadata.name, self.metadata.birthday, self.metadata.living,
-                                     self.metadata.status, self.profile_picture_identifier,
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.metadata.name, self.metadata.gender, self.metadata.birthday,
+                                     self.metadata.living, self.metadata.status, self.metadata.language,
+                                     self.metadata.flag, self.metadata.job, self.profile_picture_identifier,
                                      self.profile_picture_old_identifier, self.titlecard_identifier,
                                      self.info_identifier)))
         for fact in self.facts:

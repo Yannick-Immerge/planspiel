@@ -40,9 +40,13 @@ CREATE TABLE Session(
 CREATE TABLE RoleTable(
     name VARCHAR(100) PRIMARY KEY,
     meta_name VARCHAR(100) NOT NULL,
+    meta_gender VARCHAR(5) NOT NULL,
     meta_birthday VARCHAR(100) NOT NULL,
     meta_living VARCHAR(100) NOT NULL,
     meta_status VARCHAR(500) NOT NULL,
+    meta_language VARCHAR(100) NOT NULL,
+    meta_flag VARCHAR(100) NOT NULL,
+    meta_job VARCHAR(100) NOT NULL,
     profile_picture_identifier VARCHAR(100) NOT NULL,
     profile_picture_old_identifier VARCHAR(100) NOT NULL,
     titlecard_identifier VARCHAR(100) NOT NULL,
@@ -89,6 +93,7 @@ CREATE TABLE Post(
     text_de_identifier VARCHAR(100) NOT NULL,
     text_orig_identifier VARCHAR(100) NOT NULL,
     type VARCHAR(100) NOT NULL,
+    author VARCHAR(100) NOT NULL,
     is_scenario BOOL NOT NULL,
     FOREIGN KEY (belongs_to) REFERENCES RoleTable(name)
 );
