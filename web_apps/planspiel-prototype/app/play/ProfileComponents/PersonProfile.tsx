@@ -3,6 +3,8 @@ import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import PostComponent from './PostComponent';
 import MarkdownComponent from './MarkdownComponent';
+import { GiRollingSuitcase } from 'react-icons/gi';
+import { FaSuitcase } from 'react-icons/fa';
 
 export default function PersonProfile ({gameState, roleData}: {gameState: GameState, roleData: RoleData | null}) {
 
@@ -15,17 +17,10 @@ export default function PersonProfile ({gameState, roleData}: {gameState: GameSt
         <Titlecard url={roleData.titlecardIdentifier} />
         <ProfilePicture url={roleData.profilePictureIdentifier}/>
         <MetadataArea roleMetadata={roleData.metadata}/>
-        <MarkdownComponent path={roleData.infoIdentifier}/>
+        <BiographyComponent url={roleData.infoIdentifier}/>
         <PostsArea posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
   )
-}
-
-function GetStatus(name:string) : string {
-    if (name === "Ethan Miller") return "Saturdays are for the boys"
-    if (name === "Anais Fournier") return "Let's talk about Waste!"
-    if (name === "Mikkel Pedersen") return "~ v i b i n g ~"
-    return "Here comes " + name.split(" ")[0] + "!"
 }
 
 function PostsArea({posts, roleMetadata} : {posts: Post[] | null, roleMetadata: RoleMetadata}) {
@@ -58,8 +53,9 @@ function GetAge(birthday: Date) : number {
 }
 
 function GetPrettyDateString(birthday: Date) : string {
+    const monate = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
     // Deutsches Formatting DD.MM.YYYY
-    return `${birthday.getDate()}.${birthday.getMonth()}. ${birthday.getFullYear()}`;
+    return `${birthday.getDate()}. ${monate[birthday.getMonth()]}  ${birthday.getFullYear()}`;
 }
 
 function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
@@ -86,11 +82,22 @@ function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
                 <GrMapLocation className="" color="white"/>
                 <div className="pl-2 text-sm">{roleMetadata.living}</div>
             </div>
+            <div className="flex pt-3">
+                <FaSuitcase className="" color="white"/>
+                <div className="pl-2 text-sm">{roleMetadata.job}</div>
+            </div>
             <div className="flex py-2">
                 <LiaBirthdayCakeSolid className="" color="white"/>
                 <div className="pl-2 text-sm">{birthdayString}</div>
             </div>
         </div>)
+}
+
+function BiographyComponent ({url} : {url:string}) {
+    return (
+    <div className="bg-slate-300 p-5">
+        <MarkdownComponent path={url} />
+    </div>)
 }
 
 function ProfilePicture ({url} : {url:string}) {
