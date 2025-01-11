@@ -92,6 +92,7 @@ CREATE TABLE Post(
     text_de_identifier VARCHAR(100) NOT NULL,
     text_orig_identifier VARCHAR(100) NOT NULL,
     type VARCHAR(100) NOT NULL,
+    author VARCHAR(100) NOT NULL,
     is_scenario BOOL NOT NULL,
     FOREIGN KEY (belongs_to) REFERENCES RoleTable(name)
 );

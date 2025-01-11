@@ -96,6 +96,7 @@ export type PostType = "by_me" | "i_liked" | "got_tagged"
 export interface Post {
     name: string,
     type: PostType,
+    author: string,
 	textDeIdentifier: string,
 	textOrigIdentifier: string,
 	imageIdentifiers: string[],

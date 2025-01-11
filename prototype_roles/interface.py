@@ -105,6 +105,7 @@ def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[Sc
 
 class PostDefinitionMetadata(pydantic.BaseModel):
     type: str
+    author: str
     isScenario: bool
     conditions: list[str]
 
@@ -150,9 +151,9 @@ class PostDefinition:
     def collect_queries(self) -> list[PostQuery]:
         # Post <- PostImage <- Post_depends_on
         queries = []
-        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, is_scenario) "
+        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, author, is_scenario) "
                  f"VALUES ({_dbs(self.name)}, {_dbs(self.belongs_to)}, {_dbs(self.text_de_identifier)}, "
-                 f"{_dbs(self.text_orig_identifier)}, {_dbs(self.metadata.type)}, {_dbb(self.metadata.isScenario)})")
+                 f"{_dbs(self.text_orig_identifier)}, {_dbs(self.metadata.type)}, {_dbs(self.metadata.author)}, {_dbb(self.metadata.isScenario)})")
         queries.append(PostQuery(query, ()))
         for image_identifier in self.image_identifiers:
             query = (f"INSERT INTO PostImage(image_identifier, post) "

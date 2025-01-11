@@ -54,16 +54,18 @@ class DataManager:
         return facts
 
     def get_posts(self, name: str) -> list[dict]:
-        query = (f"SELECT name, type, text_de_identifier, text_orig_identifier, is_scenario FROM Post "
+        query = (f"SELECT name, type, author, text_de_identifier, text_orig_identifier, is_scenario FROM Post "
                  f"WHERE belongs_to = {_dbs(name)};")
         posts = []
-        for post_name, type, text_de_identifier, text_orig_identifier, is_scenario in execute_query(query):
+        for post_name, type, author, text_de_identifier, text_orig_identifier, is_scenario in execute_query(query):
             image_query = f"SELECT image_identifier FROM PostImage WHERE post = {_dbs(post_name)}"
             image_identifiers = [row[0] for row in execute_query(image_query)]
             posts.append({
                 "name": post_name,
                 "textDeIdentifier": text_de_identifier,
                 "textOrigIdentifier": text_orig_identifier,
+                "type": type,
+                "author": author,
                 "imageIdentifiers": image_identifiers,
                 "isScenario": is_scenario
             })
