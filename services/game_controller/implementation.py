@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
 
-from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER, GAME_STATE_MANAGER
+from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER, GAME_STATE_MANAGER, \
+    UserStatus
 from shared.architecture.rest import AuthError
 from shared.utility.names import generate_name
 
@@ -167,15 +168,24 @@ def impl_game_state_is_post_applicable(name: str, username: str, token: str):
         "isPostApplicable": GAME_STATE_MANAGER.is_post_applicable(game_state_id, name)
     }
 
-
-def impl_game_state_voting_has_voted(parameter: str, username: str, token: str):
+def impl_game_state_voting_get_status(username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
+    user_view = USER_MANAGER.view_user(username, UserStatus.OFFLINE)
+    buergerrat = user_view["assignedBuergerrat"]
+    if buergerrat is None:
+        raise RuntimeError("Only users who are members of a buergerrat can fetch the voting status.")
+    session_id = USER_MANAGER.get_session(username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
-        "hasVoted": GAME_STATE_MANAGER.voting_has_voted(username, parameter)
+        "votingStatus": GAME_STATE_MANAGER.voting_get_status(game_state_id, buergerrat)
     }
 
-
-def impl_game_state_voting_vote(parameter: str, voted_value: float, username:str, token: str):
+def impl_game_state_voting_update(parameter: str, voted_value: float, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
-    GAME_STATE_MANAGER.voting_vote(username, parameter, voted_value)
+    GAME_STATE_MANAGER.voting_update(username, parameter, voted_value)
+    return {}
+
+def impl_game_state_voting_commit(parameter: str, username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    GAME_STATE_MANAGER.voting_commit(username, parameter)
     return {}

@@ -5,7 +5,7 @@ from typing import Iterable
 
 import pydantic
 
-from shared.data_model.context import PostQuery, execute_post_query
+from shared.data_model.context import Query, execute
 
 _BASE_PATH: Path = Path(__file__).parent
 _METRICS_PATH = _BASE_PATH / "metrics.json"
@@ -16,16 +16,6 @@ _SCENARIOS_PATH = _BASE_PATH / "scenarios"
 
 
 _POST_IMAGE_NAME_REGEX = r"picture_[0-9]+\.png"
-
-
-def _dbs(value: str | None) -> str:
-    return "NULL" if value is None else f"\"{value}\""
-
-def _dbf(value: float | None) -> str:
-    return "NULL" if value is None else f"{value}"
-
-def _dbb(value: bool | None) -> str:
-    return "NULL" if value is None else ("TRUE" if value else "FALSE")
 
 
 def load_role_names() -> list[str]:
@@ -45,10 +35,10 @@ class ParameterDefinition(pydantic.BaseModel):
     minValue: float
     maxValue: float
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         query = (f"INSERT INTO Parameter(simple_name, description, min_value, max_value) "
-                 f"VALUES ({_dbs(self.simpleName)}, {_dbs(self.description)}, {_dbf(self.minValue)}, {_dbf(self.maxValue)});")
-        return [PostQuery(query, ())]
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.simpleName, self.description, self.minValue, self.maxValue))]
 
 
 def load_all_parameters() -> list[ParameterDefinition]:
@@ -64,10 +54,10 @@ class MetricDefinition(pydantic.BaseModel):
     minValue: float
     maxValue: float
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         query = (f"INSERT INTO Metric(simple_name, description, min_value, max_value) "
-                 f"VALUES ({_dbs(self.simpleName)}, {_dbs(self.description)}, {_dbf(self.minValue)}, {_dbf(self.maxValue)});")
-        return [PostQuery(query, ())]
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.simpleName, self.description, self.minValue, self.maxValue))]
 
 
 def load_all_metrics() -> list[MetricDefinition]:
@@ -82,10 +72,10 @@ class ScenarioConditionDefinition(pydantic.BaseModel):
     minValue: float | None
     maxValue: float | None
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         query = (f"INSERT INTO ScenarioCondition(name, metric, min_value, max_value) "
-                 f"VALUES ({_dbs(self.name)}, {_dbs(self.metric)}, {_dbf(self.minValue)}, {_dbf(self.maxValue)});")
-        return [PostQuery(query, ())]
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.name, self.metric, self.minValue, self.maxValue))]
 
 
 def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[ScenarioConditionDefinition]:
@@ -105,6 +95,7 @@ def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[Sc
 
 class PostDefinitionMetadata(pydantic.BaseModel):
     type: str
+    author: str
     isScenario: bool
     conditions: list[str]
 
@@ -147,21 +138,22 @@ class PostDefinition:
     def collect_required_conditions(self) -> list[str]:
         return self.metadata.conditions
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         # Post <- PostImage <- Post_depends_on
         queries = []
-        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, is_scenario) "
-                 f"VALUES ({_dbs(self.name)}, {_dbs(self.belongs_to)}, {_dbs(self.text_de_identifier)}, "
-                 f"{_dbs(self.text_orig_identifier)}, {_dbs(self.metadata.type)}, {_dbb(self.metadata.isScenario)})")
-        queries.append(PostQuery(query, ()))
+        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, author, is_scenario) "
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.belongs_to, self.text_de_identifier,
+                                     self.text_orig_identifier, self.metadata.type, self.metadata.author,
+                                     self.metadata.isScenario)))
         for image_identifier in self.image_identifiers:
             query = (f"INSERT INTO PostImage(image_identifier, post) "
-                     f"VALUES ({_dbs(image_identifier)}, {_dbs(self.name)});")
-            queries.append(PostQuery(query, ()))
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (image_identifier, self.name)))
         for scenario_condition in self.metadata.conditions:
             query = (f"INSERT INTO Post_depends_on(post, scenario_condition) "
-                     f"VALUES ({_dbs(self.name)}, {_dbs(scenario_condition)});")
-            queries.append(PostQuery(query, ()))
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (self.name, scenario_condition)))
         return queries
 
 
@@ -193,25 +185,36 @@ class FactDefinition:
     def collect_required_conditions(self) -> list[str]:
         return self.metadata.conditions
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         # Fact <- Fact_depends_on
         queries = []
         query = (f"INSERT INTO Fact(name, belongs_to, text_identifier, hyperlink, is_scenario) "
-                 f"VALUES ({_dbs(self.name)}, {_dbs(self.belongs_to)}, {_dbs(self.text_identifier)}, "
-                 f"{_dbs(self.metadata.hyperlink)}, {_dbb(self.metadata.isScenario)})")
-        queries.append(PostQuery(query, ()))
+                 f"VALUES (%s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.belongs_to, self.text_identifier, self.metadata.hyperlink,
+                                     self.metadata.isScenario)))
         for scenario_condition in self.metadata.conditions:
             query = (f"INSERT INTO Fact_depends_on(fact, scenario_condition) "
-                     f"VALUES ({_dbs(self.name)}, {_dbs(scenario_condition)});")
-            queries.append(PostQuery(query, ()))
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (self.name, scenario_condition)))
         return queries
 
 
 class RoleMetadata(pydantic.BaseModel):
     name: str
+    gender: str
     birthday: str
     living: str
     status: str
+    language: str
+    flag: str
+    job: str
+
+    @pydantic.field_validator("gender", mode="after")
+    @classmethod
+    def validate_gender(cls, value: str) -> str:
+        if value not in ["m", "w", "d"]:
+            raise ValueError(f"{value} is not allowed to specify the gender.")
+        return value
 
 
 class RoleDefinition:
@@ -271,16 +274,18 @@ class RoleDefinition:
             total += post.collect_required_conditions()
         return total
 
-    def collect_queries(self) -> list[PostQuery]:
+    def collect_queries(self) -> list[Query]:
         # RoleTable <- [Fact... ] <- [Post... ]
         queries = []
-        query = (f"INSERT INTO RoleTable(name, meta_name, meta_birthday, meta_living, meta_status, "
+        query = (f"INSERT INTO RoleTable(name, meta_name, meta_gender, meta_birthday, meta_living, meta_status, "
+                 f"meta_language, meta_flag, meta_job, "
                  f"profile_picture_identifier, profile_picture_old_identifier, titlecard_identifier, info_identifier) "
-                 f"VALUES ({_dbs(self.name)}, {_dbs(self.metadata.name)}, {_dbs(self.metadata.birthday)}, "
-                 f"{_dbs(self.metadata.living)}, {_dbs(self.metadata.status)}, "
-                 f"{_dbs(self.profile_picture_identifier)}, {_dbs(self.profile_picture_old_identifier)}, "
-                 f"{_dbs(self.titlecard_identifier)}, {_dbs(self.info_identifier)});")
-        queries.append(PostQuery(query, ()))
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.metadata.name, self.metadata.gender, self.metadata.birthday,
+                                     self.metadata.living, self.metadata.status, self.metadata.language,
+                                     self.metadata.flag, self.metadata.job, self.profile_picture_identifier,
+                                     self.profile_picture_old_identifier, self.titlecard_identifier,
+                                     self.info_identifier)))
         for fact in self.facts:
             queries += fact.collect_queries()
         for post in self.posts:
@@ -298,7 +303,7 @@ def load_roles(role_names: Iterable[str]) -> list[RoleDefinition]:
     return roles
 
 
-def collect_queries() -> list[PostQuery]:
+def collect_queries() -> list[Query]:
     queries = []
     for metric in load_all_metrics():
         queries += metric.collect_queries()
@@ -318,7 +323,7 @@ def collect_queries() -> list[PostQuery]:
 
 def post_all():
     for query in collect_queries():
-        execute_post_query(query)
+        execute(query, commit=True)
 
 
 if __name__ == "__main__":

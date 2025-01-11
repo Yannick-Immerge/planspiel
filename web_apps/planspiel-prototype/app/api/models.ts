@@ -52,10 +52,28 @@ export interface GameState {
     buergerrat1: Buergerrat,
     buergerrat2: Buergerrat,
     phase: GamePhase,
-    projection: Record<string, number> | null
+    projection: Record<string, number> | null,
+    votingEnd: Date | null
 }
 
-export type VotingStatus = { parameter: string, hasVoted: boolean }[]
+
+export interface ParameterVotingStatus {
+    parameter: string,
+    votedValue: number
+}
+
+
+export interface UserVotingStatus {
+    roleName: string,
+    parameterStatuses: ParameterVotingStatus[]
+}
+
+
+export interface VotingStatus {
+    buergerrat: number,
+    userStatuses: UserVotingStatus[],
+    votingEnd: Date | null /*Legacy Fruchtzwerg*/
+}
 
 
 // Data Controller
@@ -80,7 +98,7 @@ export interface RoleMetadata {
 	living: string,
 	status: string,
     language: string,
-    flag: string
+    job: string
 }
 
 export interface Fact {
@@ -95,6 +113,7 @@ export type PostType = "by_me" | "i_liked" | "got_tagged"
 export interface Post {
     name: string,
     type: PostType,
+    author: string,
 	textDeIdentifier: string,
 	textOrigIdentifier: string,
 	imageIdentifiers: string[],

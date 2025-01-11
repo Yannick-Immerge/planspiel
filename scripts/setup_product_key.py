@@ -9,8 +9,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-from shared.data_model.context import initialize_db_context_default, close_db_context, execute_void_query, PostQuery, \
-    execute_post_query
+from shared.data_model.context import initialize_db_context_default, close_db_context, Query, execute
 from scripts.utility import print_f, print_err, print_suc
 
 HELP_MESSAGE = """\
@@ -26,8 +25,8 @@ Only show this help message.\
 
 
 def push_product_key():
-    query = PostQuery("INSERT INTO ProductKey(key_value, num_sessions) VALUES (\"123-123-123\", 100);", ())
-    execute_post_query(query)
+    query = "INSERT INTO ProductKey(key_value, num_sessions) VALUES (%s, %s);"
+    execute(Query(query, ("123-123-123", 100)), commit=True)
 
 
 def parse_cli_arguments():

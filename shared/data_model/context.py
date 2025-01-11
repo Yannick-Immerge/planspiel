@@ -22,17 +22,13 @@ def _current_cursor() -> MySQLCursorAbstract:
     return _DB_CURSOR
 
 
-class PostQuery:
+class Query:
     query: str
     args: tuple
 
     def __init__(self, query: str, args: tuple):
         self.query = query
         self.args = args
-
-    @staticmethod
-    def merge(q1: PostQuery, q2: PostQuery):
-        return PostQuery(q1.query + q2.query, tuple([*q1.args, *q2.args]))
 
 
 def initialize_db_context(hostname: str, port: int, db_name: str, username: str, password: str):
@@ -90,30 +86,22 @@ def assure_connection(retries : int = 3):
     raise RuntimeError("Database is currently not available!")
 
 
-def execute_bool_query(bool_query: str) -> bool:
+def execute(query: Query, commit: bool = False):
     assure_connection()
-    _current_cursor().execute(bool_query, ())
-    return _current_cursor().fetchone()[0] == 1
+    _current_cursor().execute(query.query, query.args)
+    rows = _current_cursor().fetchall()
+    if commit:
+        commit_db_context()
+    return rows
 
-
-def execute_void_query(void_query: str) -> None:
+def execute_void(query: Query, commit: bool = False):
     assure_connection()
+    _current_cursor().execute(query.query, query.args)
+    if commit:
+        commit_db_context()
 
-    _current_cursor().execute(void_query, ())
-
-
-def execute_query(query: str) -> Any:
-    assure_connection()
-
-    _current_cursor().execute(query, ())
-    return _current_cursor().fetchall()
-
-
-def execute_post_query(post_query: PostQuery):
-    assure_connection()
-
-    _current_cursor().execute(post_query.query, post_query.args)
-    commit_db_context()
+def execute_bool(query: Query):
+    return execute(query)[0][0] == 1
 
 
 def get_last_row_id() -> int:
