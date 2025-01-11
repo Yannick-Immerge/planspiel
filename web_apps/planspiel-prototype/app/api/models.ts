@@ -52,7 +52,8 @@ export interface GameState {
     buergerrat1: Buergerrat,
     buergerrat2: Buergerrat,
     phase: GamePhase,
-    projection: Record<string, number> | null
+    projection: Record<string, number> | null,
+    votingEnd: Date | null
 }
 
 
@@ -70,7 +71,8 @@ export interface UserVotingStatus {
 
 export interface VotingStatus {
     buergerrat: number,
-    userStatuses: UserVotingStatus[]
+    userStatuses: UserVotingStatus[],
+    votingEnd: Date | null /*Legacy Fruchtzwerg*/
 }
 
 

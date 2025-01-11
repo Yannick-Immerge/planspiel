@@ -205,8 +205,8 @@ class GameStateManager:
     def get_game_state(self, game_state_id: int):
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
-        query = f"SELECT phase FROM GameState WHERE id = {_dbi(game_state_id)};"
-        phase = execute_query(query)[0]
+        query = f"SELECT phase, voting_end FROM GameState WHERE id = {_dbi(game_state_id)};"
+        phase, voting_end = execute_query(query)[0]
         buergerrat1, buergerrat2 = self.get_buergerraete(game_state_id)
         projection = self.get_projections(game_state_id)
         return {
@@ -214,7 +214,8 @@ class GameStateManager:
             "buergerrat1": buergerrat1,
             "buergerrat2": buergerrat2,
             "phase": phase,
-            "projection": projection
+            "projection": projection,
+            "votingEnd": voting_end
         }
 
     def are_users_configured(self, game_state_id: int) -> bool:
