@@ -11,9 +11,9 @@ from services.game_controller.implementation import impl_users_create, impl_user
     impl_users_login, impl_users_logout, impl_users_update_password, impl_sessions_create, \
     impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status, impl_users_configure, \
     impl_users_has_password, impl_sessions_configure_prototype, impl_game_state_get, \
-    impl_game_state_ready_to_transition, impl_game_state_transition, \
-    impl_game_state_voting_has_voted, impl_game_state_voting_vote, impl_game_state_is_fact_applicable, \
-    impl_game_state_is_post_applicable
+    impl_game_state_ready_to_transition, impl_game_state_transition, impl_game_state_is_fact_applicable, \
+    impl_game_state_is_post_applicable, impl_game_state_voting_commit, impl_game_state_voting_get_status, \
+    impl_game_state_voting_update
 from shared.architecture.rest import safe_call
 from shared.data_model.context import initialize_db_context_default
 
@@ -147,12 +147,17 @@ def game_state_is_post_applicable():
     params = request.get_json()
     return safe_call(impl_game_state_is_post_applicable, params["name"], params["username"], params["token"])
 
-@app.route("/game/game_state/voting/has_voted", methods=["POST"])
-def game_state_discussion_has_voted():
+@app.route("/game/game_state/voting/get_status", methods=["POST"])
+def game_state_voting_get_status():
     params = request.get_json()
-    return safe_call(impl_game_state_voting_has_voted, params["parameter"], params["username"], params["token"])
+    return safe_call(impl_game_state_voting_get_status, params["username"], params["token"])
 
-@app.route("/game/game_state/voting/vote", methods=["POST"])
-def game_state_discussion_vote():
+@app.route("/game/game_state/voting/update", methods=["POST"])
+def game_state_voting_update():
     params = request.get_json()
-    return safe_call(impl_game_state_voting_vote, params["parameter"], params["votedValue"], params["username"], params["token"])
+    return safe_call(impl_game_state_voting_update, params["parameter"], params["votedValue"], params["username"], params["token"])
+
+@app.route("/game/game_state/voting/commit", methods=["POST"])
+def game_state_voting_commit():
+    params = request.get_json()
+    return safe_call(impl_game_state_voting_commit, params["parameter"], params["username"], params["token"])

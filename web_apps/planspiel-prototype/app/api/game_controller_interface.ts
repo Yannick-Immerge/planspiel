@@ -91,11 +91,10 @@ export interface IsPostApplicableResult {
     isPostApplicable: boolean
 }
 
-export interface HasVotedResult {
-    hasVoted: boolean
+export interface UpdateVotingResult {
 }
 
-export interface VoteResult {
+export interface CommitVotingResult {
 }
 
 export interface GetVotingStatusResult {
@@ -345,19 +344,9 @@ export async function isPostApplicable(name: string, overrideUsername?: string, 
     }, overrideUsername, overrideToken);
 }
 
-export async function hasVoted(parameter: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<HasVotedResult>> {
+export async function updateVoting(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<UpdateVotingResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<HasVotedResult>("/game_state/voting/has_voted", {
-            parameter: parameter,
-            username: localUsername,
-            token: localToken
-        })
-    }, overrideUsername, overrideToken);
-}
-
-export async function vote(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<VoteResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<VoteResult>("/game_state/voting/vote", {
+        return game_fetch<UpdateVotingResult>("/game_state/voting/update", {
             parameter: parameter,
             votedValue: votedValue,
             username: localUsername,
@@ -366,47 +355,21 @@ export async function vote(parameter: string, votedValue: number, overrideUserna
     }, overrideUsername, overrideToken);
 }
 
-export async function getVotingStatus(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<GetVotingStatusResult>> {
-    const gameStateResult = await getGameState(overrideUsername, overrideToken);
-    if(!gameStateResult.ok || gameStateResult.data === null) {
-        return fail<GetVotingStatusResult>(`Could not fetch game state: ${gameStateResult.statusText}`);
-    }
-
-    const viewResult = await viewSelf();
-    if(!viewResult.ok || viewResult.data === null) {
-        return fail<GetVotingStatusResult>(`Could not fetch user view: ${viewResult.statusText}`);
-    }
-
-    let buergerrat = null;
-    if(viewResult.data.userView.assignedBuergerrat === null) {
-        return fail<GetVotingStatusResult>("Could not get Voting Status: Not assigned to a Bürgerrat.")
-    } else if(viewResult.data.userView.assignedBuergerrat === 1) {
-        buergerrat = gameStateResult.data.gameState.buergerrat1;
-    } else if(viewResult.data.userView.assignedBuergerrat === 2) {
-        buergerrat = gameStateResult.data.gameState.buergerrat2;
-    } else {
-        return fail<GetVotingStatusResult>("Could not get Voting Status: Invalid Bürgerrat.")
-    }
-
-    let votingStatus = [];
-    for (const parameter of buergerrat.parameters) {
-        const hasVotedResult = await hasVoted(parameter);
-        if(!hasVotedResult.ok || hasVotedResult.data === null) {
-            return fail<GetVotingStatusResult>(`Could not fetch whether user has voted for ${parameter}: ${hasVotedResult.statusText}`);
-        }
-
-        votingStatus.push({
+export async function commitVoting(parameter: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<CommitVotingResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<CommitVotingResult>("/game_state/voting/commit", {
             parameter: parameter,
-            hasVoted: hasVotedResult.data.hasVoted
-        });
-    }
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideUsername, overrideToken);
+}
 
-    return {
-        data: {
-            votingStatus: votingStatus
-        },
-        ok: true,
-        authenticationOk: true,
-        statusText: ""
-    };
+export async function getVotingStatus(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<GetVotingStatusResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<GetVotingStatusResult>("/game_state/voting/get_status", {
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideUsername, overrideToken);
 }

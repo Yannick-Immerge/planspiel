@@ -1,6 +1,7 @@
 CREATE TABLE GameState(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    phase VARCHAR(100) NOT NULL
+    phase VARCHAR(100) NOT NULL,
+    voting_end DATETIME NULL
 );
 
 CREATE TABLE Parameter(
@@ -127,7 +128,8 @@ CREATE TABLE Projection(
 CREATE TABLE Voting(
     user VARCHAR(100) NOT NULL,
     parameter VARCHAR(100) NOT NULL,
-    voted_value FLOAT NULL,
+    voted_value FLOAT NOT NULL,
+    has_committed BOOL NOT NULL,
     FOREIGN KEY (user) REFERENCES User(username),
     FOREIGN KEY (parameter) REFERENCES Parameter(simple_name),
     PRIMARY KEY (user, parameter)
