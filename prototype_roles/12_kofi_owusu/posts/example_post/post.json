@@ -1,5 +1,5 @@
 {
     "type": "by_me",
     "isScenario" : "false",
-    "conditions": []
+    "conditions": ["global_good"]
 }

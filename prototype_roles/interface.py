@@ -10,8 +10,8 @@ from shared.data_model.context import Query, execute
 _BASE_PATH: Path = Path(__file__).parent
 _METRICS_PATH = _BASE_PATH / "metrics.json"
 _PARAMETERS_PATH = _BASE_PATH / "parameters.json"
+_CONDITIONS_PATH = _BASE_PATH / "conditions.json"
 _ROLE_NAMES_PATH = _BASE_PATH / "role_names.txt"
-_CONDITIONS_PATH = _BASE_PATH / "conditions"
 _SCENARIOS_PATH = _BASE_PATH / "scenarios"
 
 
@@ -78,19 +78,10 @@ class ScenarioConditionDefinition(pydantic.BaseModel):
         return [Query(query, (self.name, self.metric, self.minValue, self.maxValue))]
 
 
-def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[ScenarioConditionDefinition]:
-    scenario_conditions = []
-    for scenario_condition_name in scenario_condition_names:
-        path = _CONDITIONS_PATH / f"{scenario_condition_name}.json"
-        if not path.exists():
-            raise NameError(f"No scenario condition for name {scenario_condition_name}.")
-        with open(path, "rt") as file:
-            data = json.load(file)
-            scenario_condition = ScenarioConditionDefinition(**data)
-            if scenario_condition.name != scenario_condition_name:
-                raise ValueError(f"The name provided in the scenario condition: {scenario_condition.name} does not match the expected: {scenario_condition_name}.")
-        scenario_conditions.append(scenario_condition)
-    return scenario_conditions
+def load_all_scenario_conditions() -> list[ScenarioConditionDefinition]:
+    with open(_CONDITIONS_PATH, "rt") as file:
+        data = json.load(file)
+        return [ScenarioConditionDefinition(**item) for item in data]
 
 
 class PostDefinitionMetadata(pydantic.BaseModel):
@@ -116,8 +107,8 @@ class PostDefinition:
     belongs_to: str
 
     def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
-        self.name = definition_path.name
-        prefix = f"{prefix}/{self.name}"
+        self.name = f"{belongs_to}_{definition_path.name}"
+        prefix = f"{prefix}/{definition_path.name}"
         self.belongs_to = belongs_to
         with open(definition_path / "post.json", "rt") as file:
             data = json.load(file)
@@ -134,9 +125,6 @@ class PostDefinition:
         for child in definition_path.iterdir():
             if child.is_file() and re.fullmatch(_POST_IMAGE_NAME_REGEX, child.name) is not None:
                 self.image_identifiers.append("/".join([prefix, child.name]))
-
-    def collect_required_conditions(self) -> list[str]:
-        return self.metadata.conditions
 
     def collect_queries(self) -> list[Query]:
         # Post <- PostImage <- Post_depends_on
@@ -170,8 +158,8 @@ class FactDefinition:
     belongs_to: str
 
     def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
-        self.name = definition_path.name
-        prefix = f"{prefix}/{self.name}"
+        self.name = f"{belongs_to}_{definition_path.name}"
+        prefix = f"{prefix}/{definition_path.name}"
         self.belongs_to = belongs_to
         with open(definition_path / "fact.json", "rt") as file:
             data = json.load(file)
@@ -181,9 +169,6 @@ class FactDefinition:
         if not (definition_path / "text.md").exists():
             raise RuntimeError(f"The fact definition at {definition_path} doesnt contain a text.md file.")
         self.text_identifier = f"{prefix}/text.md"
-
-    def collect_required_conditions(self) -> list[str]:
-        return self.metadata.conditions
 
     def collect_queries(self) -> list[Query]:
         # Fact <- Fact_depends_on
@@ -266,14 +251,6 @@ class RoleDefinition:
                 raise RuntimeError(f"Expected only folders in {post_folder} but {child} is not a folder.")
             self.posts.append(PostDefinition(child, prefix + "/posts", self.name))
 
-    def collect_required_conditions(self) -> list[str]:
-        total = []
-        for fact in self.facts:
-            total += fact.collect_required_conditions()
-        for post in self.posts:
-            total += post.collect_required_conditions()
-        return total
-
     def collect_queries(self) -> list[Query]:
         # RoleTable <- [Fact... ] <- [Post... ]
         queries = []
@@ -309,13 +286,10 @@ def collect_queries() -> list[Query]:
         queries += metric.collect_queries()
     for parameter in load_all_parameters():
         queries += parameter.collect_queries()
+    for scenario_condition in load_all_scenario_conditions():
+        queries += scenario_condition.collect_queries()
     role_names = load_role_names()
     roles = load_roles(role_names)
-    scenario_condition_names = []
-    for role in roles:
-        scenario_condition_names += role.collect_required_conditions()
-    for scenario_condition in load_scenario_conditions(scenario_condition_names):
-        queries += scenario_condition.collect_queries()
     for role in roles:
         queries += role.collect_queries()
     return queries

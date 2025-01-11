@@ -1,0 +1,74 @@
+[
+  {
+    "name": "global_bad",
+    "metric": "global",
+    "minValue": 0,
+    "maxValue": 50
+  },
+  {
+    "name": "global_good",
+    "metric": "global",
+    "minValue": 50,
+    "maxValue": 100
+  },
+  {
+    "name": "gases_agriculture_bad",
+    "metric": "gases_agriculture",
+    "minValue": 0,
+    "maxValue": 50
+  },
+  {
+    "name": "gases_agriculture_good",
+    "metric": "gases_agriculture",
+    "minValue": 50,
+    "maxValue": 100
+  },
+  {
+    "name": "reduction_meat_bad",
+    "metric": "reduction_meat",
+    "minValue": 10,
+    "maxValue": 25
+  },
+  {
+    "name": "reduction_meat_good",
+    "metric": "reduction_meat",
+    "minValue": 25,
+    "maxValue": 40
+  },
+  {
+    "name": "reduction_waste_bad",
+    "metric": "reduction_waste",
+    "minValue": 10,
+    "maxValue": 25
+  },
+  {
+    "name": "reduction_waste_good",
+    "metric": "reduction_waste",
+    "minValue": 25,
+    "maxValue": 40
+  },
+  {
+    "name": "fossil_fuel_taxes_bad",
+    "metric": "fossil_fuel_taxes",
+    "minValue": -15,
+    "maxValue": 42
+  },
+  {
+    "name": "fossil_fuel_taxes_good",
+    "metric": "fossil_fuel_taxes",
+    "minValue": 42,
+    "maxValue": 100
+  },
+  {
+    "name": "reduction_infra_bad",
+    "metric": "reduction_infra",
+    "minValue": 0,
+    "maxValue": 50
+  },
+  {
+    "name": "reduction_infra_good",
+    "metric": "reduction_infra",
+    "minValue": 50,
+    "maxValue": 100
+  }
+]
