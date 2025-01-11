@@ -75,9 +75,13 @@ export interface RoleData {
 
 export interface RoleMetadata {
     name: string,
+    gender: "m" | "w" | "d",
 	birthday: string,
 	living: string,
-	status: string
+	status: string,
+    language: string,
+    flag: string,
+    job: string
 }
 
 export interface Fact {

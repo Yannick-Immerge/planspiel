@@ -39,9 +39,13 @@ CREATE TABLE Session(
 CREATE TABLE RoleTable(
     name VARCHAR(100) PRIMARY KEY,
     meta_name VARCHAR(100) NOT NULL,
+    meta_gender VARCHAR(5) NOT NULL,
     meta_birthday VARCHAR(100) NOT NULL,
     meta_living VARCHAR(100) NOT NULL,
     meta_status VARCHAR(500) NOT NULL,
+    meta_language VARCHAR(100) NOT NULL,
+    meta_flag VARCHAR(100) NOT NULL,
+    meta_job VARCHAR(100) NOT NULL,
     profile_picture_identifier VARCHAR(100) NOT NULL,
     profile_picture_old_identifier VARCHAR(100) NOT NULL,
     titlecard_identifier VARCHAR(100) NOT NULL,

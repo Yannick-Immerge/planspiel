@@ -209,9 +209,20 @@ class FactDefinition:
 
 class RoleMetadata(pydantic.BaseModel):
     name: str
+    gender: str
     birthday: str
     living: str
     status: str
+    language: str
+    flag: str
+    job: str
+
+    @pydantic.field_validator("gender", mode="after")
+    @classmethod
+    def validate_gender(cls, value: str) -> str:
+        if value not in ["m", "w", "d"]:
+            raise ValueError(f"{value} is not allowed to specify the gender.")
+        return value
 
 
 class RoleDefinition:
@@ -274,10 +285,12 @@ class RoleDefinition:
     def collect_queries(self) -> list[PostQuery]:
         # RoleTable <- [Fact... ] <- [Post... ]
         queries = []
-        query = (f"INSERT INTO RoleTable(name, meta_name, meta_birthday, meta_living, meta_status, "
+        query = (f"INSERT INTO RoleTable(name, meta_name, meta_gender, meta_birthday, meta_living, meta_status, "
+                 f"meta_language, meta_flag, meta_job, "
                  f"profile_picture_identifier, profile_picture_old_identifier, titlecard_identifier, info_identifier) "
-                 f"VALUES ({_dbs(self.name)}, {_dbs(self.metadata.name)}, {_dbs(self.metadata.birthday)}, "
-                 f"{_dbs(self.metadata.living)}, {_dbs(self.metadata.status)}, "
+                 f"VALUES ({_dbs(self.name)}, {_dbs(self.metadata.name)}, {_dbs(self.metadata.gender)}, "
+                 f"{_dbs(self.metadata.birthday)}, {_dbs(self.metadata.living)}, {_dbs(self.metadata.status)}, "
+                 f"{_dbs(self.metadata.language)}, {_dbs(self.metadata.flag)}, {_dbs(self.metadata.job)}, "
                  f"{_dbs(self.profile_picture_identifier)}, {_dbs(self.profile_picture_old_identifier)}, "
                  f"{_dbs(self.titlecard_identifier)}, {_dbs(self.info_identifier)});")
         queries.append(PostQuery(query, ()))
