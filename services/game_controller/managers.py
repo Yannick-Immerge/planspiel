@@ -5,7 +5,7 @@ import uuid
 from enum import Enum
 
 from shared.architecture.rest import AuthError
-from shared.data_model.context import execute_query, PostQuery, execute_post_query, get_last_row_id
+from shared.data_model.context import execute_query, PostQuery, execute_post_query, get_last_row_id, execute, Query
 
 
 def _dbs(v: str | None):
@@ -50,29 +50,29 @@ class PrototypeConfiguration(Enum):
 class UserManager:
 
     def has_user(self, username: str) -> bool:
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s;"
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def has_password(self, username: str) -> bool:
         if not self.has_user(username):
             raise NameError(f"There is no user with username: {username}.")
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND password_hash IS NOT NULL"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s AND password_hash IS NOT NULL"
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def is_user_admin(self, username: str) -> bool:
         query = (f"SELECT COUNT(*) FROM User INNER JOIN Session "
                  f"ON User.member_of = Session.session_id AND User.username = Session.administrator "
-                 f"WHERE User.username = {_dbs(username)};")
-        n = execute_query(query)[0][0]
+                 f"WHERE User.username = %s;")
+        n = execute(Query(query, (username,)))[0][0]
         return n > 0
 
     def is_user_configured(self, username: str) -> bool:
         if self.is_user_admin(username):
             return False
-        query = f"SELECT COUNT(*) FROM User WHERE username = {_dbs(username)} AND plays_as IS NOT NULL;"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM User WHERE username = %s AND plays_as IS NOT NULL;"
+        n = execute_query(Query(query, (username,)))[0][0]
         return n > 0
 
     def add_user(self, username: str, password_hash: str | None, member_of: str):
@@ -80,6 +80,7 @@ class UserManager:
             raise NameError(f"A user with given username: {username} already exists.")
         query = (f"INSERT INTO User(username, password_hash, member_of) "
                  f"VALUES ({_dbs(username)}, {_dbs(password_hash)}, {_dbs(member_of)});")
+        execute(Query(query, ), commit=True)
         execute_post_query(PostQuery(query, ()))
 
     def verify_or_create_user_password(self, username: str, password_hash: str) -> bool:
@@ -143,6 +144,7 @@ USER_MANAGER: UserManager = UserManager()
 
 
 class GameStateManager:
+
     def has_game_state(self, game_state_id: int) -> bool:
         query = f"SELECT COUNT(*) FROM GameState WHERE id = {_dbi(game_state_id)};"
         n = execute_query(query)[0][0]

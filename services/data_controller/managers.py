@@ -1,50 +1,33 @@
-from enum import Enum
-
-from shared.data_model.context import execute_query, initialize_db_context_default
-
-
-def _dbs(v: str | None) -> str:
-    if v is None:
-        return "NULL"
-    else:
-        return f"\"{v}\""
-
-
-class DataType(Enum):
-    ROLE = "role"
-    ROLE_ENTRY = "role_entry"
-    SCENARIO = "scenario"
-    METRIC = "metric"
-    PARAMETER = "parameter"
+from shared.data_model.context import execute, Query
 
 
 class DataManager:
 
     def has_role(self, name: str) -> bool:
-        query = f"SELECT COUNT(*) FROM RoleTable WHERE name = {_dbs(name)};"
-        n = execute_query(query)[0][0]
+        query = "SELECT COUNT(*) FROM RoleTable WHERE name = %s;"
+        n = execute(Query(query, (name,)))[0][0]
         return n > 0
 
     def has_parameter(self, simple_name: str) -> bool:
-        query = f"SELECT COUNT(*) FROM Parameter WHERE simple_name = {_dbs(simple_name)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM Parameter WHERE simple_name = %s;"
+        n = execute(Query(query, (simple_name,)))[0][0]
         return n > 0
 
     def has_metric(self, simple_name: str) -> bool:
-        query = f"SELECT COUNT(*) FROM Metric WHERE simple_name = {_dbs(simple_name)};"
-        n = execute_query(query)[0][0]
+        query = f"SELECT COUNT(*) FROM Metric WHERE simple_name = %s;"
+        n = execute(Query(query, (simple_name,)))[0][0]
         return n > 0
 
     def list_roles(self):
         query = "SELECT name FROM RoleTable;"
         return {
-            "names": [row[0] for row in execute_query(query)]
+            "names": [row[0] for row in execute(Query(query, ()))]
         }
 
     def get_facts(self, name: str) -> list[dict]:
-        query = f"SELECT name, text_identifier, hyperlink, is_scenario FROM Fact WHERE belongs_to = {_dbs(name)};"
+        query = f"SELECT name, text_identifier, hyperlink, is_scenario FROM Fact WHERE belongs_to = %s;"
         facts = []
-        for fact_name, text_identifier, hyperlink, is_scenario in execute_query(query):
+        for fact_name, text_identifier, hyperlink, is_scenario in execute(Query(query, (name,))):
             facts.append({
                 "name": fact_name,
                 "textIdentifier": text_identifier,
@@ -55,11 +38,11 @@ class DataManager:
 
     def get_posts(self, name: str) -> list[dict]:
         query = (f"SELECT name, type, text_de_identifier, text_orig_identifier, is_scenario FROM Post "
-                 f"WHERE belongs_to = {_dbs(name)};")
+                 f"WHERE belongs_to = %s;")
         posts = []
-        for post_name, type, text_de_identifier, text_orig_identifier, is_scenario in execute_query(query):
-            image_query = f"SELECT image_identifier FROM PostImage WHERE post = {_dbs(post_name)}"
-            image_identifiers = [row[0] for row in execute_query(image_query)]
+        for post_name, type, text_de_identifier, text_orig_identifier, is_scenario in execute(Query(query, (name,))):
+            image_query = f"SELECT image_identifier FROM PostImage WHERE post = %s"
+            image_identifiers = [row[0] for row in execute(Query(image_query, (post_name,)))]
             posts.append({
                 "name": post_name,
                 "textDeIdentifier": text_de_identifier,
@@ -74,8 +57,8 @@ class DataManager:
             raise NameError(f"There exists no role with the name {name}.")
         query = (f"SELECT meta_name, meta_birthday, meta_living, meta_status, profile_picture_identifier, "
                  f"profile_picture_old_identifier, titlecard_identifier, info_identifier FROM RoleTable "
-                 f"WHERE name = {_dbs(name)};")
-        row = execute_query(query)[0]
+                 f"WHERE name = %s;")
+        row = execute(Query(query, (name,)))[0]
         metadata = {
             "name": row[0],
             "birthday": row[1],
@@ -98,8 +81,8 @@ class DataManager:
     def get_parameter(self, simple_name: str):
         if not self.has_parameter(simple_name):
             raise NameError(f"There is no parameter with name: {simple_name}.")
-        query = f"SELECT description, min_value, max_value FROM Parameter WHERE simple_name = {_dbs(simple_name)};"
-        description, min_value, max_value = execute_query(query)[0]
+        query = f"SELECT description, min_value, max_value FROM Parameter WHERE simple_name = %s;"
+        description, min_value, max_value = execute(Query(query, (simple_name,)))[0]
         return {
             "parameter": {
                 "simpleName": simple_name,
@@ -112,8 +95,8 @@ class DataManager:
     def get_metric(self, simple_name: str):
         if not self.has_metric(simple_name):
             raise NameError(f"There is no metric with name: {simple_name}.")
-        query = f"SELECT description, min_value, max_value FROM Metric WHERE simple_name = {_dbs(simple_name)};"
-        description, min_value, max_value = execute_query(query)[0]
+        query = f"SELECT description, min_value, max_value FROM Metric WHERE simple_name = %s;"
+        description, min_value, max_value = execute(Query(query, (simple_name,)))[0]
         return {
             "metric": {
                 "simpleName": simple_name,

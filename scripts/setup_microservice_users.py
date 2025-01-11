@@ -9,7 +9,7 @@ _REAL_PATH = str(Path(__file__).parent.parent)
 if _REAL_PATH not in sys.path:
     sys.path.append(_REAL_PATH)
 
-from shared.data_model.context import initialize_db_context_default, close_db_context, execute_void_query
+from shared.data_model.context import initialize_db_context_default, close_db_context, execute_void
 from scripts.utility import print_f, print_err, print_suc
 from scripts.schema.interface import load_query
 
@@ -26,7 +26,7 @@ Only show this help message.\
 
 
 def configure_database_users():
-    execute_void_query(load_query("create_users"))
+    execute_void(load_query("create_users"))
 
 
 def parse_cli_arguments():
