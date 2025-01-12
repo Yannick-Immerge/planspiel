@@ -1,19 +1,21 @@
-import itertools
 import json
+import re
 from pathlib import Path
 from typing import Iterable
 
 import pydantic
 
-from shared.data_model.context import PostQuery, execute_post_query
+from shared.data_model.context import Query, execute
 
 _BASE_PATH: Path = Path(__file__).parent
 _METRICS_PATH = _BASE_PATH / "metrics.json"
 _PARAMETERS_PATH = _BASE_PATH / "parameters.json"
+_CONDITIONS_PATH = _BASE_PATH / "conditions.json"
 _ROLE_NAMES_PATH = _BASE_PATH / "role_names.txt"
-_RESOURCES_PATH = _BASE_PATH / "resources"
-_CONDITIONS_PATH = _BASE_PATH / "conditions"
 _SCENARIOS_PATH = _BASE_PATH / "scenarios"
+
+
+_POST_IMAGE_NAME_REGEX = r"picture_[0-9]+\.png"
 
 
 def load_role_names() -> list[str]:
@@ -28,10 +30,15 @@ def load_role_names() -> list[str]:
 
 
 class ParameterDefinition(pydantic.BaseModel):
-    simple_name: str
+    simpleName: str
     description: str
-    min_value: float
-    max_value: float
+    minValue: float
+    maxValue: float
+
+    def collect_queries(self) -> list[Query]:
+        query = (f"INSERT INTO Parameter(simple_name, description, min_value, max_value) "
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.simpleName, self.description, self.minValue, self.maxValue))]
 
 
 def load_all_parameters() -> list[ParameterDefinition]:
@@ -42,217 +49,255 @@ def load_all_parameters() -> list[ParameterDefinition]:
 
 
 class MetricDefinition(pydantic.BaseModel):
-    simple_name: str
+    simpleName: str
     description: str
-    min_value: float
-    max_value: float
+    minValue: float
+    maxValue: float
+
+    def collect_queries(self) -> list[Query]:
+        query = (f"INSERT INTO Metric(simple_name, description, min_value, max_value) "
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.simpleName, self.description, self.minValue, self.maxValue))]
 
 
-def load_all_metrics() -> dict[str, MetricDefinition]:
+def load_all_metrics() -> list[MetricDefinition]:
     with open(_METRICS_PATH, "rt") as file:
         data = json.load(file)
-    all_metrics = [MetricDefinition(**item) for item in data]
-    return {metric.simple_name: metric for metric in all_metrics}
+    return [MetricDefinition(**item) for item in data]
 
 
 class ScenarioConditionDefinition(pydantic.BaseModel):
     name: str
     metric: str
-    min_value: float | None
-    max_value: float | None
+    minValue: float | None
+    maxValue: float | None
+
+    def collect_queries(self) -> list[Query]:
+        query = (f"INSERT INTO ScenarioCondition(name, metric, min_value, max_value) "
+                 f"VALUES (%s, %s, %s, %s);")
+        return [Query(query, (self.name, self.metric, self.minValue, self.maxValue))]
 
 
-def load_scenario_conditions(scenario_condition_names: Iterable[str]) -> list[ScenarioConditionDefinition]:
-    scenario_conditions = []
-    for scenario_condition_name in scenario_condition_names:
-        path = _CONDITIONS_PATH / f"{scenario_condition_name}.json"
-        if not path.exists():
-            raise NameError(f"No scenario condition for name {scenario_condition_name}.")
-        with open(path, "rt") as file:
-            data = json.load(file)
-            scenario_condition = ScenarioConditionDefinition(**data)
-            if scenario_condition.name != scenario_condition_name:
-                raise ValueError(f"The name provided in the scenario condition: {scenario_condition.name} does not match the expected: {scenario_condition_name}.")
-        scenario_conditions.append(scenario_condition)
-    return scenario_conditions
+def load_all_scenario_conditions() -> list[ScenarioConditionDefinition]:
+    with open(_CONDITIONS_PATH, "rt") as file:
+        data = json.load(file)
+        return [ScenarioConditionDefinition(**item) for item in data]
 
 
-class ResourceDefinition(pydantic.BaseModel):
-    identifier: str
-    content_type: str
-
-
-class ScenarioDefinition(pydantic.BaseModel):
-    name: str
+class PostDefinitionMetadata(pydantic.BaseModel):
+    type: str
+    author: str
+    isScenario: bool
     conditions: list[str]
-    resource: ResourceDefinition
+
+    @pydantic.field_validator("type", mode="after")
+    @classmethod
+    def ensure_type(cls, v: str) -> str:
+        if v not in ["by_me", "i_liked", "got_tagged"]:
+            raise ValueError(f"Unsupported post type: {v}.")
+        return v
 
 
-def load_scenarios(scenario_names: Iterable[str]) -> list[ScenarioDefinition]:
-    scenarios = []
-    for scenario_name in scenario_names:
-        path = _SCENARIOS_PATH / f"{scenario_name}.json"
-        if not path.exists():
-            raise NameError(f"No scenario for name {scenario_name}.")
-        with open(path, "rt") as file:
+class PostDefinition:
+    name: str
+    metadata: PostDefinitionMetadata
+    text_de_identifier: str
+    text_orig_identifier: str
+    image_identifiers: list[str]
+    belongs_to: str
+
+    def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
+        self.name = f"{belongs_to}_{definition_path.name}"
+        prefix = f"{prefix}/{definition_path.name}"
+        self.belongs_to = belongs_to
+        with open(definition_path / "post.json", "rt") as file:
             data = json.load(file)
-            scenario = ScenarioDefinition(**data)
-            if scenario.name != scenario_name:
-                raise ValueError(f"The name provided in the scenario: {scenario.name} does not match the expected: {scenario_name}.")
-        scenarios.append(scenario)
-    return scenarios
+        if data is None:
+            raise RuntimeError(f"Could not load metadata for post at {definition_path}.")
+        self.metadata = PostDefinitionMetadata(**data)
+        if not (definition_path / "text_de.md").exists():
+            raise RuntimeError(f"The post definition at {definition_path} doesnt contain a text_de.md file.")
+        self.text_de_identifier = f"{prefix}/text_de.md"
+        if not (definition_path / "text_orig.md").exists():
+            raise RuntimeError(f"The post definition at {definition_path} doesnt contain a text_orig.md file.")
+        self.text_orig_identifier = f"{prefix}/text_orig.md"
+        self.image_identifiers = []
+        for child in definition_path.iterdir():
+            if child.is_file() and re.fullmatch(_POST_IMAGE_NAME_REGEX, child.name) is not None:
+                self.image_identifiers.append("/".join([prefix, child.name]))
+
+    def collect_queries(self) -> list[Query]:
+        # Post <- PostImage <- Post_depends_on
+        queries = []
+        query = (f"INSERT INTO Post(name, belongs_to, text_de_identifier, text_orig_identifier, type, author, is_scenario) "
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.belongs_to, self.text_de_identifier,
+                                     self.text_orig_identifier, self.metadata.type, self.metadata.author,
+                                     self.metadata.isScenario)))
+        for image_identifier in self.image_identifiers:
+            query = (f"INSERT INTO PostImage(image_identifier, post) "
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (image_identifier, self.name)))
+        for scenario_condition in self.metadata.conditions:
+            query = (f"INSERT INTO Post_depends_on(post, scenario_condition) "
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (self.name, scenario_condition)))
+        return queries
 
 
-class RoleEntryDefinition(pydantic.BaseModel):
+class FactDefinitionMetadata(pydantic.BaseModel):
+    hyperlink: str
+    isScenario: bool
+    conditions: list[str]
+
+
+class FactDefinition:
     name: str
-    resource: ResourceDefinition
+    metadata: FactDefinitionMetadata
+    text_identifier: str
+    belongs_to: str
+
+    def __init__(self, definition_path: Path, prefix: str, belongs_to: str):
+        self.name = f"{belongs_to}_{definition_path.name}"
+        prefix = f"{prefix}/{definition_path.name}"
+        self.belongs_to = belongs_to
+        with open(definition_path / "fact.json", "rt") as file:
+            data = json.load(file)
+        if data is None:
+            raise RuntimeError(f"Could not load metadata for fact at {definition_path}.")
+        self.metadata = FactDefinitionMetadata(**data)
+        if not (definition_path / "text.md").exists():
+            raise RuntimeError(f"The fact definition at {definition_path} doesnt contain a text.md file.")
+        self.text_identifier = f"{prefix}/text.md"
+
+    def collect_queries(self) -> list[Query]:
+        # Fact <- Fact_depends_on
+        queries = []
+        query = (f"INSERT INTO Fact(name, belongs_to, text_identifier, hyperlink, is_scenario) "
+                 f"VALUES (%s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.belongs_to, self.text_identifier, self.metadata.hyperlink,
+                                     self.metadata.isScenario)))
+        for scenario_condition in self.metadata.conditions:
+            query = (f"INSERT INTO Fact_depends_on(fact, scenario_condition) "
+                     f"VALUES (%s, %s);")
+            queries.append(Query(query, (self.name, scenario_condition)))
+        return queries
 
 
-class RoleDefinition(pydantic.BaseModel):
+class RoleMetadata(pydantic.BaseModel):
     name: str
-    description: str
-    demographic: dict[str, str]
-    entries: list[RoleEntryDefinition]
-    scenarios: list[str]
+    gender: str
+    birthday: str
+    living: str
+    status: str
+    language: str
+    flag: str
+    job: str
+
+    @pydantic.field_validator("gender", mode="after")
+    @classmethod
+    def validate_gender(cls, value: str) -> str:
+        if value not in ["m", "w", "d"]:
+            raise ValueError(f"{value} is not allowed to specify the gender.")
+        return value
+
+
+class RoleDefinition:
+    name: str
+    metadata: RoleMetadata
+    profile_picture_identifier: str
+    profile_picture_old_identifier: str
+    titlecard_identifier: str
+    info_identifier: str
+    facts: list[FactDefinition]
+    posts: list[PostDefinition]
+
+    def __init__(self, definition_path: Path, prefix: str):
+        self.name = definition_path.name
+        prefix = f"{prefix}/{self.name}"
+        with open(definition_path / "metadata.json", "rt") as file:
+            data = json.load(file)
+        if data is None:
+            raise RuntimeError(f"Could not load metadata for role at {definition_path}.")
+        self.metadata = RoleMetadata(**data)
+        if not (definition_path / "profile_picture.png").exists():
+            raise RuntimeError(f"The role definition at {definition_path} doesnt contain a profile_picture.png file.")
+        self.profile_picture_identifier = f"{prefix}/profile_picture.png"
+        if not (definition_path / "profile_picture_old.png").exists():
+            raise RuntimeError(f"The role definition at {definition_path} doesnt contain a profile_picture_old.png file.")
+        self.profile_picture_old_identifier = f"{prefix}/profile_picture_old.png"
+        if not (definition_path / "titlecard.png").exists():
+            raise RuntimeError(f"The role definition at {definition_path} doesnt contain a titlecard.png file.")
+        self.titlecard_identifier = f"{prefix}/titlecard.png"
+        if not (definition_path / "info.md").exists():
+            raise RuntimeError(f"The role definition at {definition_path} doesnt contain a info.md file.")
+        self.info_identifier = f"{prefix}/info.md"
+
+        fact_folder = definition_path / "facts"
+        if not fact_folder.exists() or not fact_folder.is_dir():
+            raise RuntimeError(f"Expected {fact_folder} to be a directory and exist.")
+        self.facts = []
+        for child in fact_folder.iterdir():
+            if not child.is_dir():
+                raise RuntimeError(f"Expected only folders in {fact_folder} but {child} is not a folder.")
+            self.facts.append(FactDefinition(child, prefix + "/facts", self.name))
+
+        post_folder = definition_path / "posts"
+        if not post_folder.exists() or not post_folder.is_dir():
+            raise RuntimeError(f"Expected {post_folder} to be a directory and exist.")
+        self.posts = []
+        for child in post_folder.iterdir():
+            if not child.is_dir():
+                raise RuntimeError(f"Expected only folders in {post_folder} but {child} is not a folder.")
+            self.posts.append(PostDefinition(child, prefix + "/posts", self.name))
+
+    def collect_queries(self) -> list[Query]:
+        # RoleTable <- [Fact... ] <- [Post... ]
+        queries = []
+        query = (f"INSERT INTO RoleTable(name, meta_name, meta_gender, meta_birthday, meta_living, meta_status, "
+                 f"meta_language, meta_flag, meta_job, "
+                 f"profile_picture_identifier, profile_picture_old_identifier, titlecard_identifier, info_identifier) "
+                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
+        queries.append(Query(query, (self.name, self.metadata.name, self.metadata.gender, self.metadata.birthday,
+                                     self.metadata.living, self.metadata.status, self.metadata.language,
+                                     self.metadata.flag, self.metadata.job, self.profile_picture_identifier,
+                                     self.profile_picture_old_identifier, self.titlecard_identifier,
+                                     self.info_identifier)))
+        for fact in self.facts:
+            queries += fact.collect_queries()
+        for post in self.posts:
+            queries += post.collect_queries()
+        return queries
 
 
 def load_roles(role_names: Iterable[str]) -> list[RoleDefinition]:
     roles = []
     for role_name in role_names:
-        path = _BASE_PATH / f"{role_name}.json"
-        if not path.exists():
-            raise NameError(f"No role for name {role_name}.")
-        with open(path, "rt") as file:
-            data = json.load(file)
-            role = RoleDefinition(**data)
-            if role.name != role_name:
-                raise ValueError(
-                    f"The name provided in the role: {role.name} does not match the expected: {role_name}.")
-        roles.append(role)
+        path = _BASE_PATH / role_name
+        if not path.exists() or not path.is_dir():
+            raise RuntimeError(f"Expected role definition folder at {path}.")
+        roles.append(RoleDefinition(path, "roles"))
     return roles
 
 
-def make_insert(table_name: str, columns: str, values: list[str], args: tuple) -> PostQuery:
-    fmt_values = ", ".join(map(lambda s: f"({s})", values))
-    return PostQuery(f"INSERT INTO {table_name} ({columns}) VALUES {fmt_values};", args)
-
-
-def group_iterate(defs):
-    for key, coll in defs.items():
-        for item in coll:
-            yield key, item
-
-
-def collect_queries() -> list[PostQuery]:
+def collect_queries() -> list[Query]:
+    queries = []
+    for metric in load_all_metrics():
+        queries += metric.collect_queries()
+    for parameter in load_all_parameters():
+        queries += parameter.collect_queries()
+    for scenario_condition in load_all_scenario_conditions():
+        queries += scenario_condition.collect_queries()
     role_names = load_role_names()
-    role_defs = load_roles(role_names)
-    role_entry_defs = {
-        role_def.name: role_def.entries for role_def in role_defs
-    }
-    scenario_defs = {
-        role_def.name: load_scenarios(role_def.scenarios) for role_def in role_defs
-    }
-    scenario_cond_defs = {
-        scenario_def.name: load_scenario_conditions(scenario_def.conditions) for scenario_def in itertools.chain(
-            *scenario_defs.values()
-        )
-    }
-    metric_defs = load_all_metrics()
-    parameter_defs = load_all_parameters()
-    viable_metric_defs: list[MetricDefinition] = list(metric_defs[scenario_cond_def.metric]
-                                                    for scenario_cond_def in itertools.chain(*scenario_cond_defs.values()))
-    viable_resource_defs: list[ResourceDefinition] = list(entry.resource for entry in
-                                                        list(itertools.chain(*scenario_defs.values())) +
-                                                        list(itertools.chain(*role_entry_defs.values())))
-
-    parameter_query = make_insert(
-        "Parameter",
-        "simple_name, description, min_value, max_value",
-        [
-            f"\"{parameter_def.simple_name}\", \"{parameter_def.description}\", {parameter_def.min_value}, {parameter_def.max_value}"
-            for parameter_def in parameter_defs
-        ],
-        ()
-    )
-    metric_query = make_insert(
-        "Metric",
-        "simple_name, description, min_value, max_value",
-        [
-            f"\"{metric_def.simple_name}\", \"{metric_def.description}\", {metric_def.min_value}, {metric_def.max_value}"
-            for metric_def in viable_metric_defs
-        ],
-        ()
-    )
-    resource_query = make_insert(
-        "Resource",
-        "identifier, content_type",
-        [
-            f"\"{resource_def.identifier}\", \"{resource_def.content_type}\""
-            for resource_def in viable_resource_defs
-        ],
-        ()
-    )
-    scenario_cond_query = make_insert(
-        "ScenarioCondition",
-        "name, metric, min_value, max_value",
-        [
-            f"\"{scenario_cond_def.name}\", \"{scenario_cond_def.metric}\", {scenario_cond_def.min_value}, {scenario_cond_def.max_value}"
-            for scenario_cond_def in itertools.chain(*scenario_cond_defs.values())
-        ],
-        ()
-    )
-    role_query = make_insert(
-        "RoleTable",
-        "name, description",
-        [
-            f"\"{role_def.name}\", \"{role_def.description}\""
-            for role_def in role_defs
-        ],
-        ()
-    )
-    role_entry_query = make_insert(
-        "RoleEntry",
-        "name, belongs_to, resource",
-        [
-            f"\"{role_entry_def.name}\", \"{role_name}\", \"{role_entry_def.resource.identifier}\""
-            for role_name, role_entry_def in group_iterate(role_entry_defs)
-        ],
-        ()
-    )
-    scenario_query = make_insert(
-        "Scenario",
-        "name, belongs_to, resource",
-        [
-            f"\"{scenario_def.name}\", \"{role_name}\", \"{scenario_def.resource.identifier}\""
-            for role_name, scenario_def in group_iterate(scenario_defs)
-        ],
-        ()
-    )
-    depends_on_query = make_insert(
-        "depends_on",
-        "scenario, scenario_condition",
-        [
-            f"\"{scenario_name}\", \"{scenario_cond_def.name}\""
-            for scenario_name, scenario_cond_def in group_iterate(scenario_cond_defs)
-        ],
-        ()
-    )
-
-    return [
-        parameter_query,
-        # metric_query,
-        resource_query,
-        # scenario_cond_query,
-        role_query,
-        role_entry_query,
-        scenario_query,
-        #depends_on_query
-    ]
+    roles = load_roles(role_names)
+    for role in roles:
+        queries += role.collect_queries()
+    return queries
 
 
 def post_all():
     for query in collect_queries():
-        execute_post_query(query)
+        execute(query, commit=True)
 
 
 if __name__ == "__main__":

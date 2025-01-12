@@ -37,31 +37,11 @@ export interface Session {
  */
 export interface Buergerrat {
     parameters: string[]
-    configuration1: Record<string, number> | null
-    configuration2: Record<string, number> | null
+    configuration: Record<string, number> | null
 }
 
 
-export type GamePhase = "configuring" | "identification1" | "discussion1" | "identification2" | "discussion2" | "debriefing"
-export type DiscussionPhase = "inactive" | "preparing" | "introduction" | "free" | "closing" | "voting" | "completed"
-
-export function getNextDiscussionPhase(phase: DiscussionPhase) : DiscussionPhase | null {
-    switch (phase){
-        case "inactive":
-        case "completed":
-            return null;
-        case "preparing":
-            return "introduction";
-        case "introduction":
-            return "free"
-        case "free":
-            return "closing"
-        case "closing":
-            return "voting"
-        case "voting":
-            return "completed"
-    }
-}
+export type GamePhase = "configuring" | "identification" | "discussion" | "voting" | "debriefing"
 
 
 /**
@@ -72,14 +52,28 @@ export interface GameState {
     buergerrat1: Buergerrat,
     buergerrat2: Buergerrat,
     phase: GamePhase,
-    projections1: Record<string, number> | null,
-    projections2: Record<string, number> | null
-    discussionPhase: DiscussionPhase,
-    discussionSpeaker1: string | null
-    discussionSpeaker2: string | null
+    projection: Record<string, number> | null,
+    votingEnd: Date | null
 }
 
-export type VotingStatus = {parameter: string, hasVoted: boolean}[]
+
+export interface ParameterVotingStatus {
+    parameter: string,
+    votedValue: number
+}
+
+
+export interface UserVotingStatus {
+    roleName: string,
+    parameterStatuses: ParameterVotingStatus[]
+}
+
+
+export interface VotingStatus {
+    buergerrat: number,
+    userStatuses: UserVotingStatus[],
+    votingEnd: Date | null /*Legacy Fruchtzwerg*/
+}
 
 
 // Data Controller
@@ -87,54 +81,43 @@ export type VotingStatus = {parameter: string, hasVoted: boolean}[]
 /**
  * A Role object.
  */
-export interface Role {
-    name: string,
-    description: string,
-    entries: string[],
-    scenarios: string[]
+export interface RoleData {
+    metadata: RoleMetadata,
+    profilePictureIdentifier: string,
+	profilePictureOldIdentifier: string,
+	titlecardIdentifier: string,
+	infoIdentifier: string,
+	facts: Fact[],
+	posts: Post[]
 }
 
 export interface RoleMetadata {
+    gender: "m" | "w" | "d",
     name: string,
-    age: number,
-    nationality: string,
-    address: string,
-    height: number
+	birthday: string,
+	living: string,
+	status: string,
+    language: string,
+    job: string
 }
 
-/**
- * A Resource object.
- */
-export interface Resource {
-    identifier: string,
-    contentType: "picture" | "article" | "diary" | "metadata"
+export interface Fact {
+    name: string,
+    textIdentifier: string,
+	hyperlink: string,
+	isScenario: boolean
 }
 
-/**
- * A RoleEntry object.
- */
-export interface RoleEntry {
-    name: string,
-    belongsTo: string,
-    resource: Resource
-}
+export type PostType = "by_me" | "i_liked" | "got_tagged"
 
-export interface ScenarioCondition {
+export interface Post {
     name: string,
-    metric: string,
-    min_value: number | null,
-    max_value: number | null
-}
-
-
-/**
- * A Scenario object.
- */
-export interface Scenario {
-    name: string,
-    belongsTo: string,
-    resource: Resource
-    conditions: ScenarioCondition[]
+    type: PostType,
+    author: string,
+	textDeIdentifier: string,
+	textOrigIdentifier: string,
+	imageIdentifiers: string[],
+	isScenario: boolean
 }
 
 /**

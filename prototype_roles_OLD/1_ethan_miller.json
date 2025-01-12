@@ -1,0 +1,45 @@
+{
+  "name": "1_ethan_miller",
+  "demographic": {},
+  "description": "",
+  "entries": [
+    {
+      "name": "1_ethan_miller_profile_picture",
+      "resource": {
+        "identifier": "1_ethan_miller_profile_picture.png",
+        "content_type": "profile_picture"
+      }
+    },
+    {
+      "name": "1_ethan_miller_titlecard",
+      "resource": {
+        "identifier": "1_ethan_miller_titlecard.png",
+        "content_type": "titlecard"
+      }
+    },
+    {
+      "name": "1_ethan_miller_biography",
+      "resource": {
+        "identifier": "1_ethan_miller_biography.txt",
+        "content_type": "info"
+      }
+    },
+    {
+      "name": "1_ethan_miller_article",
+      "resource": {
+        "identifier": "1_ethan_miller_article.md",
+        "content_type": "article"
+      }
+    },
+    {
+      "name": "1_ethan_miller_meta",
+      "resource": {
+        "identifier": "1_ethan_miller_meta.json",
+        "content_type": "metadata"
+      }
+    }
+  ],
+  "scenarios": [
+    "1_ethan_miller_default"
+  ]
+}

@@ -6,7 +6,7 @@ import {
     fail,
     getServerAddrHttp
 } from "@/app/api/utility";
-import {DiscussionPhase, GamePhase, GameState, Session, SessionView, UserView, VotingStatus} from "@/app/api/models";
+import {GamePhase, GameState, Session, SessionView, UserView, VotingStatus} from "@/app/api/models";
 
 export const GAME_CONTROLLER_SERVER_PORT = "5002";
 
@@ -83,29 +83,18 @@ export interface ReadyToTransitionGameStateResult {
     readyToTransition: boolean
 }
 
-export interface IsScenarioApplicableResult {
-    isScenarioApplicable: boolean
+export interface IsFactApplicableResult {
+    isFactApplicable: boolean
 }
 
-export interface HaveAllSpokenResult {
-    haveAllSpoken: boolean
+export interface IsPostApplicableResult {
+    isPostApplicable: boolean
 }
 
-export interface NextSpeakerResult {
+export interface UpdateVotingResult {
 }
 
-export interface ReadyToTransitionDiscussionResult {
-    readyToTransition: boolean
-}
-
-export interface TransitionDiscussionResult {
-}
-
-export interface HasVotedResult {
-    hasVoted: boolean
-}
-
-export interface VoteResult {
+export interface CommitVotingResult {
 }
 
 export interface GetVotingStatusResult {
@@ -335,9 +324,9 @@ export async function transitionGameState(targetPhase: GamePhase, overrideAdmini
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }
 
-export async function isScenarioApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsScenarioApplicableResult>> {
+export async function isFactApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsFactApplicableResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<IsScenarioApplicableResult>("/game_state/is_scenario_applicable", {
+        return game_fetch<IsFactApplicableResult>("/game_state/is_fact_applicable", {
             name: name,
             username: localUsername,
             token: localToken
@@ -345,58 +334,19 @@ export async function isScenarioApplicable(name: string, overrideUsername?: stri
     }, overrideUsername, overrideToken);
 }
 
-export async function haveAllSpoken(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<HaveAllSpokenResult>> {
+export async function isPostApplicable(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<IsPostApplicableResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<HaveAllSpokenResult>("/game_state/discussion/have_all_spoken", {
-            username: localUsername,
-            token: localToken
-        });
-    }, overrideUsername, overrideToken)
-}
-
-export async function nextSpeaker(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<NextSpeakerResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<NextSpeakerResult>("/game_state/discussion/next_speaker", {
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
-export async function readyToTransitionDiscussion(targetPhase: DiscussionPhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<ReadyToTransitionDiscussionResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<ReadyToTransitionDiscussionResult>("/game_state/discussion/ready_to_transition", {
-            targetPhase: targetPhase,
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
-export async function transitionDiscussion(targetPhase: DiscussionPhase, overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<TransitionDiscussionResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<TransitionDiscussionResult>("/game_state/discussion/transition", {
-            targetPhase: targetPhase,
-            administratorUsername: localUsername,
-            administratorToken: localToken
-        });
-    }, overrideAdministratorUsername, overrideAdministratorToken)
-}
-
-export async function hasVoted(parameter: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<HasVotedResult>> {
-    return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<HasVotedResult>("/game_state/discussion/has_voted", {
-            parameter: parameter,
+        return game_fetch<IsPostApplicableResult>("/game_state/is_post_applicable", {
+            name: name,
             username: localUsername,
             token: localToken
         })
     }, overrideUsername, overrideToken);
 }
 
-export async function vote(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<VoteResult>> {
-    console.log("Voting 3")
+export async function updateVoting(parameter: string, votedValue: number, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<UpdateVotingResult>> {
     return fetch_with_auth((localUsername, localToken) => {
-        return game_fetch<VoteResult>("/game_state/discussion/vote", {
+        return game_fetch<UpdateVotingResult>("/game_state/voting/update", {
             parameter: parameter,
             votedValue: votedValue,
             username: localUsername,
@@ -405,47 +355,21 @@ export async function vote(parameter: string, votedValue: number, overrideUserna
     }, overrideUsername, overrideToken);
 }
 
-export async function getVotingStatus(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<GetVotingStatusResult>> {
-    const gameStateResult = await getGameState(overrideUsername, overrideToken);
-    if(!gameStateResult.ok || gameStateResult.data === null) {
-        return fail<GetVotingStatusResult>(`Could not fetch game state: ${gameStateResult.statusText}`);
-    }
-
-    const viewResult = await viewSelf();
-    if(!viewResult.ok || viewResult.data === null) {
-        return fail<GetVotingStatusResult>(`Could not fetch user view: ${viewResult.statusText}`);
-    }
-
-    let buergerrat = null;
-    if(viewResult.data.userView.assignedBuergerrat === null) {
-        return fail<GetVotingStatusResult>("Could not get Voting Status: Not assigned to a Bürgerrat.")
-    } else if(viewResult.data.userView.assignedBuergerrat === 1) {
-        buergerrat = gameStateResult.data.gameState.buergerrat1;
-    } else if(viewResult.data.userView.assignedBuergerrat === 2) {
-        buergerrat = gameStateResult.data.gameState.buergerrat2;
-    } else {
-        return fail<GetVotingStatusResult>("Could not get Voting Status: Invalid Bürgerrat.")
-    }
-
-    let votingStatus = [];
-    for (const parameter of buergerrat.parameters) {
-        const hasVotedResult = await hasVoted(parameter);
-        if(!hasVotedResult.ok || hasVotedResult.data === null) {
-            return fail<GetVotingStatusResult>(`Could not fetch whether user has voted for ${parameter}: ${hasVotedResult.statusText}`);
-        }
-
-        votingStatus.push({
+export async function commitVoting(parameter: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<CommitVotingResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<CommitVotingResult>("/game_state/voting/commit", {
             parameter: parameter,
-            hasVoted: hasVotedResult.data.hasVoted
-        });
-    }
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideUsername, overrideToken);
+}
 
-    return {
-        data: {
-            votingStatus: votingStatus
-        },
-        ok: true,
-        authenticationOk: true,
-        statusText: ""
-    };
+export async function getVotingStatus(overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<GetVotingStatusResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<GetVotingStatusResult>("/game_state/voting/get_status", {
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideUsername, overrideToken);
 }

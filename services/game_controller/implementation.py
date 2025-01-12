@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
 
-from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER, GAME_STATE_MANAGER
+from services.game_controller.managers import SESSION_MANAGER, USER_MANAGER, TOKEN_MANAGER, GAME_STATE_MANAGER, \
+    UserStatus
 from shared.architecture.rest import AuthError
 from shared.utility.names import generate_name
 
@@ -150,57 +151,41 @@ def impl_game_state_transition(target_phase: str, administrator_username: str, a
     return {}
 
 
-def impl_game_state_is_scenario_applicable(name: str, username: str, token: str):
+def impl_game_state_is_fact_applicable(name: str, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
     session_id = USER_MANAGER.get_session(username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
-        "isScenarioApplicable": GAME_STATE_MANAGER.is_scenario_applicable(game_state_id, name)
+        "isFactApplicable": GAME_STATE_MANAGER.is_fact_applicable(game_state_id, name)
     }
 
 
-def impl_game_state_discussion_have_all_spoken(username: str, token: str):
+def impl_game_state_is_post_applicable(name: str, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
     session_id = USER_MANAGER.get_session(username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
-        "haveAllSpoken": GAME_STATE_MANAGER.discussion_have_all_spoken(game_state_id)
+        "isPostApplicable": GAME_STATE_MANAGER.is_post_applicable(game_state_id, name)
     }
 
-
-def impl_game_state_discussion_next_speaker(administrator_username: str, administrator_token: str):
-    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
-    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
-    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
-    GAME_STATE_MANAGER.discussion_next_speaker(game_state_id)
-    return {}
-
-
-def impl_game_state_discussion_ready_to_transition(target_phase: str, administrator_username: str, administrator_token: str):
-    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
-    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+def impl_game_state_voting_get_status(username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    user_view = USER_MANAGER.view_user(username, UserStatus.OFFLINE)
+    buergerrat = user_view["assignedBuergerrat"]
+    if buergerrat is None:
+        raise RuntimeError("Only users who are members of a buergerrat can fetch the voting status.")
+    session_id = USER_MANAGER.get_session(username)
     game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
     return {
-        "readyToTransition": GAME_STATE_MANAGER.discussion_ready_to_transition(game_state_id, target_phase)
+        "votingStatus": GAME_STATE_MANAGER.voting_get_status(game_state_id, buergerrat)
     }
 
-
-def impl_game_state_discussion_transition(target_phase: str, administrator_username: str, administrator_token: str):
-    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
-    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
-    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
-    GAME_STATE_MANAGER.discussion_transition(game_state_id, target_phase)
+def impl_game_state_voting_update(parameter: str, voted_value: float, username: str, token: str):
+    TOKEN_MANAGER.authenticate(username, token)
+    GAME_STATE_MANAGER.voting_update(username, parameter, voted_value)
     return {}
 
-
-def impl_game_state_discussion_has_voted(parameter: str, username: str, token: str):
+def impl_game_state_voting_commit(parameter: str, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
-    return {
-        "hasVoted": GAME_STATE_MANAGER.discussion_has_voted(username, parameter)
-    }
-
-
-def impl_game_state_discussion_vote(parameter: str, voted_value: float, username:str, token: str):
-    TOKEN_MANAGER.authenticate(username, token)
-    GAME_STATE_MANAGER.discussion_vote(username, parameter, voted_value)
+    GAME_STATE_MANAGER.voting_commit(username, parameter)
     return {}

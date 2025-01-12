@@ -1,0 +1,23 @@
+[
+  {
+    "simple_name": "sea_level",
+    "en_roads_name": "sea_level_offset_cm",
+    "description": "Describes the average offset of the sea levels from the current value.",
+    "min_value": -10,
+    "max_value": 30
+  },
+  {
+    "simple_name": "energy_prod_coal",
+    "en_roads_name": "endenergie_kohle_GWh",
+    "description": "Describes how much energy is being produced by means of coal in GWh",
+    "min_value": 0,
+    "max_value": 100
+  },
+  {
+    "simple_name": "energy_prod_wind",
+    "en_roads_name": "endenergie_wind_GWh",
+    "description": "Describes how much energy is being produced by means of wind in GWh",
+    "min_value": 0,
+    "max_value": 100
+  }
+]

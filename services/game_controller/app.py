@@ -11,12 +11,11 @@ from services.game_controller.implementation import impl_users_create, impl_user
     impl_users_login, impl_users_logout, impl_users_update_password, impl_sessions_create, \
     impl_sessions_exists, impl_sessions_view, impl_sessions_get, impl_sessions_status, impl_users_configure, \
     impl_users_has_password, impl_sessions_configure_prototype, impl_game_state_get, \
-    impl_game_state_ready_to_transition, impl_game_state_transition, impl_game_state_is_scenario_applicable, \
-    impl_game_state_discussion_have_all_spoken, impl_game_state_discussion_next_speaker, \
-    impl_game_state_discussion_ready_to_transition, impl_game_state_discussion_transition, \
-    impl_game_state_discussion_has_voted, impl_game_state_discussion_vote
+    impl_game_state_ready_to_transition, impl_game_state_transition, impl_game_state_is_fact_applicable, \
+    impl_game_state_is_post_applicable, impl_game_state_voting_commit, impl_game_state_voting_get_status, \
+    impl_game_state_voting_update
 from shared.architecture.rest import safe_call
-from shared.data_model.context import initialize_db_context_default, initialize_db_context
+from shared.data_model.context import initialize_db_context_default
 
 initialize_db_context_default()
 
@@ -138,37 +137,27 @@ def game_state_transition():
     params = request.get_json()
     return safe_call(impl_game_state_transition, params["targetPhase"], params["administratorUsername"], params["administratorToken"])
 
-@app.route("/game/game_state/is_scenario_applicable", methods=["POST"])
-def game_state_is_scenario_applicable():
+@app.route("/game/game_state/is_fact_applicable", methods=["POST"])
+def game_state_is_fact_applicable():
     params = request.get_json()
-    return safe_call(impl_game_state_is_scenario_applicable, params["name"], params["username"], params["token"])
+    return safe_call(impl_game_state_is_fact_applicable, params["name"], params["username"], params["token"])
 
-@app.route("/game/game_state/discussion/have_all_spoken", methods=["POST"])
-def game_state_discussion_have_all_spoken():
+@app.route("/game/game_state/is_post_applicable", methods=["POST"])
+def game_state_is_post_applicable():
     params = request.get_json()
-    return safe_call(impl_game_state_discussion_have_all_spoken, params["username"], params["token"])
+    return safe_call(impl_game_state_is_post_applicable, params["name"], params["username"], params["token"])
 
-@app.route("/game/game_state/discussion/next_speaker", methods=["POST"])
-def game_state_discussion_next_speaker():
+@app.route("/game/game_state/voting/get_status", methods=["POST"])
+def game_state_voting_get_status():
     params = request.get_json()
-    return safe_call(impl_game_state_discussion_next_speaker, params["administratorUsername"], params["administratorToken"])
+    return safe_call(impl_game_state_voting_get_status, params["username"], params["token"])
 
-@app.route("/game/game_state/discussion/ready_to_transition", methods=["POST"])
-def game_state_discussion_ready_to_transition():
+@app.route("/game/game_state/voting/update", methods=["POST"])
+def game_state_voting_update():
     params = request.get_json()
-    return safe_call(impl_game_state_discussion_ready_to_transition, params["targetPhase"], params["administratorUsername"], params["administratorToken"])
+    return safe_call(impl_game_state_voting_update, params["parameter"], params["votedValue"], params["username"], params["token"])
 
-@app.route("/game/game_state/discussion/transition", methods=["POST"])
-def game_state_discussion_transition():
+@app.route("/game/game_state/voting/commit", methods=["POST"])
+def game_state_voting_commit():
     params = request.get_json()
-    return safe_call(impl_game_state_discussion_transition, params["targetPhase"], params["administratorUsername"], params["administratorToken"])
-
-@app.route("/game/game_state/discussion/has_voted", methods=["POST"])
-def game_state_discussion_has_voted():
-    params = request.get_json()
-    return safe_call(impl_game_state_discussion_has_voted, params["parameter"], params["username"], params["token"])
-
-@app.route("/game/game_state/discussion/vote", methods=["POST"])
-def game_state_discussion_vote():
-    params = request.get_json()
-    return safe_call(impl_game_state_discussion_vote, params["parameter"], params["votedValue"], params["username"], params["token"])
+    return safe_call(impl_game_state_voting_commit, params["parameter"], params["username"], params["token"])

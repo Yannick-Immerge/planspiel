@@ -7,10 +7,10 @@ from flask import Flask, request, jsonify
 _ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(_ROOT_DIR))
 
-from services.data_controller.implementation import impl_roles_list, impl_get_route
-from services.data_controller.managers import DataType
+from services.data_controller.implementation import impl_roles_list, impl_roles_get, impl_metrics_get, \
+    impl_parameters_get
 from shared.architecture.rest import safe_call
-from shared.data_model.context import initialize_db_context_default, initialize_db_context
+from shared.data_model.context import initialize_db_context_default
 
 initialize_db_context_default()
 
@@ -38,26 +38,16 @@ def roles_list():
     return safe_call(impl_roles_list)
 
 @app.route("/data/roles/get", methods=["POST"])
-def roles_get():
+def roles_get_data():
     params = request.get_json()
-    return safe_call(impl_get_route, DataType.ROLE, params["name"])
-
-@app.route("/data/role_entries/get", methods=["POST"])
-def role_entries_get():
-    params = request.get_json()
-    return safe_call(impl_get_route, DataType.ROLE_ENTRY, params["name"])
-
-@app.route("/data/scenarios/get", methods=["POST"])
-def scenarios_get():
-    params = request.get_json()
-    return safe_call(impl_get_route, DataType.SCENARIO, params["name"])
+    return safe_call(impl_roles_get, params["name"])
 
 @app.route("/data/metrics/get", methods=["POST"])
 def metrics_get():
     params = request.get_json()
-    return safe_call(impl_get_route, DataType.METRIC, params["simpleName"])
+    return safe_call(impl_metrics_get, params["simpleName"])
 
 @app.route("/data/parameters/get", methods=["POST"])
 def parameters_get():
     params = request.get_json()
-    return safe_call(impl_get_route, DataType.PARAMETER, params["simpleName"])
+    return safe_call(impl_parameters_get, params["simpleName"])

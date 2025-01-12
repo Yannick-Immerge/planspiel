@@ -1,7 +1,6 @@
 import {ApiResult, fetch_typesafe, fail, getServerAddrHttp} from "@/app/api/utility";
-import {Metric, Parameter, Role, RoleEntry, RoleMetadata, Scenario, Resource} from "@/app/api/models";
-import {loadMetadataResource} from "@/app/api/resources";
-import {isScenarioApplicable} from "@/app/api/game_controller_interface";
+import {Metric, Parameter, RoleData} from "@/app/api/models";
+import {getGameState, isFactApplicable, isPostApplicable} from "@/app/api/game_controller_interface";
 
 export const DATA_CONTROLLER_SERVER_PORT = "5001";
 
@@ -12,15 +11,7 @@ export interface ListRolesResult {
 }
 
 export interface GetRoleResult {
-    role: Role
-}
-
-export interface GetRoleEntryResult {
-    role_entry: RoleEntry
-}
-
-export interface GetScenarioResult {
-    scenario: Scenario
+    roleData: RoleData
 }
 
 export interface GetParameterResult {
@@ -30,16 +21,6 @@ export interface GetParameterResult {
 export interface GetMetricResult {
     metric: Metric
 }
-
-export interface GetRoleEntryInformationResult {
-    metadata: RoleMetadata,
-    resourceEntries: Resource[]
-}
-
-export interface GetScenarioInformationResult {
-    resourceEntries: Resource[]
-}
-
 
 function data_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
     const addr = `${getServerAddrHttp()}:${DATA_CONTROLLER_SERVER_PORT}/data${endpoint}`
@@ -56,16 +37,75 @@ export async function getRole(name: string) : Promise<ApiResult<GetRoleResult>> 
     })
 }
 
-export async function getRoleEntry(name: string) : Promise<ApiResult<GetRoleEntryResult>> {
-    return data_fetch<GetRoleEntryResult>("/role_entries/get", {
-        name: name
-    })
-}
+/**
+ * This call returns a RoleData object, that only contains posts and facts applicable to the current game state of the user.
+ * If the game state is e.g. identification, all facts and posts with isScenario === true will be filtered out.
+ * If the game state is debriefing, only the conditional facts and posts will be filtered, whose conditions are not met.
+ * @param name The role name.
+ * @param overrideUsername Optional username to use instead of the one stored in sessionStorage.
+ * @param overrideToken Optional access token to use instead of the one stored in sessionStorage.
+ */
+export async function getRoleFiltered(name: string, overrideUsername?: string, overrideToken?: string) : Promise<ApiResult<GetRoleResult>> {
+    const getRoleResponse = await getRole(name);
+    if(!getRoleResponse.ok || getRoleResponse.data === null) {
+        return fail(`Could not fetch role data: ${getRoleResponse.statusText}.`);
+    }
 
-export async function getScenario(name: string) : Promise<ApiResult<GetScenarioResult>> {
-    return data_fetch<GetScenarioResult>("/scenarios/get", {
-        name: name
-    })
+    const getGameStateResponse = await getGameState(overrideUsername, overrideToken);
+    if(!getGameStateResponse.ok || getGameStateResponse.data === null) {
+        return fail(`Could not fetch game state: ${getGameStateResponse.statusText}.`);
+    }
+
+    const consider_scenarios = getGameStateResponse.data.gameState.phase == "debriefing";
+    let applicableFacts = [];
+    let applicablePosts = [];
+    for(const fact of getRoleResponse.data.roleData.facts) {
+        if(!fact.isScenario) {
+            applicableFacts.push(fact);
+            continue;
+        }
+        if(consider_scenarios) {
+            const isApplicableResult = await isFactApplicable(fact.name, overrideUsername, overrideToken);
+            if(!isApplicableResult.ok || isApplicableResult.data === null) {
+                return fail(`Could not check if fact ${fact.name} is applicable: ${isApplicableResult.statusText}.`);
+            }
+            if(isApplicableResult.data.isFactApplicable) {
+                applicableFacts.push(fact);
+            }
+        }
+    }
+    for(const post of getRoleResponse.data.roleData.posts) {
+        if(!post.isScenario) {
+            applicablePosts.push(post);
+            continue;
+        }
+        if(consider_scenarios) {
+            const isApplicableResult = await isPostApplicable(post.name, overrideUsername, overrideToken);
+            if(!isApplicableResult.ok || isApplicableResult.data === null) {
+                return fail(`Could not check if post ${post.name} is applicable: ${isApplicableResult.statusText}.`);
+            }
+            if(isApplicableResult.data.isPostApplicable) {
+                applicablePosts.push(post);
+            }
+        }
+    }
+
+    return {
+        data: {
+            roleData: {
+                metadata: getRoleResponse.data.roleData.metadata,
+                profilePictureIdentifier: getRoleResponse.data.roleData.profilePictureIdentifier,
+                profilePictureOldIdentifier: getRoleResponse.data.roleData.profilePictureOldIdentifier,
+                titlecardIdentifier: getRoleResponse.data.roleData.titlecardIdentifier,
+                infoIdentifier: getRoleResponse.data.roleData.infoIdentifier,
+                facts: applicableFacts,
+                posts: applicablePosts
+            }
+        },
+        ok: true,
+        authenticationOk: true,
+        statusText: ""
+    }
 }
 
 export async function getParameter(simpleName: string) : Promise<ApiResult<GetParameterResult>> {
@@ -78,77 +118,4 @@ export async function getMetric(simpleName: string) : Promise<ApiResult<GetMetri
     return data_fetch<GetMetricResult>("/metrics/get", {
         simpleName: simpleName
     })
-}
-
-export async function getRoleEntryInformation(name: string) : Promise<ApiResult<GetRoleEntryInformationResult>> {
-    const roleResult = await getRole(name);
-    if(!roleResult.ok || roleResult.data === null) {
-        return fail<GetRoleEntryInformationResult>(`Error fetching role ${name}: ${roleResult.statusText}`);
-    }
-
-    let resourceEntries : Resource[] = [];
-    let metadataEntry : Resource | null = null;
-    for (const entryName of roleResult.data.role.entries) {
-        const entryResult = await getRoleEntry(entryName);
-        if(!entryResult.ok || entryResult.data === null) {
-            return fail<GetRoleEntryInformationResult>(`Error fetching entry ${entryName} of role ${name}: ${entryResult.statusText}`);
-        }
-
-        if(entryResult.data.role_entry.resource.contentType === "metadata") {
-            if(metadataEntry !== null) {
-                return fail<GetRoleEntryInformationResult>(`Error: Role ${name} provides multiple entries of type metadata.`);
-            }
-            metadataEntry = entryResult.data.role_entry.resource;
-        } else {
-            resourceEntries.push(entryResult.data.role_entry.resource);
-        }
-    }
-    if(metadataEntry === null) {
-        return fail<GetRoleEntryInformationResult>(`Error: Role ${name} provides no entry of type metadata.`);
-    }
-    const metadata = await loadMetadataResource(metadataEntry);
-    if(metadata === null) {
-        return fail<GetRoleEntryInformationResult>(`Error: Could not load metadata of role ${name}: Resource ${metadataEntry.identifier} could not be loaded.`);
-    }
-    return {
-        data: {
-            metadata: metadata,
-            resourceEntries: resourceEntries
-        },
-        ok: true,
-        authenticationOk: true,
-        statusText: ""
-    };
-}
-
-export async function getScenarioInformation(name: string) : Promise<ApiResult<GetScenarioInformationResult>> {
-    const roleResult = await getRole(name);
-    if(!roleResult.ok || roleResult.data === null) {
-        return fail<GetScenarioInformationResult>(`Error fetching role ${name}: ${roleResult.statusText}`);
-    }
-
-    let resourceEntries : Resource[] = [];
-    for (const scenarioName of roleResult.data.role.scenarios) {
-        const isApplicableResult = await isScenarioApplicable(scenarioName);
-        if(!isApplicableResult.ok || isApplicableResult.data === null) {
-            return fail<GetScenarioInformationResult>(`Error checking whether scenario ${scenarioName} of role ${name} is applicable: ${isApplicableResult.statusText}`);
-        }
-        if(!isApplicableResult.data.isScenarioApplicable) {
-            continue;
-        }
-
-        const scenarioResult = await getScenario(scenarioName);
-        if(!scenarioResult.ok || scenarioResult.data === null) {
-            return fail<GetScenarioInformationResult>(`Error fetching scenario ${scenarioName} of role ${name}: ${scenarioResult.statusText}`);
-        }
-        resourceEntries.push(scenarioResult.data.scenario.resource)
-    }
-    return {
-        data: {
-            resourceEntries: resourceEntries
-        },
-        ok: true,
-        authenticationOk: true,
-        statusText: ""
-    };
 }

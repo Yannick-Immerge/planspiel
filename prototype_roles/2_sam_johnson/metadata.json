@@ -1,0 +1,8 @@
+{
+  "name": "Name",
+  "birthday": "Geburtstag im format MM/DD/YYYY",
+  "living": "Adresse",
+  "status": "Status",
+  "gender": "m, w oder d",
+  "language": "Name der Muttersprache hier eingeben, zB Französisch"
+}
