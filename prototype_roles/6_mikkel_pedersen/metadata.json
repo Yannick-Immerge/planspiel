@@ -1,10 +1,11 @@
 {
-  "name": "Name",
-  "birthday": "Geburtstag im format MM/DD/YYYY",
-  "living": "Adresse",
-  "status": "Status",
+  "name": "Mikkel Pedersen",
+  "status": "We are hiring!",
+  "birthday": "21/11/1991",
+  "language": "Dänisch",
+  "flag": "🇩🇰",
+  "height": 175,
   "gender": "m",
-  "language": "Name der Muttersprache hier eingeben, zB Französisch",
-  "flag": "🇫🇷🇷",
-  "job": "Metzgerin und Leiterin bei der Tafel \\\" Aliments pour Lyon\\\""
+  "living": "Aalborgvej 12, 9000 , Aalborg, Denmark",
+  "job": "Offshore-Windingenieur bei Ventus Systems"
 }

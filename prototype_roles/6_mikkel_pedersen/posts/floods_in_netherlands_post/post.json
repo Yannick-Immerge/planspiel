@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Mikkel Pedersen",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}
