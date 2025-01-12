@@ -11,12 +11,9 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
     const [endOfTime, setEndOfTime] = useState<Date | undefined>(undefined);
     const [timeRemainingString, setTimeRemainingString] = useState<string>("");
 
-    if (!gameState || !roleData) return (<div>This should not happen. Pleas go back to /login.</div>)
-
     // Der Countdown wird alle 0.2 Sekunden neu berechnet
     useEffect(() => {
-        
-        const interval = setInterval(() => {
+        const reformatCountdownString = () => {
             if (!endOfTime) return ""
             const now = new Date();
             let differenceHours : number = endOfTime.getHours() - now.getHours();
@@ -33,7 +30,9 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
             const remainingSecondsString = differenceSeconds < 10? ("0" + differenceSeconds) : differenceSeconds;
             const remainingMinutesString = differenceMinutes < 10? ("0" + differenceMinutes) : differenceMinutes;
             setTimeRemainingString(remainingMinutesString + ":" + remainingSecondsString)
-        }, 200);
+        }
+
+        const interval = setInterval(() => reformatCountdownString(), 200);
 
         return () => clearInterval(interval);
     }, []);
@@ -51,6 +50,7 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 
             if (votingStatus?.votingEnd) {
                 setEndOfTime(votingStatus.votingEnd);
+                console.log(endOfTime);
             }
         };
 
@@ -58,6 +58,8 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 
         return() => clearInterval(interval);
     }, []);
+
+    if (!gameState || !roleData) return (<div>This should not happen. Pleas go back to /login.</div>)
 
     if(gameState.phase == "identification") {
         return (
@@ -80,7 +82,7 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
                 </div>
             )}
             {gameState.phase== "voting"?
-            <RatComponent text={`Ihr habt noch 4:36 Minuten, danach wird die Abstimmung automatisch beendet.`}/>
+            <RatComponent text={`In ${timeRemainingString} minuten wird die Abstimmung automatisch beendet. Versucht euch einig zu werden.`} countdown={timeRemainingString}/>
             : <></>
             }
         </div>
@@ -90,6 +92,7 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 function RatComponent({text, hyperlink = "", countdown = ""} : {text: string, hyperlink?: string, countdown?: string}) {
     return (
     <div className="flex border-solid items-center m-auto max-w-[600px] w-full border-stone-800 p-3 bg-stone-200 rounded-2xl shadow-[0px_0px_20px_rgba(0,0,0,0.6)]" style={{"borderLeftWidth":"10px"}}>
+        <div>{countdown}</div>
         <div className="bg-cover bg-center bg-[url(/images/icon.png)] w-1/4 h-32" style={{"border" : "none !important"}} />
         <div className="text-lg text-left m-auto text-black w-3/4">{text}</div>
     </div>)
