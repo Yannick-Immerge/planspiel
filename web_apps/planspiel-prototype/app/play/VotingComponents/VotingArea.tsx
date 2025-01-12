@@ -1,14 +1,14 @@
 "use client"
 
-import {GameState, RoleData, VotingStatus} from "@/app/api/models";
+import {GameState, Parameter, RoleData, UserView, VotingStatus} from "@/app/api/models";
 import {useEffect, useState} from "react";
 import {getVotingStatus, updateVoting } from "@/app/api/game_controller_interface";
-import VotingStatusItem from "@/app/play/VotingComponents/VotingStatusItem";
+import Regler from "@/app/play/VotingComponents/Regler";
+import { getParameter } from "@/app/api/data_controller_interface";
 
-export default function VotingArea({gameState, roleData}: { gameState: GameState | null, roleData: RoleData | null}) {
+export default function VotingArea({gameState, roleData, userData}: { userData: UserView, gameState: GameState | null, roleData: RoleData | null}) {
     const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
-    const [votingParameters, setVotingParameters] = useState<string[]>([]);
-    const [endOfTime, setEndOfTime] = useState<Date | null>(null);
+    const [votingParameterNames, setVotingParameterNames] = useState<string[]>([]);
     const [timeRemainingString, setTimeRemainingString] = useState<string>("");
 
     const fetchVotingStatus = async () => {
@@ -18,36 +18,29 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
             setVotingStatus(null);
             return;
         }
-
+        console.log(votingStatusResult.data.votingStatus)
+        
         setVotingStatus(votingStatusResult.data.votingStatus);
-
-        if (votingStatus?.votingEnd) {
-            setEndOfTime(votingStatus.votingEnd);
-            console.log(endOfTime);
-        } else {
-            console.log("Voting Status enthält kein VotingEnd");
-            if (gameState?.votingEnd) {
-                console.log("Game State enthält ein VotingEnd: " + gameState.votingEnd);
-                setEndOfTime(gameState.votingEnd);
-            } else {
-                console.log("Game State enthält kein VotingEnd");
-                setEndOfTime(null);
-            }
-        }
     }
 
     // Der Countdown wird alle 0.2 Sekunden neu berechnet
     useEffect(() => {
         const reformatCountdownString = () => {
-            if (!endOfTime) {
-                setTimeRemainingString("00:00");
+            if (!votingStatus) {
+                setTimeRemainingString("no Voting Status!");
+                console.log("No Voting Status!");
+                return;                
+            }
+            if (!votingStatus.votingEnd) {
+                setTimeRemainingString("null!");
+                console.log("Nope");
                 return;
             }
             const now = new Date();
-            
-            let differenceHours : number = endOfTime.getHours() - now.getHours();
-            let differenceMinutes : number = endOfTime.getMinutes() - now.getMinutes();
-            let differenceSeconds : number = endOfTime.getSeconds() - now.getSeconds();
+            const votingEnd : Date = new Date(votingStatus.votingEnd);
+            let differenceHours : number = votingEnd.getHours() - now.getHours();
+            let differenceMinutes : number = votingEnd.getMinutes() - now.getMinutes();
+            let differenceSeconds : number = votingEnd.getSeconds() - now.getSeconds();
             if (differenceSeconds < 0) {
                 differenceSeconds += 60;
                 differenceMinutes -= 1;
@@ -55,16 +48,19 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
             if (differenceMinutes < 0) {
                 differenceMinutes += 60;
                 differenceHours -= 1;
+            } if (differenceHours < 0) {
+                setTimeRemainingString("00:00")
+                return;
             }
             const remainingSecondsString = differenceSeconds < 10? ("0" + differenceSeconds) : differenceSeconds;
             const remainingMinutesString = differenceMinutes < 10? ("0" + differenceMinutes) : differenceMinutes;
             setTimeRemainingString(remainingMinutesString + ":" + remainingSecondsString)
         }
 
-        const interval = setInterval(() => reformatCountdownString(), 200);
+        const interval = setInterval(() => reformatCountdownString(), 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [votingStatus]);
 
     // Der Voting Status wird alle 5 Sekunden erfragt.
     useEffect(() => {
@@ -72,6 +68,10 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 
         return() => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        fetchVotingStatus();
+    }, [])
 
     if (!gameState || !roleData) return (<div>This should not happen. Pleas go back to /login.</div>)
 
@@ -87,16 +87,18 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
         </div>);
     } else {
         return <div>
-            <h1 className="text-lg">Deine Stimme:</h1>
-            {votingStatus === null ? <p>Die Abstimmung ist gerade nicht verfügbar.</p> : (
                 <div>
-                    {votingParameters.map((item, index) => (
-                        <VotingStatusItem key={index} parameter={item}/>
+                    {(userData.assignedBuergerrat == 1? gameState.buergerrat1.parameters : gameState.buergerrat2.parameters).map((item, index) => (
+                        <Regler 
+                            active={timeRemainingString != "00:00"}
+                            key={index} 
+                            parameterName={item}
+                            userVotings={votingStatus?.userStatuses? votingStatus.userStatuses : []}/>
                     ))}
                 </div>
-            )}
+            
             {gameState.phase== "voting"?
-            <RatComponent text={`In ${timeRemainingString} minuten wird die Abstimmung automatisch beendet. Versucht euch einig zu werden.`} countdown={timeRemainingString}/>
+            <RatComponent text={timeRemainingString === "00:00"? `Die Abstimmung ist beendet. Findet euch jetzt wieder mit dem anderen Bürgerrat zusammen.` : `Die Abstimmung wird demnächst automatisch beendet. Versucht euch einig zu werden.`} countdown={timeRemainingString}/>
             : <></>
             }
         </div>
@@ -112,4 +114,12 @@ function RatComponent({text, hyperlink = "", countdown = ""} : {text: string, hy
             <div className="text-lg text-left m-auto text-black">{text}</div>
         </div>
     </div>)
+}
+
+function DraftComponent() {
+    return (
+    <div className="font-bold"> Entwurf: Empfehlung an die Vereinten Nationen</div>
+
+    
+)
 }

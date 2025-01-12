@@ -147,8 +147,8 @@ export default function Play() {
                     <PersonProfile gameState={gameState} roleData={roleData}/> : 
             <></>}
 
-            {activePanel == "voting"?
-                   <VotingArea gameState={gameState} roleData={roleData}/> :
+            {(activePanel == "voting" && user != null)?
+                   <VotingArea userData={user} gameState={gameState} roleData={roleData}/> : 
             <></>}
 
             {activePanel == "email"? 
