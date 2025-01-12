@@ -8,14 +8,43 @@ import VotingStatusItem from "@/app/play/VotingComponents/VotingStatusItem";
 export default function VotingArea({gameState, roleData}: { gameState: GameState | null, roleData: RoleData | null}) {
     const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
     const [votingParameters, setVotingParameters] = useState<string[]>([]);
-    const [endOfTime, setEndOfTime] = useState<Date | undefined>(undefined);
+    const [endOfTime, setEndOfTime] = useState<Date | null>(null);
     const [timeRemainingString, setTimeRemainingString] = useState<string>("");
+
+    const fetchVotingStatus = async () => {
+        const votingStatusResult = await getVotingStatus();
+        if(!votingStatusResult.ok || votingStatusResult.data === null) {
+            console.log("Voting Status konnte nicht geladen werden");
+            setVotingStatus(null);
+            return;
+        }
+
+        setVotingStatus(votingStatusResult.data.votingStatus);
+
+        if (votingStatus?.votingEnd) {
+            setEndOfTime(votingStatus.votingEnd);
+            console.log(endOfTime);
+        } else {
+            console.log("Voting Status enthält kein VotingEnd");
+            if (gameState?.votingEnd) {
+                console.log("Game State enthält ein VotingEnd: " + gameState.votingEnd);
+                setEndOfTime(gameState.votingEnd);
+            } else {
+                console.log("Game State enthält kein VotingEnd");
+                setEndOfTime(null);
+            }
+        }
+    }
 
     // Der Countdown wird alle 0.2 Sekunden neu berechnet
     useEffect(() => {
         const reformatCountdownString = () => {
-            if (!endOfTime) return ""
+            if (!endOfTime) {
+                setTimeRemainingString("00:00");
+                return;
+            }
             const now = new Date();
+            
             let differenceHours : number = endOfTime.getHours() - now.getHours();
             let differenceMinutes : number = endOfTime.getMinutes() - now.getMinutes();
             let differenceSeconds : number = endOfTime.getSeconds() - now.getSeconds();
@@ -39,21 +68,6 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 
     // Der Voting Status wird alle 5 Sekunden erfragt.
     useEffect(() => {
-        const fetchVotingStatus = async () => {
-            const votingStatusResult = await getVotingStatus();
-            if(!votingStatusResult.ok || votingStatusResult.data === null) {
-                setVotingStatus(null);
-                return;
-            }
-
-            setVotingStatus(votingStatusResult.data.votingStatus);
-
-            if (votingStatus?.votingEnd) {
-                setEndOfTime(votingStatus.votingEnd);
-                console.log(endOfTime);
-            }
-        };
-
         const interval = setInterval(() => fetchVotingStatus(), 5012);
 
         return() => clearInterval(interval);
@@ -92,8 +106,10 @@ export default function VotingArea({gameState, roleData}: { gameState: GameState
 function RatComponent({text, hyperlink = "", countdown = ""} : {text: string, hyperlink?: string, countdown?: string}) {
     return (
     <div className="flex border-solid items-center m-auto max-w-[600px] w-full border-stone-800 p-3 bg-stone-200 rounded-2xl shadow-[0px_0px_20px_rgba(0,0,0,0.6)]" style={{"borderLeftWidth":"10px"}}>
-        <div>{countdown}</div>
         <div className="bg-cover bg-center bg-[url(/images/icon.png)] w-1/4 h-32" style={{"border" : "none !important"}} />
-        <div className="text-lg text-left m-auto text-black w-3/4">{text}</div>
+        <div className="w-3/4">
+            <div className="text-6xl text-red-800 text-left m-auto">{countdown}</div>
+            <div className="text-lg text-left m-auto text-black">{text}</div>
+        </div>
     </div>)
 }
