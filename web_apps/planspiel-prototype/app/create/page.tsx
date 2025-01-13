@@ -55,8 +55,9 @@ export default function FormComponent() {
       return;
     }
 
-    let n_users = 2;
     // Create users
+    let n_users = 10;
+
     for (let i = 0; i < n_users; i++) {
       const userResponse = await createUserForSession();
       if(!userResponse.ok) {
