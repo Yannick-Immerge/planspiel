@@ -121,7 +121,7 @@ export default function VotingArea({gameState, roleData, userData, votings}: { v
                             active={timeRemainingString != "00:00"}
                             key={index} 
                             parameterName={item}
-                            userVotings={votingStatus?.userStatuses? AppendDummyVoting(votingStatus.userStatuses) : []}/>
+                            userVotings={votingStatus?.userStatuses? votingStatus.userStatuses : []}/>
                     ))}
                 </div>
             
