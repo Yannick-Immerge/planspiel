@@ -2,26 +2,40 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import {Parameter, UserVotingStatus} from "@/app/api/models";
 import {getParameter} from "@/app/api/data_controller_interface";
-import { GetEinheit, GetGermanName } from "../../dashboard/BuergerraeteArea";
 import { updateVoting } from "@/app/api/game_controller_interface";
+import { ComputeAbsoluteAverage, GetEinheited, GetSollte, GetStatusQuo } from "./ReglerHelper";
+import { GetGermanName } from "@/app/dashboard/BuergerraeteArea";
+import { Voting } from "./VotingArea";
 
-export default function Regler({parameterName, userVotings, active} : {parameterName: string, userVotings: UserVotingStatus[], active: boolean}) {
+function clamp(val: number, min?: number, max?: number) : number 
+{
+    if (val < (min? min : -4000)) return (min? min : -4000);
+    if (val > (max? max : 4000)) return (max? max : 4000);
+    return val;
+}
+
+export default function Regler({ownRoleName, parameterName, userVotings, active, index, voting} : {voting: Voting, index:number, ownRoleName: string, parameterName: string, userVotings: UserVotingStatus[], active: boolean}) {
     const [parameterInfo, setParameterInfo] = useState<Parameter | null>(null);
-    const [value, setValue] = useState<number | null>(null);
-    const [movedSlider, setMovedSlider] = useState<boolean>(false);
-    const [einheit, setEinheit] = useState<string>("");
+    const [movedSlider, setMovedSlider] = useState<boolean>(true);
     
+    const statusQuo : number = GetStatusQuo(parameterName); 
+    
+    // Die Schieberegler werden geupdated
     useEffect(() => {
         
         const pushVote = async () => {
+            if (!movedSlider) {
+                console.log("Didn't move slider, nothing to push.")
+                return;
+            }
+            setMovedSlider(false);
             
-            const result = await updateVoting(parameterName, value? value : 0);
-            console.log(result.ok);
+            await updateVoting(parameterName, voting.wert? voting.wert : GetStatusQuo(parameterName));
         }
-        const interval = setInterval(() => pushVote(), 2401);
+        const interval = setInterval(() => pushVote(), 2500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [voting.wert]);
 
     const fetchParameterInfo = async () => {
         console.log("Fetching from " + parameterName);
@@ -32,72 +46,106 @@ export default function Regler({parameterName, userVotings, active} : {parameter
         }
 
         setParameterInfo(parameterResult.data.parameter);
-
-        console.log(parameterResult.data.parameter.maxValue);
-        if (value === null) {
-            setValue((parameterResult.data.parameter.minValue + parameterResult.data.parameter.maxValue) / 2)
-            console.log("  Set Value to initial " + ((parameterResult.data.parameter.minValue + parameterResult.data.parameter.maxValue) / 2));
-        } else {
-            console.log("  Value was not null");
-        }
     }
 
     useEffect(() => {
         fetchParameterInfo();
     }, [parameterName]);
 
-    const clamp = (val: number, min: number, max: number) => {
-        if (val < min) return min;
-        if (val > max) return max;
-        return val;
-    }
-
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (parameterInfo) {
-            setValue(clamp(Number(event.target.value), parameterInfo.minValue, parameterInfo.maxValue));
-            setMovedSlider(true);
+            voting.setRegler(clamp(Number(event.target.value), parameterInfo.minValue, parameterInfo.maxValue));
+            setMovedSlider(true); 
         }
     }
 
-    return <div className="mb-[3%] mx-[5%] p-[3%] border-red-50 border-2 rounded-2xl text-center">
-        <div className="text-lg">Thema {1}: {GetGermanName(parameterName)}</div>
+    const averageValue = ComputeAbsoluteAverage(userVotings, parameterName);
+
+    return <div className="rounded-2xl text-center">
         
-        {(parameterInfo && value != null)?<>
-            
+        {(parameterInfo)?<>
+            <div className="font-bold pt-4">Punkt {index+1}: {GetGermanName(parameterName)}:</div>
+            <div className="bg-stone-300 rounded-2xl mx-[5%] my-4">
+                <div className="w-[70%]">
+                    <StatusQuoMarker parameterName={parameterName} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue}/>
+                    <AverageComponent absoluteEinheitedString={GetEinheited(parameterInfo.simpleName, averageValue)} absoluteAverage={averageValue} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue}/>
+                </div>
                 <div className="flex justify-center" style={{"height": "180px", "lineHeight":"180px"}}>
-                    <div className="w-[10%] text-right">
-                        {parameterInfo.minValue}
-                    </div>
+                    <div className="w-[5%] text-right z-20">{parameterInfo.minValue}%</div>
                     <input
-                        className="w-[60%] mx-2 my-5"
+                        disabled={!active}
+                        className="w-[70%] mx-[2%] my-[5%]"
                         width={200}
                         type="range"
                         min={parameterInfo.minValue}
                         max={parameterInfo.maxValue}
-                        value={value}
+                        value={voting.wert? voting.wert : GetStatusQuo(parameterName)}
                         onChange={handleChange}
                     /> 
-                    <div className="w-[10%] text-left">
-                        {parameterInfo.maxValue}
+                    <div className="w-[5%] text-left">
+                        {parameterInfo.maxValue}%
                     </div>
+                </div> 
+                <div className="w-[70%]">
+                    {userVotings.map((item, index) => (<OtherPersonComponent ownVote={voting.wert? voting.wert : GetStatusQuo(parameterName)} ownRoleName={ownRoleName} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue} parameterName={parameterName} key={index} otherVote={item}/>))}
                 </div>
-                <div className="w-80">
-                    {userVotings.map((item, index) => (<OtherPersonComponent key={index} otherVote={item} percentage={(item.parameterStatuses[index].votedValue - parameterInfo.minValue) / (parameterInfo.maxValue - parameterInfo.minValue)}/>))}
                 </div>
-                <div>Wenn es nach dir Ginge:</div>
-                <div>{GetEinheit(parameterName, value)}</div>
+                <div className="text-left">{GetSollte(parameterName, averageValue, statusQuo)}</div>
                 </>
                 : <></>
-                }
-            
+                }  
     </div>
 }
 
-function OtherPersonComponent({otherVote, percentage} : {otherVote: UserVotingStatus, percentage: number}) {
-    const adjustedPercentage = percentage/2 + 25;
+function OtherPersonComponent({ownRoleName, otherVote, ownVote, parameterName, minValue, maxValue} : {ownVote: number, ownRoleName: string, otherVote: UserVotingStatus, parameterName: string, minValue:number, maxValue:number}) {
+    let absolute : number | undefined = otherVote.parameterStatuses.find(n => n.parameter == parameterName)?.votedValue;
+
+    let url : string = ""
+    if (otherVote.roleName == ownRoleName) {
+        url = "images/yourselfmarker.png";
+        absolute = ownVote;
+    } else {
+        url = "images/otherguymarker.png";
+    }
+
+    if (absolute === undefined) return (<>Error when parsing user percentage</>)
+
+    const percentage = clamp(100 * (absolute - minValue) / (maxValue - minValue), 0, 100)
+
+    const adjustedPercentage = percentage*0.54 + 23;
+
+    
+
     return (
-    <>
-        <div className={`-translate-x-1/2 -translate-y-20 rounded-full absolute w-20 h-20 bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(images/otherguymarker.png)`}}></div>
+    <div>
+        <div className={`-translate-x-1/2 -translate-y-20 rounded-full absolute w-20 h-20 bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(${url})`}}></div>
         <div className={`-translate-x-1/2 -translate-y-16 rounded-full absolute w-12 h-12 bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(roles/${otherVote.roleName}/profile_picture.png)`}}></div>
-    </>)
+    </div>)
+}
+
+
+function StatusQuoMarker({parameterName, minValue, maxValue} : {parameterName: string, minValue:number, maxValue:number}) {
+    const absolute : number = GetStatusQuo(parameterName)
+
+    const percentage = 100 * (absolute - minValue) / (maxValue - minValue)
+
+    const adjustedPercentage = percentage*0.54 + 23;
+
+    return (
+    <div>
+        <div className={`-translate-x-1/2 translate-y-[70px] rounded-full absolute w-[10px] h-[10px] bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(images/statusquomarker.png)`}}></div>
+    </div>)
+}
+
+
+function AverageComponent({absoluteAverage, minValue, maxValue, absoluteEinheitedString} : {absoluteAverage: number, minValue:number, maxValue:number, absoluteEinheitedString: string}) {
+
+    const percentage = 100 * (absoluteAverage - minValue) / (maxValue - minValue)
+
+    const adjustedPercentage = percentage*0.54 + 23;
+    return (
+    <div>
+        <div className={`-translate-x-1/2 translate-y-4 rounded-full absolute w-2 h-16 bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(images/averagemarker3.png)`}}></div>
+        <div className="absolute translate-y-1 px-2 bg-[#457D80] text-bold max-w-[50%] text-amber-200 rounded-lg -translate-x-1/2  transition-all duration-1000 text-center" style={{"left": `${adjustedPercentage}%`}}>Durchschnitt: {absoluteEinheitedString}</div>
+    </div>)
 }
