@@ -23,8 +23,8 @@ const page = () => {
     }
 
     const gameState : GameState = {
-        phase: "identification",
-        votingEnd: null,
+        phase: "voting",
+        votingEnd: new Date("01-12-2025 14:08"),
         buergerrat1: buergerratOne,
         buergerrat2: buergerratTwo,
         id: 0,

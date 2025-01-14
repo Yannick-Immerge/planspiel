@@ -6,7 +6,7 @@ import {
 } from "@/app/api/game_controller_interface";
 
 import {GameState, RoleData, UserView} from "@/app/api/models";
-import VotingArea from "@/app/play/VotingComponents/VotingArea";
+import VotingArea, { Voting } from "@/app/play/VotingComponents/VotingArea";
 import { ConfigurationPlaceholder } from "./KonfiguringWait";
 import { BsPersonVcard } from "react-icons/bs";
 import { MdOutlineMail } from "react-icons/md";
@@ -14,6 +14,7 @@ import { GoCommentDiscussion } from "react-icons/go";
 import PersonProfile from "./ProfileComponents/PersonProfile";
 import EMailProvider from "./EMailComponents/EMailProvider";
 import { getRole } from "../api/data_controller_interface";
+import { GetStatusQuo } from "./VotingComponents/ReglerHelper";
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -110,26 +111,34 @@ export default function Play() {
     },[]);
 
     useEffect(() => {
-        getThemes();
-    }, []);
-
-    useEffect(() => {
         const interval = setInterval(() => { fetchGameState() }, 5000);
 
         return () => clearInterval(interval);
     }, [])
 
-    const getThemes = async () => {
+    let themen : string[] = [];
 
-        if (!gameState) {
-            setThemen(["GameState is null"])
-            return;
+        if (user && gameState) themen = user.assignedBuergerrat==1? gameState.buergerrat1.parameters : gameState.buergerrat2.parameters;
+    
+        const [votingsRegler1, setVotingsRegler1] = useState<number | null>(null);
+        const [votingsRegler2, setVotingsRegler2] = useState<number| null>(null);
+        const [votingsRegler3, setVotingsRegler3] = useState<number| null>(null);
+    
+        const myVoting1 : Voting = {
+            wert: votingsRegler1,
+            setRegler: setVotingsRegler1
+        }
+        
+        const myVoting2 : Voting = {
+            wert: votingsRegler2,
+            setRegler: setVotingsRegler2
+        }
+    
+        const myVoting3 : Voting = {
+            wert: votingsRegler3,
+            setRegler: setVotingsRegler3
         }
 
-        
-    }
-    const [themen, setThemen] = useState<string[]>(["Thema 1" , "Thema 2"]);
-    
     if (gameState == undefined || gameState.phase == "configuring" )
         return (
         <>
@@ -140,6 +149,12 @@ export default function Play() {
         </>
     );
 
+    
+    
+        console.log("Regler3:" + myVoting3.wert);
+    
+        const votings : Voting[] = [myVoting1, myVoting2, myVoting3];
+
     return (
         <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
             
@@ -147,8 +162,8 @@ export default function Play() {
                     <PersonProfile gameState={gameState} roleData={roleData}/> : 
             <></>}
 
-            {activePanel == "voting"?
-                   <VotingArea gameState={gameState} roleData={roleData}/> :
+            {(activePanel == "voting" && user != null)?
+                   <VotingArea votings={votings} userData={user} gameState={gameState} roleData={roleData}/> : 
             <></>}
 
             {activePanel == "email"? 
