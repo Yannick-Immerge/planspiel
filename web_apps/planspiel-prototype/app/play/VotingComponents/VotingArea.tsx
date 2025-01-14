@@ -6,6 +6,7 @@ import {getVotingStatus, updateVoting } from "@/app/api/game_controller_interfac
 import Regler from "@/app/play/VotingComponents/Regler";
 import { GetStatusQuo } from "./ReglerHelper";
 import { GetGermanName } from "@/app/dashboard/BuergerraeteArea";
+import MarkdownComponent from "../ProfileComponents/MarkdownComponent";
 
 export interface Voting {
     wert: number | null,
@@ -175,13 +176,29 @@ function AppendDummyVoting(userStatuses: UserVotingStatus[]) : UserVotingStatus[
     return ret;
 }
 
-function RatComponent({text, hyperlink = "", countdown = ""} : {text: string, hyperlink?: string, countdown?: string}) {
+export function RatComponent({text, hyperlink = "", countdown = ""} : {text: string, hyperlink?: string, countdown?: string}) {
     return (
     <div className="flex border-solid items-center m-auto max-w-[600px] w-full border-stone-800 p-3 bg-stone-200 rounded-2xl shadow-[0px_0px_20px_rgba(0,0,0,0.6)]" style={{"borderLeftWidth":"10px"}}>
         <div className="bg-cover bg-center bg-[url(/images/icon.png)] w-1/4 h-32" style={{"border" : "none !important"}} />
         <div className="w-3/4">
             <div className="text-6xl text-red-800 text-left m-auto">{countdown}</div>
             <div className="text-lg text-left m-auto text-black">{text}</div>
+        </div>
+    </div>)
+}
+
+export function RatFactComponent({textIdentifier: string, hyperlink = ""} : {textIdentifier: string, hyperlink?: string}) {
+    return (
+    <div className="flex border-solid items-center m-auto max-w-[600px] w-full border-stone-800 p-3 bg-stone-200 rounded-2xl shadow-[0px_0px_20px_rgba(0,0,0,0.6)]" style={{"borderLeftWidth":"10px"}}>
+        <div className="bg-contain bg-no-repeat bg-center bg-[url(/images/icon_i.png)] w-1/4 h-[128px]" style={{"border" : "none !important"}} />
+        <div className="w-3/4">
+            <div className="text-lg text-left m-auto text-black">
+                <MarkdownComponent path={string}/>
+                <div className="pt-2 flex text-sm">
+                    <div className="pr-2">Quelle:</div>
+                    <a className="underline" target="_blank" href={hyperlink}>{hyperlink.split("/").slice(0, 3).join("/")}</a>
+                </div>
+            </div>
         </div>
     </div>)
 }
