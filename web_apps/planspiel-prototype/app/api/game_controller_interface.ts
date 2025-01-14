@@ -382,8 +382,8 @@ export async function getVotingStatus(overrideUsername?: string, overrideToken?:
 export async function getVotingOverview(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetVotingOverviewResult>> {
     return fetch_with_auth((localUsername, localToken) => {
         return game_fetch<GetVotingOverviewResult>("/game_state/voting/overview", {
-            username: localUsername,
-            token: localToken
+            administratorUsername: localUsername,
+            administratorToken: localToken
         })
     }, overrideAdministratorUsername, overrideAdministratorToken);
 }
