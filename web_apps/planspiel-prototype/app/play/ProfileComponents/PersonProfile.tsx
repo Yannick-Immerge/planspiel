@@ -44,7 +44,11 @@ function PostsArea({posts, roleMetadata, facts, roleID} : {roleID: string, facts
         {facts
             .map((n, index) => 
             <div key={index} className="py-2">
-                <RatFactComponent textIdentifier={`roles/${roleID}/facts/${n.name}/text.md`} hyperlink={n.hyperlink}/>
+                <RatFactComponent textIdentifier={`roles/${roleID}/facts/${
+                    // Check if at the beginning of the string we have the name of the role, 
+                    // if yes, remove it otherwise let it bee
+                    n.name.startsWith(roleID) ? n.name.substring(roleID.length + "_".length) : n.name
+                }/text.md`} hyperlink={n.hyperlink}/>
             </div>)
             }
 
