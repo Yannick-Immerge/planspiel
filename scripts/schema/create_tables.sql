@@ -82,7 +82,7 @@ CREATE TABLE Fact(
     name VARCHAR(100) PRIMARY KEY,
     belongs_to VARCHAR(100) NOT NULL,
     text_identifier VARCHAR(100) NOT NULL,
-    hyperlink VARCHAR(100) NOT NULL,
+    hyperlink VARCHAR(500) NOT NULL,
     is_scenario BOOL NOT NULL,
     FOREIGN KEY (belongs_to) REFERENCES RoleTable(name)
 );

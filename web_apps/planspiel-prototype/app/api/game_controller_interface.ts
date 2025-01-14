@@ -101,6 +101,11 @@ export interface GetVotingStatusResult {
     votingStatus: VotingStatus
 }
 
+export interface GetVotingOverviewResult {
+    votingStatus1: VotingStatus
+    votingStatus2: VotingStatus
+}
+
 
 function game_fetch<T>(endpoint: string, params?: Record<string, any>) : Promise<ApiResult<T>> {
     const addr = `${getServerAddrHttp()}:${GAME_CONTROLLER_SERVER_PORT}/game${endpoint}`
@@ -372,4 +377,13 @@ export async function getVotingStatus(overrideUsername?: string, overrideToken?:
             token: localToken
         })
     }, overrideUsername, overrideToken);
+}
+
+export async function getVotingOverview(overrideAdministratorUsername?: string, overrideAdministratorToken?: string) : Promise<ApiResult<GetVotingOverviewResult>> {
+    return fetch_with_auth((localUsername, localToken) => {
+        return game_fetch<GetVotingOverviewResult>("/game_state/voting/overview", {
+            username: localUsername,
+            token: localToken
+        })
+    }, overrideAdministratorUsername, overrideAdministratorToken);
 }
