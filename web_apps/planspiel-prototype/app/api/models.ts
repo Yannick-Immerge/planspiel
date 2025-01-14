@@ -136,6 +136,6 @@ export interface Metric {
 export interface Parameter {
     simpleName: string,
     description: string,
-    min_value: number,
-    max_value: number
+    minValue: number,
+    maxValue: number
 }

@@ -12,6 +12,18 @@ export function GetGermanName(id: string) : string {
     else return id
 }
 
+export function GetEinheited(id: string, value: number) : string { 
+    if (id === "fossil_fuel_taxes") return `$${value.toFixed(1)} pro Tonne Kohle $${((20.0/17.0)*value).toFixed(1)} pro Fass Öl, $${(20.0*value).toFixed(1)} pro Cubic Foot Erdgas`
+    if (id === "reduction_infra") return `${value}%`
+    if (id === "gases_agriculture") return `${value}%`
+    if (id === "reduction_meat") return `${value}%`
+    if (id === "reduction_waste") return `${value}%`
+
+    else return " Kg"
+}
+
+
+
 export default function BuergerraeteArea({gameState, users} : { gameState: GameState | null, users: UserView[] | null }) {
     return gameState === null ? (
         <div></div>

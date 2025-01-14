@@ -13,7 +13,7 @@ from services.game_controller.implementation import impl_users_create, impl_user
     impl_users_has_password, impl_sessions_configure_prototype, impl_game_state_get, \
     impl_game_state_ready_to_transition, impl_game_state_transition, impl_game_state_is_fact_applicable, \
     impl_game_state_is_post_applicable, impl_game_state_voting_commit, impl_game_state_voting_get_status, \
-    impl_game_state_voting_update
+    impl_game_state_voting_update, impl_game_state_voting_overview
 from shared.architecture.rest import safe_call
 from shared.data_model.context import initialize_db_context_default
 
@@ -161,3 +161,9 @@ def game_state_voting_update():
 def game_state_voting_commit():
     params = request.get_json()
     return safe_call(impl_game_state_voting_commit, params["parameter"], params["username"], params["token"])
+
+@app.route("/game/game_state/voting/overview", methods=["POST"])
+def game_state_voting_overview():
+    params = request.get_json()
+    return safe_call(impl_game_state_voting_overview, params["administratorUsername"], params["administratorToken"])
+
