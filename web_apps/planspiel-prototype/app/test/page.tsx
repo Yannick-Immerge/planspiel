@@ -181,7 +181,7 @@ function GetRoleData(roleID: string) : RoleData | null{
 
   let roleData : RoleData | null = {
     facts: [],
-    infoIdentifier: "",
+    infoIdentifier: `roles/${roleID}/info.md`,
     metadata: {
         birthday: "",
         gender: "w",
