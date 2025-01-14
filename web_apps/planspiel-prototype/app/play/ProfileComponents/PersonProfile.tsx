@@ -6,6 +6,7 @@ import MarkdownComponent from './MarkdownComponent';
 import { GiRollingSuitcase } from 'react-icons/gi';
 import { FaSuitcase } from 'react-icons/fa';
 import { RatComponent, RatFactComponent } from '../VotingComponents/VotingArea';
+import { useState } from 'react';
 
 export default function PersonProfile ({gameState, roleData, roleID}: {roleID: string, gameState: GameState, roleData: RoleData | null}) {
 
@@ -102,9 +103,12 @@ function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
 }
 
 function BiographyComponent ({url} : {url:string}) {
+    const [show, setShow] = useState<boolean>(false)
+
     return (
     <div className="bg-slate-300 p-5">
-        <MarkdownComponent path={url} />
+        {show? <MarkdownComponent path={url} /> : <></>}
+        <div onClick={() => setShow(!show)} className="my-3 text-black underline cursor-pointer">{show? "Einklappen" : "Wer ist Anais Fournier?"}</div>
     </div>)
 }
 

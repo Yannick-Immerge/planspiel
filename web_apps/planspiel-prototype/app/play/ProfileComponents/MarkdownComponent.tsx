@@ -14,7 +14,7 @@ export default function MarkdownComponent({ path } : { path: string}) {
     }, []);
 
     return (
-        <div className="w-full h-full text-sm prose text-black">
+        <div className="w-full h-full text-sm text-black">
             <ReactMarkdown>{markdown}</ReactMarkdown>
         </div>
     )
