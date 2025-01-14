@@ -159,7 +159,7 @@ export default function Play() {
         <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
             
             {activePanel == "profile"? 
-                    <PersonProfile gameState={gameState} roleData={roleData}/> : 
+                    <PersonProfile roleID={user?.assignedRoleId? user.assignedRoleId : ""} gameState={gameState} roleData={roleData}/> : 
             <></>}
 
             {(activePanel == "voting" && user != null)?

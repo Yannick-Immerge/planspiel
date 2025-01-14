@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import VotingArea from '../play/VotingComponents/VotingArea'
-import { Buergerrat, Fact, GameState, Post, RoleData, RoleMetadata } from '../api/models'
+import { Buergerrat, Fact, GameState, Post, RoleData, RoleMetadata, UserView } from '../api/models'
 import EMailProvider from '../play/EMailComponents/EMailProvider'
 import PersonProfile from '../play/ProfileComponents/PersonProfile'
 import { MdOutlineMail } from 'react-icons/md'
@@ -11,6 +11,14 @@ import { BsPersonVcard } from 'react-icons/bs'
 const page = () => {
 
     const [activePanel, setActivePanel] = useState<"profile" | "voting" | "email">("voting");
+
+    const user : UserView = {
+        administrator: false,
+        assignedBuergerrat: 1,
+        assignedRoleId: "11_anais_fournier",
+        status: "online",
+        username: "schnelles-Pferd"
+    }
 
     const buergerratOne : Buergerrat = {
         parameters: ["Parameter of Wisdom", "Parameter of Courage"],
@@ -42,19 +50,19 @@ const page = () => {
     }
 
     const anais_fact: Fact = {
-        name: "Law!",
+        name: "france_bans_food_destruction",
         isScenario: false,
         textIdentifier: "text.md",
         hyperlink: "https://zerowasteeurope.eu/wp-content/uploads/2020/11/zwe_11_2020_factsheet_france_en.pdf"
     }
 
     const anais_post: Post = {
-        name: "article_post",
+        name: "example_post",
         author: "Ben Affleck",
         type: "by_me",
         textDeIdentifier: "roles/11_anais_fournier/posts/article_post/text_de.md",
         textOrigIdentifier: "roles/11_anais_fournier/posts/article_post/text_orig.md",
-        imageIdentifiers: [ "roles/11_anais_fournier/posts/article_post/anais_tafel.png", "roles/11_anais_fournier/posts/article_post/wasted_food.png" ],
+        imageIdentifiers: [ "roles/11_anais_fournier/posts/article_post/anais_article_picture.png", "roles/11_anais_fournier/posts/article_post/wasted_food.png" ],
         isScenario: false
     }
 
@@ -74,11 +82,11 @@ const page = () => {
     <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
             
             {activePanel == "profile"? 
-                    <PersonProfile gameState={gameState} roleData={anais_role}/> : 
+                    <PersonProfile roleID={user.assignedRoleId? user.assignedRoleId:""} gameState={gameState} roleData={anais_role}/> : 
             <></>}
 
             {activePanel == "voting"?
-                   <VotingArea gameState={gameState} roleData={anais_role}/> :
+                   <></> :
             <></>}
 
             {activePanel == "email"? 

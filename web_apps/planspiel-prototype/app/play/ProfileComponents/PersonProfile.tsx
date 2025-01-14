@@ -1,12 +1,13 @@
-import { GameState, Post, RoleData, RoleMetadata } from '../../api/models'
+import { Fact, GameState, Post, RoleData, RoleMetadata } from '../../api/models'
 import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import PostComponent from './PostComponent';
 import MarkdownComponent from './MarkdownComponent';
 import { GiRollingSuitcase } from 'react-icons/gi';
 import { FaSuitcase } from 'react-icons/fa';
+import { RatComponent, RatFactComponent } from '../VotingComponents/VotingArea';
 
-export default function PersonProfile ({gameState, roleData}: {gameState: GameState, roleData: RoleData | null}) {
+export default function PersonProfile ({gameState, roleData, roleID}: {roleID: string, gameState: GameState, roleData: RoleData | null}) {
 
     if (!roleData) return (<div>Profil konnte nicht geladen werden. Versuch, die Seite neu zu laden, ansonsten wende dich an unser support team.</div>)
 
@@ -18,12 +19,12 @@ export default function PersonProfile ({gameState, roleData}: {gameState: GameSt
         <ProfilePicture url={roleData.profilePictureIdentifier}/>
         <MetadataArea roleMetadata={roleData.metadata}/>
         <BiographyComponent url={roleData.infoIdentifier}/>
-        <PostsArea posts={roleData.posts} roleMetadata={roleData.metadata} />
+        <PostsArea roleID={roleID} facts={roleData.facts} posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
   )
 }
 
-function PostsArea({posts, roleMetadata} : {posts: Post[] | null, roleMetadata: RoleMetadata}) {
+function PostsArea({posts, roleMetadata, facts, roleID} : {roleID: string, facts: Fact[], posts: Post[] | null, roleMetadata: RoleMetadata}) {
     if (!posts) return (<div>Dein Feed konnte nicht geladen werden. Versuche es später erneut.</div>);
 
     return (<>
@@ -36,6 +37,13 @@ function PostsArea({posts, roleMetadata} : {posts: Post[] | null, roleMetadata: 
                 <PostComponent post={n} roleMetadata={roleMetadata}/>
             </div>)
             }
+        {facts
+            .map((n, index) => 
+            <div key={index} className="py-2">
+                <RatFactComponent textIdentifier={`roles/${roleID}/facts/${n.name}/text.md`} hyperlink={n.hyperlink}/>
+            </div>)
+            }
+
             <div className="h-40 w-full bg-sky-900">
                 
             </div>
