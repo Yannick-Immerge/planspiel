@@ -15,11 +15,12 @@ export default function PersonProfile ({gameState, roleData, roleID}: {roleID: s
     if (!roleData) return (<div>Profil konnte nicht geladen werden. Versuch, die Seite neu zu laden, ansonsten wende dich an unser support team.</div>)
 
     // TODO Die Projektsionsphase fehlt wo das Profilbild ausgetauscht wird und die Szenarios stimmen
+    
 
     return (
     <div className="w-full h-full">
         <Titlecard url={roleData.titlecardIdentifier} />
-        <ProfilePicture url={roleData.profilePictureIdentifier}/>
+        <ProfilePicture old={gameState.phase == 'debriefing'} url={roleData.profilePictureIdentifier}/>
         <MetadataArea roleMetadata={roleData.metadata}/>
         <BiographyComponent url={roleData.infoIdentifier}/>
         <PostsArea roleID={roleID} facts={roleData.facts} posts={roleData.posts} roleMetadata={roleData.metadata} />
@@ -114,10 +115,10 @@ function BiographyComponent ({url} : {url:string}) {
     </div>)
 }
 
-function ProfilePicture ({url} : {url:string}) {
+function ProfilePicture ({url, old} : {url:string, old:boolean}) {
     return (
     <div className="shadow-[0px_0px_20px_rgba(0,0,0,0.6)] absolute left-[20px] top-[20px] h-[150px] w-[150px] rounded-full border-white border-solid" 
-    style={{backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: "center", borderWidth: "2px"}}>
+    style={{backgroundImage: `url(${old? (url.split(".")[0] + "_old.png") : url})`, backgroundSize: 'cover', backgroundPosition: "center", borderWidth: "2px"}}>
 
     </div>)
 }
