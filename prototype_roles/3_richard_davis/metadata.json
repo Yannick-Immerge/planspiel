@@ -1,10 +1,11 @@
-{
-  "name": "Name",
-  "birthday": "12/12/1988",
-  "language": "Französisch",
-  "flag": "🇫🇷🇷",
-  "status": "Status",
-  "gender": "w",
-  "living": "Address here",
-  "job": "Job here"
-}
+  {
+    "name": "Richard Davis",
+    "birthday": "12/06/1962",
+    "status": "Vom Sohn eines Mechanikers zum Vizepräsidenten von Conch Inc. - Beharrlichkeit",
+    "language": "Englisch",
+    "gender": "w",
+    "flag": "🇺🇸",
+    "height": 174,
+    "living": "8057 Bendell Dr, Houston ,Texas, USA",
+    "job": "Senior Vice President für die nordamerikanische Energieproduktion bei Conch Inc."
+  }
