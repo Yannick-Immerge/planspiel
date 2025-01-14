@@ -1,3 +1,5 @@
+"use client"
+
 import { Fact, GameState, Post, RoleData, RoleMetadata } from '../../api/models'
 import { GrMapLocation } from 'react-icons/gr';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
