@@ -22,7 +22,7 @@ export default function PersonProfile ({gameState, roleData, roleID}: {roleID: s
         <Titlecard url={roleData.titlecardIdentifier} />
         <ProfilePicture old={gameState.phase == 'debriefing'} url={roleData.profilePictureIdentifier}/>
         <MetadataArea old={gameState.phase == 'debriefing'} roleMetadata={roleData.metadata}/>
-        <BiographyComponent url={roleData.infoIdentifier}/>
+        <BiographyComponent url={roleData.infoIdentifier} roleName={roleData.metadata.name}/>
         <PostsArea roleID={roleID} facts={roleData.facts} posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
   )
@@ -105,13 +105,15 @@ function MetadataArea({roleMetadata, old} : {old: boolean, roleMetadata: RoleMet
         </div>)
 }
 
-function BiographyComponent ({url} : {url:string}) {
+function BiographyComponent ({url, roleName} : {roleName: string, url:string}) {
     const [show, setShow] = useState<boolean>(false)
 
     return (
-    <div className="bg-slate-300 p-5">
-        {show? <MarkdownComponent path={url} /> : <></>}
-        <div onClick={() => setShow(!show)} className="my-3 text-black underline cursor-pointer">{show? "Einklappen" : "Wer ist Anais Fournier?"}</div>
+    <div className="m-5 p-3 bg-stone-300 hover:bg-stone-400 rounded-2xl transition-colors">
+        
+        {show? <div className="p-3"><MarkdownComponent path={url} /></div> : <></>}
+        
+        <div onClick={() => setShow(!show)} className=" text-black rounded-full cursor-pointer">{show? "▲ Einklappen" : `▼ Wer ist ${roleName}?`}</div>
     </div>)
 }
 
