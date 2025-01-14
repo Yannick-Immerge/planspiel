@@ -15,12 +15,13 @@ export default function PersonProfile ({gameState, roleData, roleID}: {roleID: s
     if (!roleData) return (<div>Profil konnte nicht geladen werden. Versuch, die Seite neu zu laden, ansonsten wende dich an unser support team.</div>)
 
     // TODO Die Projektsionsphase fehlt wo das Profilbild ausgetauscht wird und die Szenarios stimmen
+    
 
     return (
     <div className="w-full h-full">
         <Titlecard url={roleData.titlecardIdentifier} />
-        <ProfilePicture url={roleData.profilePictureIdentifier}/>
-        <MetadataArea roleMetadata={roleData.metadata}/>
+        <ProfilePicture old={gameState.phase == 'debriefing'} url={roleData.profilePictureIdentifier}/>
+        <MetadataArea old={gameState.phase == 'debriefing'} roleMetadata={roleData.metadata}/>
         <BiographyComponent url={roleData.infoIdentifier}/>
         <PostsArea roleID={roleID} facts={roleData.facts} posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
@@ -69,13 +70,13 @@ function GetPrettyDateString(birthday: Date) : string {
     return `${birthday.getDate()}. ${monate[birthday.getMonth()]}  ${birthday.getFullYear()}`;
 }
 
-function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
+function MetadataArea({roleMetadata, old} : {old: boolean, roleMetadata: RoleMetadata | null}) {
 
     if (!roleMetadata) return (<div>Deine Metadaten konnten nicht geladen werden. Versuche es später erneut.</div>)
 
     const birthday : Date = new Date(roleMetadata.birthday);
     
-    const age : number = GetAge(birthday);
+    const age : number = GetAge(birthday) + (old? 20 : 0);
 
     const dateString : string = GetPrettyDateString(birthday);
 
@@ -114,10 +115,10 @@ function BiographyComponent ({url} : {url:string}) {
     </div>)
 }
 
-function ProfilePicture ({url} : {url:string}) {
+function ProfilePicture ({url, old} : {url:string, old:boolean}) {
     return (
     <div className="shadow-[0px_0px_20px_rgba(0,0,0,0.6)] absolute left-[20px] top-[20px] h-[150px] w-[150px] rounded-full border-white border-solid" 
-    style={{backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: "center", borderWidth: "2px"}}>
+    style={{backgroundImage: `url(${old? (url.split(".")[0] + "_old.png") : url})`, backgroundSize: 'cover', backgroundPosition: "center", borderWidth: "2px"}}>
 
     </div>)
 }

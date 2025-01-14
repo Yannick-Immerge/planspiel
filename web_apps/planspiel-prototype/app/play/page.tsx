@@ -13,7 +13,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { GoCommentDiscussion } from "react-icons/go";
 import PersonProfile from "./ProfileComponents/PersonProfile";
 import EMailProvider from "./EMailComponents/EMailProvider";
-import { getRole } from "../api/data_controller_interface";
+import { getRole, getRoleFiltered } from "../api/data_controller_interface";
 import { GetStatusQuo } from "./VotingComponents/ReglerHelper";
 
 export default function Play() {
@@ -58,7 +58,7 @@ export default function Play() {
             return;
         }
 
-        const roleDataResponse = await getRole(viewResponse.data.userView.assignedRoleId);
+        const roleDataResponse = await getRoleFiltered(viewResponse.data.userView.assignedRoleId);
         if(!roleDataResponse.ok || roleDataResponse.data === null) {
             setWarning(roleDataResponse.statusText);
             setRoleData(null);
