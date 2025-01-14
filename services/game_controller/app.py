@@ -161,3 +161,9 @@ def game_state_voting_update():
 def game_state_voting_commit():
     params = request.get_json()
     return safe_call(impl_game_state_voting_commit, params["parameter"], params["username"], params["token"])
+
+@app.route("/game/game_state/voting/overview", methods=["POST"])
+def game_state_voting_overview():
+    params = request.get_json()
+    return safe_call(impl_game_state_voting_overview, params["administratorUsername"], params["administratorToken"])
+
