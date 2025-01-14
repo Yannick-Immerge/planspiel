@@ -6,6 +6,7 @@ import {
     getGameState,
     getSessionMemberViews,
     transitionGameState, viewSelf,
+    getVotingOverview,
 } from "@/app/api/game_controller_interface";
 import WarningArea from "@/app/components/WarningArea";
 import MembersArea from "@/app/dashboard/MembersArea";
@@ -23,6 +24,7 @@ export default function Dashboard() {
 
     // This is needed to create the en-roads link to the generated dashboard
     const [enRoadsURL, setEnRoadsURL] = useState<string | null>(null);
+
 
     const fetchUser = async () => {
         const viewResponse = await viewSelf();
@@ -66,6 +68,14 @@ export default function Dashboard() {
     }
 
     const fetchEnRoadsURL = async () => {
+        const votingOverviewResponse = await getVotingOverview();
+
+        if (!votingOverviewResponse.ok || votingOverviewResponse.data === null) {
+            setEnRoadsURL("Something went wrong");
+            return;
+        }
+
+        //setEndVote(votingOverviewResponse.data.votingStatus1.votingEnd)
         const votingFinalized = true  // TODO: change this when done
 
         if (!votingFinalized) {
@@ -74,14 +84,14 @@ export default function Dashboard() {
         }
 
         // For now, we only hardcode this
-        const votingValues : any = {
+        const votingValues: any = {
             "gases_agriculture": "100",
             "reduction_meat": "10",
             "reduction_waste": "10",
             "fossil_fuel_taxes": "250",
             "reduction_infra": "100",
         }
-        const metricNameToParameter : any = {
+        const metricNameToParameter: any = {
             "gases_agriculture": "60",
             "reduction_meat": "287",
             "reduction_waste": "305",
@@ -141,6 +151,7 @@ export default function Dashboard() {
                         <div className="w-1/2">
                             <div className="flex-1 rounded-2xl bg-[#5a53] p-5 shadow-[10px_10px_10px_rgba(0,0,0,0.4)] backdrop-blur-xl">
                                 <TransitionArea stateDescriptions={stateDescriptions} gameState={gameState} onTransitionAction={onTransitionAction} />
+                                <div>{enRoadsURL ? enRoadsURL : enRoadsURL}</div>
                                 <EnRoadsProjection enRoadsURL={enRoadsURL} />
                             </div>
                             <MembersArea members={members} />

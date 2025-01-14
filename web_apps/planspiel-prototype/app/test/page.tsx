@@ -8,12 +8,16 @@ import { BsPersonVcard } from 'react-icons/bs'
 import path from 'path'
 import fs from 'fs'
 
+
+const roleID : string = "7_yasemin_aidin";
+
+
 const page = () => {
 
     const user : UserView = {
         administrator: false,
         assignedBuergerrat: 1,
-        assignedRoleId: "11_anais_fournier",
+        assignedRoleId: roleID,
         status: "online",
         username: "schnelles-Pferd"
     }
@@ -37,7 +41,6 @@ const page = () => {
         projection: null
     }
 
-    const roleID : string = "7_yasemin_aidin";
 
     const testRole : RoleData | null = GetRoleData(roleID);
     

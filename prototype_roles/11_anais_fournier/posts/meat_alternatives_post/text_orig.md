@@ -1,4 +1,4 @@
-🌱 **Nouveaux horizons à la boucherie.**🌱
+🌱 **Nouveaux horizons à la boucherie.** 🌱
 
 J’ai élargi notre gamme et propose désormais aussi des alternatives véganes. 🍔🌿 Inspirée par des démarches comme celles de @YaseminAidin24, j’espère que cela pourra contribuer, même modestement, à la lutte contre la crise climatique.
 

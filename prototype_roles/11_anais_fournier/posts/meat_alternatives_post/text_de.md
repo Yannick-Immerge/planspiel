@@ -1,4 +1,4 @@
-🌱 **Neue Wege in der Metzgerei.**🌱
+🌱 **Neue Wege in der Metzgerei.** 🌱
 
 Ich habe unser Sortiment erweitert und biete jetzt auch vegane Alternativen an. 🍔🌿 Inspiriert von Ansätzen wie bei @YaseminAidin24 hoffe ich, dass wir damit einen kleinen Beitrag zur Klimakrise leisten können.
 
