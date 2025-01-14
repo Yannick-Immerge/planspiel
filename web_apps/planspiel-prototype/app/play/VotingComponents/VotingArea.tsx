@@ -187,13 +187,13 @@ export function RatComponent({text, hyperlink = "", countdown = ""} : {text: str
     </div>)
 }
 
-export function RatFactComponent({textIdentifier: string, hyperlink = ""} : {textIdentifier: string, hyperlink?: string}) {
+export function RatFactComponent({textIdentifier, hyperlink = ""} : {textIdentifier: string, hyperlink?: string}) {
     return (
     <div className="flex border-solid items-center m-auto max-w-[600px] w-full border-stone-800 p-3 bg-stone-200 rounded-2xl shadow-[0px_0px_20px_rgba(0,0,0,0.6)]" style={{"borderLeftWidth":"10px"}}>
         <div className="bg-contain bg-no-repeat bg-center bg-[url(/images/icon_i.png)] w-1/4 h-[128px]" style={{"border" : "none !important"}} />
         <div className="w-3/4">
             <div className="text-lg text-left m-auto text-black">
-                <MarkdownComponent path={string}/>
+                <MarkdownComponent path={textIdentifier}/>
                 <div className="pt-2 flex text-sm">
                     <div className="pr-2">Quelle:</div>
                     <a className="underline" target="_blank" href={hyperlink}>{hyperlink.split("/").slice(0, 3).join("/")}</a>
