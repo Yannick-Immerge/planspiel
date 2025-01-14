@@ -21,7 +21,7 @@ export default function PersonProfile ({gameState, roleData, roleID}: {roleID: s
     <div className="w-full h-full">
         <Titlecard url={roleData.titlecardIdentifier} />
         <ProfilePicture old={gameState.phase == 'debriefing'} url={roleData.profilePictureIdentifier}/>
-        <MetadataArea roleMetadata={roleData.metadata}/>
+        <MetadataArea old={gameState.phase == 'debriefing'} roleMetadata={roleData.metadata}/>
         <BiographyComponent url={roleData.infoIdentifier}/>
         <PostsArea roleID={roleID} facts={roleData.facts} posts={roleData.posts} roleMetadata={roleData.metadata} />
     </div>
@@ -70,13 +70,13 @@ function GetPrettyDateString(birthday: Date) : string {
     return `${birthday.getDate()}. ${monate[birthday.getMonth()]}  ${birthday.getFullYear()}`;
 }
 
-function MetadataArea({roleMetadata} : {roleMetadata: RoleMetadata | null}) {
+function MetadataArea({roleMetadata, old} : {old: boolean, roleMetadata: RoleMetadata | null}) {
 
     if (!roleMetadata) return (<div>Deine Metadaten konnten nicht geladen werden. Versuche es später erneut.</div>)
 
     const birthday : Date = new Date(roleMetadata.birthday);
     
-    const age : number = GetAge(birthday);
+    const age : number = GetAge(birthday) + (old? 20 : 0);
 
     const dateString : string = GetPrettyDateString(birthday);
 
