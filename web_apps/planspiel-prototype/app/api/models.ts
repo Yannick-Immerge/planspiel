@@ -92,13 +92,12 @@ export interface RoleData {
 }
 
 export interface RoleMetadata {
-    name: string,
     gender: "m" | "w" | "d",
+    name: string,
 	birthday: string,
 	living: string,
 	status: string,
     language: string,
-    flag: string,
     job: string
 }
 
@@ -137,6 +136,6 @@ export interface Metric {
 export interface Parameter {
     simpleName: string,
     description: string,
-    min_value: number,
-    max_value: number
+    minValue: number,
+    maxValue: number
 }
