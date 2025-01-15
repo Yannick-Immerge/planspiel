@@ -1,0 +1,1 @@
+Beispiel aus Dänemark: Verbot neuer Öl- und Gasheizungen - Dänemark hat ein Gesetz verabschiedet, das den Einbau neuer Öl- und Gasheizungen in den kommenden Jahren faktisch verbietet. Jede neu eingebaute Heizung muss zu mindestens 65 % mit erneuerbaren Energien betrieben werden.

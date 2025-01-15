@@ -9,12 +9,16 @@ import path from 'path'
 
 import fs from 'fs'
 
+
+const roleID : string = "7_yasemin_aidin";
+
+
 const page = () => {
 
     const user : UserView = {
         administrator: false,
         assignedBuergerrat: 1,
-        assignedRoleId: "1_ethan_miller",
+        assignedRoleId: roleID,
         status: "online",
         username: "schnelles-Pferd"
     }
@@ -37,8 +41,6 @@ const page = () => {
         id: 0,
         projection: null
     }
-
-    const roleID : string = "1_ethan_miller"
 
     const testRole : RoleData | null = GetRoleData(roleID);
     

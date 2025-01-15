@@ -9,7 +9,7 @@ Portant un tablier bleu, elle trie ce matin des viandes fraîches, généreuseme
 C’est un véritable signal d’alarme, » explique Anaïs, 37 ans, employée dans une boucherie à temps plein.
 « C’est absurde que tant de nourriture de qualité soit jetée alors que des familles ont du mal à joindre les deux bouts. »
 
-## Sauver avant qu’il ne soit trop tard
+### Sauver avant qu’il ne soit trop tard
 
 Le travail au sein de la banque alimentaire n’est pas toujours simple.
 Chaque matin, les bénévoles collectent des denrées alimentaires auprès des supermarchés, des boulangeries, des boucheries et des restaurants.
@@ -22,7 +22,7 @@ Pour répondre à ce défi, elle a même lancé sa propre initiative : "Zéro ga
 
 Les résultats sont impressionnants : rien que cette année, grâce à l’engagement d’Anaïs, la banque alimentaire Lyon a sauvé près de 2 tonnes de viande – suffisamment pour préparer des centaines de repas.
 
-## Une vision pour l’avenir
+### Une vision pour l’avenir
 
 Anaïs rêve d’un monde où le gaspillage alimentaire ne serait plus qu’un mauvais souvenir. Elle milite pour que davantage de boucheries, supermarchés et restaurants rejoignent des initiatives comme celles de la banque alimentaire. Elle plaide également pour des cadres juridiques plus favorables aux dons alimentaires, afin de réduire le gaspillage.
 « Ce n’est pas seulement une question de durabilité – c’est une question d’humanité, » conclut-elle. Par son travail à la banque alimentaire Lyon, Anaïs Fournier prouve qu’une seule personne peut faire une grande différence.

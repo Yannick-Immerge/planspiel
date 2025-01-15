@@ -1,8 +1,10 @@
 {
   "name": "Name",
-  "birthday": "Geburtstag im format MM/DD/YYYY",
-  "living": "Adresse",
+  "birthday": "12/12/1988",
+  "language": "Französisch",
+  "flag": "🇫🇷🇷",
   "status": "Status",
-  "gender": "m, w oder d",
-  "language": "Name der Muttersprache hier eingeben, zB Französisch"
+  "gender": "w",
+  "living": "Address here",
+  "job": "Job here"
 }

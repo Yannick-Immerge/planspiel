@@ -189,3 +189,12 @@ def impl_game_state_voting_commit(parameter: str, username: str, token: str):
     TOKEN_MANAGER.authenticate(username, token)
     GAME_STATE_MANAGER.voting_commit(username, parameter)
     return {}
+
+def impl_game_state_voting_overview(administrator_username: str, administrator_token: str):
+    TOKEN_MANAGER.authenticate(administrator_username, administrator_token)
+    session_id = USER_MANAGER.get_session_if_admin(administrator_username)
+    game_state_id = SESSION_MANAGER.get_game_state_id(session_id)
+    return {
+        "votingStatus1": GAME_STATE_MANAGER.voting_get_status(game_state_id, 1),
+        "votingStatus2": GAME_STATE_MANAGER.voting_get_status(game_state_id, 2)
+    }

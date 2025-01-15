@@ -1,6 +1,7 @@
 """
 Database queries for the game controller.
 """
+from typing import Tuple
 import uuid
 from datetime import timedelta, datetime
 from enum import Enum
@@ -263,25 +264,28 @@ class GameStateManager:
             query = f"UPDATE Projection SET projected_value = %s WHERE game_state = %s AND metric = %s;"
             execute(Query(query, (projected_value, game_state_id, metric)), commit=True)
 
-    def ready_to_transition(self, game_state_id: int, target_phase: str):
+    def ready_to_transition(self, game_state_id: int, target_phase: str) -> Tuple[bool, str]:
         if not self.has_game_state(game_state_id):
             raise ValueError(f"No game state with id {game_state_id}.")
         query = f"SELECT phase FROM GameState WHERE id = %s;"
         phase = execute(Query(query, (game_state_id,)))[0][0]
         if phase == GamePhase.CONFIGURING.value and target_phase == GamePhase.IDENTIFICATION.value:
-            return self.are_users_configured(game_state_id) and self.are_buergerraete_configured(game_state_id)
+            return self.are_users_configured(game_state_id) and self.are_buergerraete_configured(game_state_id), "Not yet ready to transition (Are all users & buergerraete configured?)."
         elif phase == GamePhase.IDENTIFICATION.value and target_phase == GamePhase.DISCUSSION.value:
-            return True
+            return True, f"This always works. Why are you raising an error from {phase} to {target_phase}?"
         elif phase == GamePhase.DISCUSSION.value and target_phase == GamePhase.VOTING.value:
-            return True
+            return True, f"This always works. Why are you raising an error from {phase} to {target_phase}?"
         elif phase == GamePhase.VOTING.value and target_phase == GamePhase.DEBRIEFING.value:
-            return self.voting_have_all_committed(game_state_id)
+            # return self.voting_have_all_committed(game_state_id)  # NOTE: Legacy, now we just go to debrief, users can not lock votes
+            return self.voting_ended(game_state_id), "Is voting over?"
         else:
-            return False
+            return False, f"Inapropiate phase transition from {phase} to {target_phase}"
 
     def transition(self, game_state_id: int, target_phase: str):
-        if not self.ready_to_transition(game_state_id, target_phase):
-            raise RuntimeError("Not yet ready to transition (Are all users & buergerraete configured?).")
+        is_ready, reason = self.ready_to_transition(game_state_id, target_phase)
+        if not is_ready:
+            raise RuntimeError(reason)
+
         if target_phase == GamePhase.IDENTIFICATION.value:
             pass
         elif target_phase == GamePhase.DISCUSSION.value:
@@ -328,6 +332,13 @@ class GameStateManager:
             if not (min_value <= projected_metrics[metric] <= max_value):
                 return False
         return True
+
+    def voting_ended(self, game_state_id: int) -> bool:
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        query = f"SELECT voting_end FROM GameState WHERE id = %s;"
+        voting_end = execute(Query(query, (game_state_id,)))[0][0]
+        return datetime.now() > voting_end
 
     def voting_have_all_committed(self, game_state_id: int) -> bool:
         if not self.has_game_state(game_state_id):
@@ -377,7 +388,7 @@ class GameStateManager:
     def voting_get_status(self, game_state_id: int, buergerrat: int) -> dict:
         query = f"SELECT phase, voting_end FROM GameState WHERE id = %s;"
         phase, voting_end = execute(Query(query, (game_state_id,)))[0]
-        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value:
+        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
             raise RuntimeError("Game is not in voting nor in discussion phase.")
         query = (f"SELECT User.username, User.plays_as "
                  f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
@@ -404,7 +415,9 @@ class GameStateManager:
         }
 
     def voting_set_timer(self, game_state_id: int):
-        voting_end = datetime.now() + timedelta(minutes=5)
+        # duration_min = 5
+        duration_min = 0.5  # TODO: rollback to 5 for the final prototype, just speed up voting here
+        voting_end = datetime.now() + timedelta(minutes=duration_min)
         query = f"UPDATE GameState SET voting_end = %s WHERE id = %s;"
         execute(Query(query, (voting_end, game_state_id)))
 
