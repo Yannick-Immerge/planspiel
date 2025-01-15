@@ -1,0 +1,8 @@
+{
+    "type": "i_liked",
+    "author": "Aliments pour Lyon",
+    "isScenario": true,
+    "conditions": [
+        "reduction_waste_bad"
+    ]
+}

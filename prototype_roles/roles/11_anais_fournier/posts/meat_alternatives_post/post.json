@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Anais Fournier",
+    "isScenario": true,
+    "conditions": [
+        "reduction_meat_good"
+    ]
+}

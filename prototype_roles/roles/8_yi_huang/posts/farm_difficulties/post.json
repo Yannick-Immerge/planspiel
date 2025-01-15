@@ -1,0 +1,6 @@
+{
+ "type": "i_likked",
+ "author": "Ming Yuang (明毅)",
+ "isScenario": true,
+"conditions": ["reduction_meat_good"]
+}

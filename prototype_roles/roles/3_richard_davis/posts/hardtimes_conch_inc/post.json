@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Richard Davis",
+    "isScenario": true,
+    "conditions": [
+        "fossil_fuel_taxes_good"
+    ]
+}
