@@ -1,0 +1,6 @@
+{
+	"type": "got_tagged",
+	"author": "Ming Yuang (明毅)",
+	"isScenario": true,
+	"conditions": ["global_bad"]
+}

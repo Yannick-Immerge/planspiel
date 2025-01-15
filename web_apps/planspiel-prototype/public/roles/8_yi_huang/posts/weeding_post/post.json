@@ -1,0 +1,6 @@
+{
+	"type": "by_me",
+	"author": "Yi Huang",
+	"isScenario": true,
+	"conditions": ["global_good"]
+}

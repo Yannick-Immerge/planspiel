@@ -1,0 +1,1 @@
+Mahjong ist mehr als nur ein Spiel – es bringt die Gemeinschaft zusammen! 🀄💬 Ich bin stolz darauf, lokale Turniere zu organisieren und gemeinsam mit unseren Nachbarn zu lachen, zu lernen und Verbindungen zu stärken. 
