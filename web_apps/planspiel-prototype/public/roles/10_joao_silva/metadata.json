@@ -1,10 +1,10 @@
 {
-  "name": "Name",
-  "birthday": "12/12/1988",
-  "language": "Französisch",
-  "flag": "🇫🇷🇷",
-  "status": "Status",
-  "gender": "w",
-  "living": "Address here",
-  "job": "Job here"
+  "name": "João Silva",
+  "birthday": "03/15/1978",
+  "language": "Portugiesisch",
+  "flag": "🇧🇷",
+  "status": "Responsabilidade por um futuro melhor",
+  "height": 175,
+  "living": "Fazenda Verde, Mato Grosso, Brasilien",
+  "job": "Sojabauer und Mitglied der Mato Grosso Landwirtschaftsvereinigung"
 }

@@ -1,1 +1,0 @@
-Seni özlüyorum baba. 💜

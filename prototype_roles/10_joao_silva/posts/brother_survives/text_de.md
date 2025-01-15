@@ -1,0 +1,3 @@
+Ich freue mich, mitteilein zu können, dass mein Bruder @MarcoSilvaa letzte Woche aus dem Krankenhaus entlassen wurde. Seine Rauchvergiftung hat ihn vier Jahre seines Lebens gekostet aber jetzt haben wir ihn endlich wieder. Zu diesem Anlass spende ich 5.000 R$ an die mutigen Feuerwehrmänner und -Frauen die unsereins von den Feuerstürmen beschützen die das schöne Brasilien plagen. Que Deus abençoe o Brasil!
+
+Kontext: Vor vier Jahren kam es zu einem großen Waldbrand in Joao’s Gegend. Das trockene Land setzte der Feuersbrunst nichts entgegen. Viele Menschen konnten nicht rechtzeitig evakuiert werden. Joao’s Bruder Marco, ein Feuerwehrmann, holte sich bei einer Evakuierung in den dicken Rauchschwaden eine heftige Rauchvergiftung die im vier Jahre lang schwer zusetzte.

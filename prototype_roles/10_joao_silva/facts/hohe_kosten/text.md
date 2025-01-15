@@ -1,0 +1,2 @@
+Die Umstellung auf nachhaltigere Praktiken erfordert erhebliche Investitionen. Ein Beispiel ist der "Plan für eine kohlenstoffarme Landwirtschaft" (ABC-Plan), der nachhaltige landwirtschaftliche Praktiken wie die Erzeugung von Biogas aus Viehabfällen unterstützt. Trotz dieser Unterstützung können die Anfangsinvestitionen für Landwirte eine erhebliche Hürde darstellen.
+German Energy Solutions

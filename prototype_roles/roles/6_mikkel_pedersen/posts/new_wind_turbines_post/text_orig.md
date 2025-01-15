@@ -1,1 +1,0 @@
-Ny vindmølleø i Vigsø Bugt – drevet af Ventus Systems' ingeniørmæssige mesterværker! 🌬️🔋 Dette er et skridt i den rigtige retning for vedvarende energi, men det er stadig ikke nok. Kul er stadig en af vores primære energikilder, og det skal ændres, hvis vi vil bekæmpe de konsekvenser af klimaforandringer, som vi allerede ser nu.

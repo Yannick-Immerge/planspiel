@@ -1,8 +1,0 @@
-{
-    "type": "i_liked",
-    "author": "Ventus Systems",
-    "isScenario": true,
-    "conditions": [
-        "fossil_fuel_taxes_bad"
-    ]
-}

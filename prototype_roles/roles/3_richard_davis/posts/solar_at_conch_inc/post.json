@@ -1,8 +1,0 @@
-{
-    "type": "i_liked",
-    "author": "Conch Inc.",
-    "isScenario": true,
-    "conditions": [
-        "fossil_fuel_taxes_good"
-    ]
-}

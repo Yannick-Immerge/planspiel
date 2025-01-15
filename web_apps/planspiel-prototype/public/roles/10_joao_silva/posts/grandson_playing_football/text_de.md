@@ -1,0 +1,1 @@
+Mein Enkel Mateus hat heute auf dem Bolzplatz den Ball herumgekickt und gelacht, als hätte er die Weltmeisterschaft gewonnen. Ich sagte ihm, er wird der nächste Pelé, und er strahlte über beide Ohren. Diese Kinder zeigen mir jeden Tag, wie einfach es ist, glücklich zu sein. ⚽

@@ -1,3 +1,0 @@
-Eine CO₂-Steuer verteuert fossile Brennstoffe und macht erneuerbare Energiequellen wie Windkraft wettbewerbsfähiger. Studien zeigen, dass eine signifikante CO₂-Steuer den Anteil erneuerbarer Energien am Strommix erhöhen kann.
-
-*“Die kosteneffizienteste Systemkonfiguration zur Erreichung von 5 % CO₂-Emissionen im Vergleich zu 1990 wurde ermittelt. Diese Zielkonfiguration erfordert einen CO₂-Preis von 380 €/tCO₂. Da keine Biomasse zur Stromerzeugung im Modell berücksichtigt wird, muss der CO₂-Preis hoch genug sein, um die Rangfolge zwischen einer teuren Wärmeversorgung durch Power-to-Heat-Technologien und einer kostengünstigen Nutzung von Gas zum Heizen zu ändern.”*

@@ -1,10 +1,12 @@
 {
-  "name": "Name",
-  "birthday": "12/12/1988",
-  "language": "Französisch",
-  "flag": "🇫🇷🇷",
-  "status": "Status",
-  "gender": "w",
-  "living": "Address here",
-  "job": "Job here"
+  "name": "Sam Johnson",
+  "status": "Family first.",
+  "birthday": "05/23/1982",
+  "language": "English",
+  "flag": "🇺🇸",
+  "gender": "m",
+  "height": 183,
+  "living": "12 Maple Drive, Redstone, Alberta, Kanada",
+  "job": "Fracking-Vorarbeiter bei Northern Energy Resources"
 }
+

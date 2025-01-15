@@ -1,0 +1,1 @@
+Die Umsetzung neuer landwirtschaftlicher Praktiken erfordert spezifisches Wissen und Schulungen. Ein Projekt zur Methanminderung in der Landwirtschaft hat gezeigt, dass die Sensibilisierung und Schulung der Landwirte entscheidend sind, um die Akzeptanz und Umsetzung von Methanreduktionsmaßnahmen zu fördern.

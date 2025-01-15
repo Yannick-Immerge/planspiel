@@ -1,8 +1,0 @@
-{
-    "type": "by_me",
-    "author": "me",
-    "isScenario": true,
-    "conditions": [
-        "global_bad"
-    ]
-}

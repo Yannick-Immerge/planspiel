@@ -1,1 +1,0 @@
-**Max Mustermann** ist ein krasser Typ

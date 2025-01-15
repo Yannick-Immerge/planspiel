@@ -1,1 +1,0 @@
-Ich vermisse dich, dad. 💜
