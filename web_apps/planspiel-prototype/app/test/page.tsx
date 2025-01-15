@@ -34,7 +34,7 @@ const page = () => {
     }
 
     const gameState : GameState = {
-        phase: "voting",
+        phase: "debriefing",
         votingEnd: new Date("01-12-2025 14:08"),
         buergerrat1: buergerratOne,
         buergerrat2: buergerratTwo,

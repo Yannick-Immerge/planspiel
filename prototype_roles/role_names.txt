@@ -1,12 +1,2 @@
-1_ethan_miller
-2_sam_johnson
-3_richard_davis
-4_li_wen
-5_leon_schulz
 6_mikkel_pedersen
 7_yasemin_aidin
-8_yi_huang
-9_aigerim_amanova
-10_joao_silva
-11_anais_fournier
-12_kofi_owusu
