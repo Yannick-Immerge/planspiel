@@ -12,6 +12,7 @@ import MembersArea from "@/app/dashboard/MembersArea";
 import BuergerraeteArea from "@/app/dashboard/BuergerraeteArea";
 import TransitionArea, { StateDescription } from "@/app/dashboard/TransitionArea";
 import { GetAllStateDescriptions } from "./StateDescriptions";
+import { useRouter } from "next/navigation";
 
 
 export default function Dashboard() {
@@ -20,11 +21,16 @@ export default function Dashboard() {
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [warning, setWarning] = useState<string | null>(null);
 
+    const router = useRouter();
+
     const fetchUser = async () => {
         const viewResponse = await viewSelf();
         if(!viewResponse.ok || viewResponse.data === null) {
             setUser(null);
-            setWarning("Error: You are logged out!")
+            // Redirect to login page if logged out
+            
+            console.log("Hallo")
+            router.push("../login");
             return;
         }
         setUser(viewResponse.data.userView);
@@ -61,13 +67,17 @@ export default function Dashboard() {
         setGameState(gameStateResponse.data.gameState);
     }
 
-
-
     const revalidate = () => {
         fetchUser();
         fetchMembers();
         fetchGameState();
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => revalidate(), 4965);
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         revalidate();
@@ -99,7 +109,17 @@ export default function Dashboard() {
         <>
         <title>Planet Council Dashboard</title>
         <div className="bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
+            <div className="flex">
             <div className="absolute left-[8.33%] top-5 text-5xl">Admin-Dashboard</div>
+            <div className="absolute right-[8.33%] text-center px-3 py-2 text-lg">
+                <div>
+                    Admin-Benutzername:
+                </div>
+                <div className="px-3 rounded-full bg-[#6666ff30] backdrop-blur-2xl">
+                    {user?.username}
+                </div>
+            </div>
+            </div>
             <div className="pt-20 w-full">
                 <div className="flex h-80 justify-between gap-10 mx-10">
                     <div className="w-1/2">

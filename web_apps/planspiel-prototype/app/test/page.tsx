@@ -6,6 +6,7 @@ import { MdOutlineMail } from 'react-icons/md'
 import { GoCommentDiscussion } from 'react-icons/go'
 import { BsPersonVcard } from 'react-icons/bs'
 import path from 'path'
+
 import fs from 'fs'
 
 const page = () => {
@@ -13,7 +14,7 @@ const page = () => {
     const user : UserView = {
         administrator: false,
         assignedBuergerrat: 1,
-        assignedRoleId: "11_anais_fournier",
+        assignedRoleId: "1_ethan_miller",
         status: "online",
         username: "schnelles-Pferd"
     }
@@ -37,7 +38,7 @@ const page = () => {
         projection: null
     }
 
-    const roleID : string = "11_anais_fournier"
+    const roleID : string = "1_ethan_miller"
 
     const testRole : RoleData | null = GetRoleData(roleID);
     

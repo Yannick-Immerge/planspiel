@@ -5,7 +5,7 @@ export function GetSollte(id: string, value: number, statusQuo: number) : string
         if (ApproximatelyEqual(statusQuo, value)) {
             return `Der Bürgerrat sieht keine Notwendigkeit, fossile Brennstoffe zu besteuern oder Richtwerte global vorzugeben.`
         } else {
-            return `Der Bürgerrat stimmt für die Einführung einer globalen Richtlinie für die ${value > statusQuo? "Besteuerung" : "Subventionierung"} von Fossilen Brennstoffen in folgender Höhe: ${GetEinheited(id, value)}.`
+            return `Der Bürgerrat stimmt für die Einführung einer globalen Richtlinie für die ${value > statusQuo? "Besteuerung" : "Subventionierung"} von Fossilen Brennstoffen in folgender Höhe: ${GetEinheitenText(id, value)}.`
         }
     }
     if (id === "reduction_infra")  {
@@ -44,11 +44,21 @@ export function GetSollte(id: string, value: number, statusQuo: number) : string
     else return " Äpfel"
 }
 
-export function GetEinheited(id: string, value: number) : string { 
+export function GetEinheitenAverageMarker(id: string, value: number) : string { 
+    if (id === "fossil_fuel_taxes") return `${value}% Besteuerung`
+    if (id === "reduction_infra") return `${value}% Rückbau`
+    if (id === "gases_agriculture") return `${value}% Verringerung`
+    if (id === "reduction_meat") return `${value}% der Ernährung`
+    if (id === "reduction_waste") return `${value}% der Produz. Lebensmittel`
+
+    else return " Kilogramm"
+}
+
+export function GetEinheitenText(id: string, value: number) : string {
     if (id === "fossil_fuel_taxes") return `$${value.toFixed(1)} pro Tonne Kohle,  $${((20.0/17.0)*value).toFixed(1)} pro Fass Öl und  $${(value/20.0).toFixed(1)} pro CFM Erdgas`
     if (id === "reduction_infra") return `${value}%`
     if (id === "gases_agriculture") return `${value}%`
-    if (id === "reduction_meat") return `${value}%`
+    if (id === "reduction_meat") return `${value}% `
     if (id === "reduction_waste") return `${value}%`
 
     else return " Kg"

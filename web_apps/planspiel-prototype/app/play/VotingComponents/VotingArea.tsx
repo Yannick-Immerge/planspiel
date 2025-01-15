@@ -126,8 +126,9 @@ export default function VotingArea({gameState, roleData, userData, votings}: { v
                     ))}
                 </div>
             
-                <div>Wir hoffen, dass unsere Empfehlungen in den internationalen Dialog einfließen und als Grundlage für entschlossenes Handeln dienen.</div>
-                <div className="pt-4">Die Entscheidungen wurden unter Berücksichtigung verschiedener Perspektiven im Wert gemittelt.</div>
+                
+                <div className="pt-4">Alle Entscheidungen wurden unter Berücksichtigung verschiedener Perspektiven im Wert gemittelt.</div>
+                <div className="pt-4">Wir hoffen, dass unsere Empfehlungen in den internationalen Dialog einfließen und als Grundlage für entschlossenes Handeln dienen.</div>
 
                 </div>
                 <div className="h-40 w-full bg-sky-900">
