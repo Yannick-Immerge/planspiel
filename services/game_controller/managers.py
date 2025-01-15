@@ -258,8 +258,27 @@ class GameStateManager:
                     execute(Query(query, (username, parameter, min_value)), commit=True)
 
     def make_projections(self, game_state_id: int):
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        
+
         # TODO: Make projections CORRECT & DYNAMIC
-        fixed_projections = [("energy_prod_coal", 50), ("energy_prod_wind", 50), ("sea_level", 10)]
+        # Work in progress here
+        #
+        # voting_status1 = self.voting_get_status(game_state_id, 1)
+        # voting_status2 = self.voting_get_status(game_state_id, 2)
+        #
+        # for status in voting_status1["userStatuses"]:
+        #     pass
+
+        fixed_projections = [
+            ("fossil_fuel_taxes", 100), 
+            ("gases_agriculture", 100), 
+            ("reduction_meat", 10),
+            ("reduction_waste", 10),
+            ("reduction_infra", 100),
+            ("global", 100)
+        ]
         for metric, projected_value in fixed_projections:
             query = f"UPDATE Projection SET projected_value = %s WHERE game_state = %s AND metric = %s;"
             execute(Query(query, (projected_value, game_state_id, metric)), commit=True)
@@ -321,13 +340,18 @@ class GameStateManager:
         query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
                  f"FROM ScenarioCondition INNER JOIN Post_depends_on ON ScenarioCondition.name = Post_depends_on.scenario_condition "
                  f"WHERE Post_depends_on.post = %s;")
-        all_conditions = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
+        all_conditions: dict[str, tuple[float, float]] = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
         query = f"SELECT metric, projected_value FROM Projection WHERE game_state = %s;"
-        projected_metrics = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
+        projected_metrics: dict[str, float] = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
 
         for metric in all_conditions:
-            if metric not in projected_metrics or projected_metrics[metric] is None:
+            if metric not in projected_metrics:
                 raise RuntimeError(f"Metric {metric} has not been projected in this session.")
+            if not projected_metrics:
+                raise RuntimeError("Projected metrics is empty.")
+            if projected_metrics[metric] is None:
+                raise RuntimeError(f"Projected metrics {projected_metrics} does not contain metric {metric}.")
+
             min_value, max_value = all_conditions[metric]
             if not (min_value <= projected_metrics[metric] <= max_value):
                 return False
@@ -362,8 +386,8 @@ class GameStateManager:
         game_state_id = execute(Query(query, (username,)))[0][0]
         query = f"SELECT phase FROM GameState WHERE id = %s;"
         phase = execute(Query(query, (game_state_id,)))[0][0]
-        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value:
-            raise RuntimeError("Game is not in voting nor discussion phase.")
+        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
+            raise RuntimeError("Game is not in voting nor discussion phase nor debriefing phase.")
         if self.voting_has_committed(username, parameter):
             raise RuntimeError(f"User {username} has already committed a vote for {parameter}.")
         query = f"UPDATE Voting SET voted_value = %s WHERE user = %s AND parameter = %s;"
@@ -389,7 +413,7 @@ class GameStateManager:
         query = f"SELECT phase, voting_end FROM GameState WHERE id = %s;"
         phase, voting_end = execute(Query(query, (game_state_id,)))[0]
         if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
-            raise RuntimeError("Game is not in voting nor in discussion phase.")
+            raise RuntimeError("Game is not in voting nor in discussion phase nor in debriefing phase.")
         query = (f"SELECT User.username, User.plays_as "
                  f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
                  f"WHERE User.buergerrat = %s AND Session.game_state = %s;")
@@ -416,7 +440,7 @@ class GameStateManager:
 
     def voting_set_timer(self, game_state_id: int):
         # duration_min = 5
-        duration_min = 0.5  # TODO: rollback to 5 for the final prototype, just speed up voting here
+        duration_min = 0.1  # TODO: rollback to 5 for the final prototype, just speed up voting here
         voting_end = datetime.now() + timedelta(minutes=duration_min)
         query = f"UPDATE GameState SET voting_end = %s WHERE id = %s;"
         execute(Query(query, (voting_end, game_state_id)))
