@@ -123,7 +123,7 @@ class PostDefinition:
         self.text_orig_identifier = f"{prefix}/text_orig.md"
         self.image_identifiers = []
         for child in definition_path.iterdir():
-            if child.is_file() and re.fullmatch(_POST_IMAGE_NAME_REGEX, child.name) is not None:
+            if child.is_file() and (child.name.endswith(".png") or child.name.endswith(".jpg")):
                 self.image_identifiers.append("/".join([prefix, child.name]))
 
     def collect_queries(self) -> list[Query]:
