@@ -1,0 +1,8 @@
+{
+    "type": "got_tagged",
+    "author": "Alberta Daily Times",
+    "isScenario": true,
+    "conditions": [
+        "fossil_fuel_taxes_bad"
+    ]
+}
