@@ -13,14 +13,14 @@ export default function FormComponent() {
   const router = useRouter();
 
   const handleSubmit = async () => {
-    setMessage(`Text`);
+    setMessage(`Einloggen...`);
     const response = await logIn(username, password); // TODO: Plain Text password
     if (response.ok && response.data !== null) {
         router.push(response.data.administrator ? "/dashboard" : "/play")
     } else {
-        setMessage(`Error: ${response.statusText}`);
+        setMessage(`Benutzername oder Passwort inkorrekt.`);
     }
-    setMessage(`Text`);
+    
   };
 
   const handleEnterOnAuthentication = (event: React.KeyboardEvent) => {
