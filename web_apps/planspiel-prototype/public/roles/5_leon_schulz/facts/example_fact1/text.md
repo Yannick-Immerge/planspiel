@@ -1,0 +1,1 @@
+Technologien wie Carbon Capture and Storage (CCS) könnten in der Zukunft helfen, die Emissionen bestehender Kraftwerke zu reduzieren. Allerdings sind diese Technologien noch nicht flächendeckend im Einsatz.
