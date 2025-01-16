@@ -14,6 +14,8 @@ _CONDITIONS_PATH = _BASE_PATH / "conditions.json"
 _ROLE_NAMES_PATH = _BASE_PATH / "role_names.txt"
 _SCENARIOS_PATH = _BASE_PATH / "scenarios"
 
+_SERIAL_PATH = _BASE_PATH / "serial.json"
+
 
 _POST_IMAGE_NAME_REGEX = r"picture_[0-9]+\.png"
 
@@ -294,12 +296,27 @@ def collect_queries() -> list[Query]:
         queries += role.collect_queries()
     return queries
 
+def serialize_all():
+    if _SERIAL_PATH.exists():
+        raise RuntimeError("There already is a serialized version.")
+    with open(_SERIAL_PATH, "wt") as file:
+        data = [query.serialize() for query in collect_queries()]
+        json.dump(data, file, ensure_ascii=False)
 
-def post_all():
-    for query in collect_queries():
+def deserialize_all() -> list[Query]:
+    if not _SERIAL_PATH.exists():
+        raise RuntimeError("There is no serialized version.")
+    with open(_SERIAL_PATH, "rt", encoding="utf-8") as file:
+        data = json.load(file)
+        return [Query.deserialize(item) for item in data]
+
+def post_all(use_serial: bool = True):
+    for query in (deserialize_all() if use_serial else collect_queries()):
         execute(query, commit=True)
 
 
+
 if __name__ == "__main__":
-    tmp = collect_queries()
+    #tmp = serialize_all()
+    queries = deserialize_all()
     pass

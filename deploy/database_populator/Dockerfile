@@ -9,7 +9,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY shared ./shared
-COPY prototype_roles ./prototype_roles
+COPY prototype_roles/interface.py ./prototype_roles/interface.py
+COPY prototype_roles/serial.json ./prototype_roles/serial.json
 COPY scripts ./scripts
 RUN chmod +x ./scripts/initialize_db.sh
 

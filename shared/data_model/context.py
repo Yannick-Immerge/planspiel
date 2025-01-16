@@ -30,6 +30,16 @@ class Query:
         self.query = query
         self.args = args
 
+    def serialize(self) -> dict:
+        return {
+            "query": self.query,
+            "args": list(self.args)
+        }
+
+    @staticmethod
+    def deserialize(serial: dict):
+        return Query(serial["query"], tuple(serial["args"]))
+
 
 def initialize_db_context(hostname: str, port: int, db_name: str, username: str, password: str):
     """
