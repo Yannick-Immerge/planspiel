@@ -3,6 +3,6 @@
     "author": "傲",
     "isScenario": true,
     "conditions": [
-        "reduction_waste_good, fossil_fuel_taxes_good"
+        "fossil_fuel_taxes_good"
     ]
 }

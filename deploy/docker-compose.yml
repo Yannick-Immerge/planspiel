@@ -54,14 +54,14 @@ services:
       - "5002:5002"
     networks:
       - mynetwork
-  planspiel_prototype:
-    build:
-      context: ..
-      dockerfile: deploy/planspiel_prototype/Dockerfile
-    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel/planspiel_prototype:latest
-    restart: always
-    ports:
-      - "3000:3000"
+#  planspiel_prototype:
+#    build:
+#      context: ..
+#      dockerfile: deploy/planspiel_prototype/Dockerfile
+#    image: 961341546462.dkr.ecr.eu-west-3.amazonaws.com/planspiel/planspiel_prototype:latest
+#    restart: always
+#    ports:
+#      - "3000:3000"
 
 networks:
   mynetwork:

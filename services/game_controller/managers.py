@@ -507,8 +507,7 @@ class GameStateManager:
         }
 
     def voting_set_timer(self, game_state_id: int):
-        # duration_min = 5
-        duration_min = 0.1  # TODO: rollback to 5 for the final prototype, just speed up voting here
+        duration_min = 5
         voting_end = datetime.now() + timedelta(minutes=duration_min)
         query = f"UPDATE GameState SET voting_end = %s WHERE id = %s;"
         execute(Query(query, (voting_end, game_state_id)))

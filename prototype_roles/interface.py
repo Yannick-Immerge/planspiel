@@ -21,7 +21,7 @@ _POST_IMAGE_NAME_REGEX = r"picture_[0-9]+\.png"
 
 
 def load_role_names() -> list[str]:
-    with open(_ROLE_NAMES_PATH, "rt") as file:
+    with open(_ROLE_NAMES_PATH, "rt", encoding="utf-8") as file:
         names = []
         for line in file.readlines():
             line = line.strip()
@@ -44,7 +44,7 @@ class ParameterDefinition(pydantic.BaseModel):
 
 
 def load_all_parameters() -> list[ParameterDefinition]:
-    with open(_PARAMETERS_PATH, "rt") as file:
+    with open(_PARAMETERS_PATH, "rt", encoding="utf-8") as file:
         data = json.load(file)
     all_parameters = [ParameterDefinition(**item) for item in data]
     return [parameter for parameter in all_parameters]
@@ -63,7 +63,7 @@ class MetricDefinition(pydantic.BaseModel):
 
 
 def load_all_metrics() -> list[MetricDefinition]:
-    with open(_METRICS_PATH, "rt") as file:
+    with open(_METRICS_PATH, "rt", encoding="utf-8") as file:
         data = json.load(file)
     return [MetricDefinition(**item) for item in data]
 
@@ -81,7 +81,7 @@ class ScenarioConditionDefinition(pydantic.BaseModel):
 
 
 def load_all_scenario_conditions() -> list[ScenarioConditionDefinition]:
-    with open(_CONDITIONS_PATH, "rt") as file:
+    with open(_CONDITIONS_PATH, "rt", encoding="utf-8") as file:
         data = json.load(file)
         return [ScenarioConditionDefinition(**item) for item in data]
 
@@ -112,7 +112,7 @@ class PostDefinition:
         self.name = f"{belongs_to}_{definition_path.name}"
         prefix = f"{prefix}/{definition_path.name}"
         self.belongs_to = belongs_to
-        with open(definition_path / "post.json", "rt") as file:
+        with open(definition_path / "post.json", "rt", encoding="utf-8") as file:
             data = json.load(file)
         if data is None:
             raise RuntimeError(f"Could not load metadata for post at {definition_path}.")
@@ -163,7 +163,7 @@ class FactDefinition:
         self.name = f"{belongs_to}_{definition_path.name}"
         prefix = f"{prefix}/{definition_path.name}"
         self.belongs_to = belongs_to
-        with open(definition_path / "fact.json", "rt") as file:
+        with open(definition_path / "fact.json", "rt", encoding="utf-8") as file:
             data = json.load(file)
         if data is None:
             raise RuntimeError(f"Could not load metadata for fact at {definition_path}.")
@@ -217,7 +217,7 @@ class RoleDefinition:
     def __init__(self, definition_path: Path, prefix: str):
         self.name = definition_path.name
         prefix = f"{prefix}/{self.name}"
-        with open(definition_path / "metadata.json", "rt") as file:
+        with open(definition_path / "metadata.json", "rt", encoding="utf-8") as file:
             data = json.load(file)
         if data is None:
             raise RuntimeError(f"Could not load metadata for role at {definition_path}.")
@@ -299,7 +299,7 @@ def collect_queries() -> list[Query]:
 def serialize_all():
     if _SERIAL_PATH.exists():
         raise RuntimeError("There already is a serialized version.")
-    with open(_SERIAL_PATH, "wt") as file:
+    with open(_SERIAL_PATH, "wt", encoding="utf-8") as file:
         data = [query.serialize() for query in collect_queries()]
         json.dump(data, file, ensure_ascii=False)
 
@@ -317,6 +317,7 @@ def post_all(use_serial: bool = True):
 
 
 if __name__ == "__main__":
-    #tmp = serialize_all()
-    queries = deserialize_all()
+    # collect_queries()
+    tmp = serialize_all()
+    # queries = deserialize_all()
     pass

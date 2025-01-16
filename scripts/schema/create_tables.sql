@@ -46,7 +46,7 @@ CREATE TABLE RoleTable(
     meta_status VARCHAR(500) NOT NULL,
     meta_language VARCHAR(100) NOT NULL,
     meta_flag VARCHAR(100) NOT NULL,
-    meta_job VARCHAR(100) NOT NULL,
+    meta_job VARCHAR(500) NOT NULL,
     profile_picture_identifier VARCHAR(100) NOT NULL,
     profile_picture_old_identifier VARCHAR(100) NOT NULL,
     titlecard_identifier VARCHAR(100) NOT NULL,
