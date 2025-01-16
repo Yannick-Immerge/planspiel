@@ -32,10 +32,10 @@ export default function Regler({ownRoleName, parameterName, userVotings, active,
             
             await updateVoting(parameterName, voting.wert? voting.wert : GetStatusQuo(parameterName));
         }
-        const interval = setInterval(() => pushVote(), 2500);
+        const interval = setInterval(() => pushVote(), 5000);
 
         return () => clearInterval(interval);
-    }, [voting.wert]);
+    });
 
     const fetchParameterInfo = async () => {
         console.log("Fetching from " + parameterName);
