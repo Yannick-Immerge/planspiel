@@ -7,7 +7,9 @@ export default function PostComponent({ post, roleMetadata } : { post: Post, rol
     const [showDE, setShowDE] = useState<boolean>(false);
 
     let postFormat : string = "";
+    let postBg : string = "bg-stone-200";
     let descText : string = ""
+    let descPrefix : string = ""
 
     switch (post.type) {
         case "by_me":
@@ -23,10 +25,15 @@ export default function PostComponent({ post, roleMetadata } : { post: Post, rol
             descText = "Du hast auf diesen Post mit 👍🏼 reagiert"
             break;
     }
+    if (post.isScenario) {
+        descPrefix = "Aktuell: ";
+        postBg = "bg-[#ffcdadff]";
+    }
+
 
     return (
-    <div className={postFormat + " " + "bg-stone-200 m-auto b-l-8 py-1 rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.5)] max-w-[500px] text-slate-900 border-solid"} style={{"borderLeftWidth": "0px"}}>
-        <div className=" text-[#0000009b] m-3">{descText}</div>
+    <div className={postFormat + " " + postBg + " " + "m-auto b-l-8 py-1 rounded-2xl shadow-[0px_10px_30px_rgba(0,0,0,0.5)] max-w-[500px] text-slate-900 border-solid"} style={{"borderLeftWidth": "0px"}}>
+        <div className="text-[#0000009b] m-3"><span className="text-[#7530059b] font-bold m-3">{descPrefix}</span>{descText}</div>
         {  // TODO: image identifiers are empty when using the backend!!! no image is being displayed
            post.imageIdentifiers.length > 0 ? 
             <div className="w-[100%] m-auto aspect-square shadow-[inset_0px_0px_20px_0px_rgba(1,1,1,1.0)]">

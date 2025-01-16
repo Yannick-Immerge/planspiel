@@ -35,7 +35,7 @@ function PostsArea({posts, roleMetadata, facts, roleID} : {roleID: string, facts
         <div className='text-2xl p-5 text-[#ffffff90]'>
             Für dich interessant:
         </div>
-        {posts
+        {GetSortedPosts(posts)
             .map((n, index) => 
             <div key={index} className="py-2">
                 <PostComponent post={n} roleMetadata={roleMetadata}/>
@@ -72,6 +72,21 @@ function GetPrettyDateString(birthday: Date) : string {
     const monate = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
     // Deutsches Formatting DD.MM.YYYY
     return `${birthday.getDate()}. ${monate[birthday.getMonth()]}  ${birthday.getFullYear()}`;
+}
+
+function GetSortedPosts(posts: Post[]) : Post[] {
+    let result = [];
+    for(let p of posts) {
+        if(p.isScenario) {
+            result.push(p);
+        }
+    }
+    for(let p of posts) {
+        if(!p.isScenario) {
+            result.push(p);
+        }
+    }
+    return result;
 }
 
 function MetadataArea({roleMetadata, old} : {old: boolean, roleMetadata: RoleMetadata | null}) {

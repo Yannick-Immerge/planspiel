@@ -5,7 +5,7 @@ export function getServerAddrHttp() {
     if(USE_LOCAL_SERVER) {
         return "http://localhost";
     }
-    const AWS_INSTANCE_ADDR_HTTP = "http://ec2-16-170-171-234.eu-north-1.compute.amazonaws.com";
+    const AWS_INSTANCE_ADDR_HTTP = "http://ec2-16-16-79-94.eu-north-1.compute.amazonaws.com";
     if(AWS_INSTANCE_ADDR_HTTP === undefined){
         throw URIError("Specify the Uri!.")
     }
