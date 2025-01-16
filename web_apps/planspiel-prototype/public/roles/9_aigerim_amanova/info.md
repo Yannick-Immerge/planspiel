@@ -1,1 +1,7 @@
-**Max Mustermann** ist ein krasser Typ
+Aigerim Amanova, 34 Jahre alt, stammt aus Kasachstan und wuchs in einem landwirtschaftlichen Haushalt im Norden des Landes auf. Ihre Eltern betreiben eine Weizenfarm, auf der sie schon in jungen Jahren mithalf. Ihr kleiner Bruder half ebenfalls schon in frühen Jahren auf der Farm und spielte auch oft in der Nähe der Felder. Eines Tages erkrankte er an einer schweren Leukämie. Die Ärzte stellten fest, dass die Ursache auf die langjährige Belastung durch Pestizide zurückzuführen war. 
+
+Der Verlust ihres Bruders erschütterte sie zutiefst und öffnet ihr die Augen für die gravierenden Folgen der industriellen Landwirtschaft auf die Gesundheit von Menschen und Umwelt. Sie entschied sich, in der großen Stadt zu studieren, um die landwirtschaftlichen Praktiken ihrer Familie zu verändern und sich für nachhaltige Methoden einzusetzen.
+
+Aigerim machte mit 25 Jahren ihren Masterabschluss in Agrarökologie und Umweltmanagement an der Kasachischen Nationalen Agraruniversität in Almaty. Seitdem arbeitet sie als Beraterin für landwirtschaftliche Unternehmen und NGOs, die sich mit Nachhaltigkeit und Klimawandelbekämpfung befassen. Ihr Fokus liegt auf der Förderung von ökologischen Anbaumethoden und der Unterstützung von Betrieben mit Bio-Produkten. Sie war u.a. die Leitung des Projekts zur Einführung von Zertifizierungen und nachhaltigen Methoden, wodurch der Landwirtschaftssektor Kasachstans international wettbewerbsfähig wurde.
+
+Aigerims Vision ist eine globale Landwirtschaft, die sowohl ökologisch als auch wirtschaftlich nachhaltig ist und die kulturellen Besonderheiten jeder Region respektiert.
