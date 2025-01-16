@@ -1,10 +1,11 @@
 {
-  "name": "Name",
-  "birthday": "12/12/1988",
-  "language": "Französisch",
-  "flag": "🇫🇷🇷",
-  "status": "Status",
-  "gender": "w",
-  "living": "Address here",
-  "job": "Job here"
+  "name": "Kofi Owusu",
+  "birthday": "09/04/2001",
+  "language": "Twi",
+  "flag": "GH",
+  "gender": "m",
+  "height": 172,
+  "status": "Rettet die Wälder!",
+  "living": "Main Street 24, Tano Odumase, Asani Region, GH-0203",
+  "job": "Projektkoordinator für Umwelt- und Wiederaufforstungsprojekte bei der \"Green Africa Youth Organization (GAYO)\""
 }
