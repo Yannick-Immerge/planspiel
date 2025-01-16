@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "me",
+    "isScenario": true,
+    "conditions": [
+        "gases_agriculture_bad"
+    ]
+}

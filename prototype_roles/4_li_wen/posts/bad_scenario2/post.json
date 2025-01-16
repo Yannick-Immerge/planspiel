@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Dr.Li Wen",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}

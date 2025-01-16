@@ -1,10 +1,11 @@
 {
-  "name": "Name",
-  "birthday": "12/12/1988",
-  "language": "Französisch",
-  "flag": "🇫🇷🇷",
-  "status": "Status",
-  "gender": "w",
-  "living": "Address here",
-  "job": "Job here"
+  "name": "Ethan Miller",
+  "status": "Von indifferent zu inspirierend - der Kampf um sauberes Wasser",
+  "birthday": "05/27/1972",
+  "language": "Englisch",
+  "flag": "🇺🇸",
+  "height": 189,
+  "gender": "m",
+  "living": "123 Carter Rd, Montrose, PA 18801, USA",
+  "job": "Teilzeitmechaniker"
 }

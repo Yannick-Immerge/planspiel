@@ -1,0 +1,8 @@
+{
+    "type": "got_tagged",
+    "author": "上海公共卫生中心",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "type": "got_tagged",
+    "author": "Karavan",
+    "isScenario": true,
+    "conditions": [
+        "gases_agriculture_good"
+    ]
+}

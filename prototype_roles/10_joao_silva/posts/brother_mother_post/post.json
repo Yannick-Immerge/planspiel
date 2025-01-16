@@ -1,6 +1,6 @@
 {
 	"type": "by_me",
-	"author": "Me",
-	"isScenario": true,
-	"conditions": ["global_bad"]
+	"author": "me",
+	"isScenario": false,
+	"conditions": []
 }

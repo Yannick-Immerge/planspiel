@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Ethan Miller",
+    "isScenario": true,
+    "conditions": [
+        "fossil_fuel_taxes_bad"
+    ]
+}

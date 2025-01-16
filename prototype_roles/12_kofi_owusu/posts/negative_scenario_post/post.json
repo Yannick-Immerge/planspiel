@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Kofi Owusu",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}
