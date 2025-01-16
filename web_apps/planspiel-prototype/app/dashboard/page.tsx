@@ -152,7 +152,7 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
-        const interval = setInterval(() => revalidate(), 4965);
+        const interval = setInterval(() => revalidate(), 20000);
 
         return () => clearInterval(interval);
     }, []);

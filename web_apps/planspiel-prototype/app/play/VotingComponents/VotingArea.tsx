@@ -67,7 +67,7 @@ export default function VotingArea({gameState, roleData, userData, votings}: { v
 
     // Der Voting Status wird alle 5 Sekunden erfragt.
     useEffect(() => {
-        const interval = setInterval(() => fetchVotingStatus(), 1000);
+        const interval = setInterval(() => fetchVotingStatus(), 10000);
 
         return() => clearInterval(interval);
     }, []);

@@ -7,7 +7,7 @@ from datetime import timedelta, datetime
 from enum import Enum
 
 from shared.architecture.rest import AuthError
-from shared.data_model.context import get_last_row_id, execute, Query
+from shared.data_model.context import execute, Query, execute_and_get_id
 
 
 class UserStatus(Enum):
@@ -134,9 +134,7 @@ class GameStateManager:
 
     def add_game_state(self) -> int:
         query = f"INSERT INTO GameState(phase) VALUES (%s);"
-        execute(Query(query, (GamePhase.CONFIGURING.value,)), commit=True)
-
-        game_state_id = get_last_row_id()
+        game_state_id = execute_and_get_id(Query(query, (GamePhase.CONFIGURING.value,)))
         query = "SELECT simple_name FROM Metric"
         metrics = [row[0] for row in execute(Query(query, ()))]
         for metric in metrics:

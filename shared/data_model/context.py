@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from threading import Lock
 
 from mysql.connector import connect
 from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstract
 
 _DB_CONTEXT: MySQLConnectionAbstract | None = None
 _DB_CURSOR: MySQLCursorAbstract | None = None
+_DB_MUTEX: Lock = Lock()
 
 
 def _current_context() -> MySQLConnectionAbstract:
@@ -97,40 +98,31 @@ def assure_connection(retries : int = 3):
 
 
 def execute(query: Query, commit: bool = False):
-    assure_connection()
-    _current_cursor().execute(query.query, query.args)
-    rows = _current_cursor().fetchall()
-    if commit:
-        commit_db_context()
+    with _DB_MUTEX:
+        assure_connection()
+        _current_cursor().execute(query.query, query.args)
+        rows = _current_cursor().fetchall()
+        if commit:
+            commit_db_context()
     return rows
 
 def execute_void(query: Query, commit: bool = False):
-    assure_connection()
-    _current_cursor().execute(query.query, query.args)
-    if commit:
-        commit_db_context()
+    with _DB_MUTEX:
+        assure_connection()
+        _current_cursor().execute(query.query, query.args)
+        if commit:
+            commit_db_context()
 
 def execute_bool(query: Query):
     return execute(query)[0][0] == 1
 
 
-def get_last_row_id() -> int:
-    v = _current_cursor().lastrowid
+def execute_and_get_id(query: Query):
+    with _DB_MUTEX:
+        assure_connection()
+        _current_cursor().execute(query.query, query.args)
+        commit_db_context()
+        v = _current_cursor().lastrowid
     if v is None:
         raise RuntimeError("It seems like there was no call to INSERT in this session.")
     return v
-
-
-def get_record_by_id(table: str, id: int, names: tuple[str]):
-    """
-    Accesses a table and selects the names from the record with the given id.
-    :param table:
-    :param id:
-    :param names:
-    :return:
-    """
-    query = f"FROM {table} SELECT {names} WHERE id = {id};"
-    _current_cursor().execute(query, ())
-    return _current_cursor().fetchone()
-
-
