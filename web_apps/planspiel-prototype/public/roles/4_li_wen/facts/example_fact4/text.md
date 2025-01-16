@@ -1,0 +1,1 @@
+China deckt nach wie vor rund 50–60 % seines Energiebedarfs über Kohle ab. Obwohl Shanghai teilweise auf sauberere Energien umstellt, sind in der Region noch immer mehrere Kohlekraftwerke in Betrieb, die SO₂, NOx und Feinstaub ausstoßen.

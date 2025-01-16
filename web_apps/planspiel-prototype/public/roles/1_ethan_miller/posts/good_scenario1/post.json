@@ -1,0 +1,8 @@
+{
+    "type": "got_tagged",
+    "author": "The Times-Tribune",
+    "isScenario": true,
+    "conditions": [
+        "fossil_fuel_taxes_good"
+    ]
+}

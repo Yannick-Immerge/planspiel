@@ -1,0 +1,1 @@
+Ich bin für Innovation, nicht für Abschaltung. Unsere Region hat über Jahrzehnte den Wohlstand dieses Landes mit aufgebaut. Wir verdienen einen fairen Übergang, keinen radikalen Schnitt. ⚒️💪 #RuhrgebietBleibt #ZukunftMitTradition

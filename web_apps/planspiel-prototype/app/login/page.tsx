@@ -13,14 +13,14 @@ export default function FormComponent() {
   const router = useRouter();
 
   const handleSubmit = async () => {
-    setMessage(`Text`);
-    const response = await logIn(username, password); // TODO: Plain Text password
+    setMessage(`Einloggen...`);
+    const response = await logIn(username, password);
     if (response.ok && response.data !== null) {
         router.push(response.data.administrator ? "/dashboard" : "/play")
     } else {
-        setMessage(`Error: ${response.statusText}`);
+        setMessage(`Benutzername oder Passwort inkorrekt.`);
     }
-    setMessage(`Text`);
+    
   };
 
   const handleEnterOnAuthentication = (event: React.KeyboardEvent) => {
@@ -32,7 +32,7 @@ export default function FormComponent() {
     <title>Planet Council Login</title>
     <div className="pt-40 bg-cover bg-center bg-no-repeat bg-[url(/images/EarthTint.png)] min-h-screen bg-fixed">
       <div className="p-10 w-1/3 max-lg:w-1/2 max-md:w-3/4 m-auto backdrop-blur-xl rounded-2xl shadow-[10px_10px_10px_rgba(0,0,0,0.8)]">
-          <div className="pb-10 text-center text-3xl font-bold">Login</div>
+          <div className="pb-10 text-center text-3xl font-bold text-white">Login</div>
           <TextEingabe 
             onKeyDown={handleEnterOnAuthentication}
             type="text"
@@ -40,7 +40,7 @@ export default function FormComponent() {
             placeholdertext="Benutzername (Von deiner Lehrkraft zugewiesen)"
             value={username}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-            icon={<FaUser />}
+            icon={<FaUser color='white'/>}
             />
           <div className="mb-[5%]"></div>
           <TextEingabe 
@@ -50,7 +50,7 @@ export default function FormComponent() {
             placeholdertext="Passwort"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            icon={<FaLock />}
+            icon={<FaLock color="white"/>}
             />
             <div className="mb-[5%]"></div>
         <div className='ml-16 text-amber-400'>{message}</div>

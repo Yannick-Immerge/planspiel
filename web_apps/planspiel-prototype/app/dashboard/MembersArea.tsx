@@ -22,6 +22,7 @@ export default function MembersArea({members} : {members: UserView[] | null}) {
                 applyFilter={(n) => !n.administrator && n.status == "offline"}
                 description="Benutzer offline"
                 includeBrgrrt={true}
+                showPwd={true}
                 />
         </div>
     )

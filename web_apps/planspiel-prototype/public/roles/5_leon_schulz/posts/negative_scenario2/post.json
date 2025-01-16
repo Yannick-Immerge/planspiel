@@ -1,0 +1,8 @@
+{
+    "type": "got_tagged",
+    "author": "Deutsche Morgenpost",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}

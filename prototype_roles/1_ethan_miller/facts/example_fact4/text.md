@@ -1,0 +1,1 @@
+Emissionen aus der Verbrennung und Entlüftung bei der Öl- und Gasförderung verursachen jährlich Gesundheitsschäden in Höhe von über 7,4 Milliarden Dollar, 710 vorzeitige Todesfälle und 73.000 Asthmaerkrankungen bei Kindern. 

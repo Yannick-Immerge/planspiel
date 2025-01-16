@@ -1,1 +1,7 @@
-**Max Mustermann** ist ein krasser Typ
+**Yi Huang (黄毅)**, 59 Jahre alt, lebt in der Provinz Sichuan, China, einem der bedeutendsten Agrargebiete des Landes. Er stammt aus einer langjährigen Bauernfamilie, die sich auf die Produktion von Schweinefleisch und Gemüse für lokale und internationale Märkte spezialisiert hat.
+
+Nach dem Tod seines Vaters Huang Feng übernahm Yi das Familienunternehmen und führte es mit harter Arbeit, praktischer Erfahrung und einer tiefen Verbindung zur traditionellen Landwirtschaft zu einem erfolgreichen Agrarunternehmen mit Massenproduktion. Trotz seines Erfolgs steht Yi vor großen Herausforderungen, darunter strenge Klimaschutzauflagen und Umweltregulierungen, die er als teilweise unrealistisch und hinderlich für das Wachstum seines Unternehmens empfindet.
+
+Ohne formale Ausbildung brachte Yi durch jahrelanges Lernen auf der Farm und den Austausch mit anderen Landwirten innovative Technologien und effizientere Produktionsmethoden in das Unternehmen ein. Seine praktischen Ansätze und seine unternehmerische Weitsicht ermöglichten es ihm, die Produktionskapazitäten zu erhöhen und den Anforderungen internationaler Märkte gerecht zu werden.
+
+In seiner Freizeit engagiert sich Yi in lokalen Wirtschaftsverbänden und setzt sich leidenschaftlich für die Interessen von Landwirten in Schwellen- und Entwicklungsländern ein. Mit seiner Arbeit träumt Yi davon, eine nachhaltige und stabile Zukunft für die nächste Generation von Landwirten zu schaffen.

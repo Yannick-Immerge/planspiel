@@ -1,0 +1,3 @@
+Wie jedes Jahr spende ich heute, am Todestag meines geliebten Bruders Marco 5.000 R$ an die mutigen Feuerwehrmänner und -Frauen die unsereins von den Feuerstürmen beschützen die das schöne Brasilien plagen. Er gab damals alles was er hatte für Menschen die er nicht einmal kannte. In tiefer Trauer und voller Hochachtung denken wir heute an dich, Marco.
+
+Vor vier Jahren kam es zu einem gewaltigen Waldbrand in Joao’s gegend. Das trockene Land setzte der Feuersbrunst nichts entgegen. Viele Menschen konnten nicht rechtzeitig evakuiert werden. Joao’s Bruder Marco, ein Feuerwehrmann, fand bei der Evakuierung eines kleinen Dorfes in den Dicken Rauchschwaden den Tod.

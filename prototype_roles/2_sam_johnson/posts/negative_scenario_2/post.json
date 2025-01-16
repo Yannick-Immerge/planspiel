@@ -1,0 +1,8 @@
+{
+    "type": "by_me",
+    "author": "Sam Johnson",
+    "isScenario": true,
+    "conditions": [
+        "fossil_fuel_taxes_bad"
+    ]
+}

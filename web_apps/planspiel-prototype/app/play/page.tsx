@@ -15,6 +15,7 @@ import PersonProfile from "./ProfileComponents/PersonProfile";
 import EMailProvider from "./EMailComponents/EMailProvider";
 import { getRole, getRoleFiltered } from "../api/data_controller_interface";
 import { GetStatusQuo } from "./VotingComponents/ReglerHelper";
+import {useRouter} from 'next/navigation'
 
 export default function Play() {
     const [user, setUser] = useState<UserView | null>(null);
@@ -23,12 +24,14 @@ export default function Play() {
     //const [scenarios, setScenarios] = useState<GetScenarioInformationResult | null>(null);
     const [warning, setWarning] = useState<string | null>(null);
     const [activePanel, setActivePanel] = useState<"profile" | "voting" | "email">("voting")
+    const router = useRouter();
 
     const fetchUser = async () => {
         const viewResponse = await viewSelf();
         if(!viewResponse.ok || viewResponse.data === null) {
             setWarning(viewResponse.statusText);
             setUser(null)
+            router.push("./login")
             return;
         }
         setUser(viewResponse.data.userView);
@@ -80,6 +83,7 @@ export default function Play() {
         }
 
         const gameStateResponse = await getGameState();
+
         if(!gameStateResponse.ok || gameStateResponse.data === null) {
             setWarning(gameStateResponse.statusText);
             //setScenarios(null);
@@ -144,7 +148,7 @@ export default function Play() {
         <>
             <link rel="icon" href="/icon.png"/>
             <div className="bg-cover bg-center bg-no-repeat bg-sky-900 min-h-screen bg-fixed">
-                <ConfigurationPlaceholder />
+                <ConfigurationPlaceholder reason={gameState == undefined? "loading" : "configuration"}/>
             </div>
         </>
     );

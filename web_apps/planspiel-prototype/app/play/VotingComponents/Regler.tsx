@@ -3,7 +3,7 @@ import {ChangeEvent, useEffect, useState} from "react";
 import {Parameter, UserVotingStatus} from "@/app/api/models";
 import {getParameter} from "@/app/api/data_controller_interface";
 import { updateVoting } from "@/app/api/game_controller_interface";
-import { ComputeAbsoluteAverage, GetEinheited, GetSollte, GetStatusQuo } from "./ReglerHelper";
+import { ComputeAbsoluteAverage, GetEinheitenAverageMarker, GetSollte, GetStatusQuo } from "./ReglerHelper";
 import { GetGermanName } from "@/app/dashboard/BuergerraeteArea";
 import { Voting } from "./VotingArea";
 
@@ -68,7 +68,7 @@ export default function Regler({ownRoleName, parameterName, userVotings, active,
             <div className="bg-stone-300 rounded-2xl mx-[5%] my-4">
                 <div className="w-[70%]">
                     <StatusQuoMarker parameterName={parameterName} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue}/>
-                    <AverageComponent absoluteEinheitedString={GetEinheited(parameterInfo.simpleName, averageValue)} absoluteAverage={averageValue} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue}/>
+                    <AverageComponent absoluteEinheitedString={GetEinheitenAverageMarker(parameterInfo.simpleName, averageValue)} absoluteAverage={averageValue} minValue={parameterInfo.minValue} maxValue={parameterInfo.maxValue}/>
                 </div>
                 <div className="flex justify-center" style={{"height": "180px", "lineHeight":"180px"}}>
                     <div className="w-[5%] text-right z-20">{parameterInfo.minValue}%</div>
@@ -146,6 +146,6 @@ function AverageComponent({absoluteAverage, minValue, maxValue, absoluteEinheite
     return (
     <div>
         <div className={`-translate-x-1/2 translate-y-4 rounded-full absolute w-2 h-16 bg-cover transition-all duration-1000`} style={{"left": `${adjustedPercentage}%`, "backgroundImage": `url(images/averagemarker3.png)`}}></div>
-        <div className="absolute translate-y-1 px-2 bg-[#457D80] text-bold max-w-[50%] text-amber-200 rounded-lg -translate-x-1/2  transition-all duration-1000 text-center" style={{"left": `${adjustedPercentage}%`}}>Durchschnitt: {absoluteEinheitedString}</div>
+        <div className="absolute translate-y-1 px-2 bg-[#457D80] min-w-[30%] text-bold max-h-12 text-amber-200 rounded-lg -translate-x-1/2 transition-all duration-1000 text-center" style={{"left": `${adjustedPercentage}%`}}>Durchschnitt: {absoluteEinheitedString}</div>
     </div>)
 }

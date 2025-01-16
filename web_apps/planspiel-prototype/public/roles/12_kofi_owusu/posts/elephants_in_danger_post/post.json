@@ -1,0 +1,8 @@
+{
+    "type": "i_liked",
+    "author": "Ghana Today",
+    "isScenario": true,
+    "conditions": [
+        "global_bad"
+    ]
+}

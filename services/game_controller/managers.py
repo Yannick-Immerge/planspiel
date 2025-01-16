@@ -258,9 +258,96 @@ class GameStateManager:
                     execute(Query(query, (username, parameter, min_value)), commit=True)
 
     def make_projections(self, game_state_id: int):
+        if not self.has_game_state(game_state_id):
+            raise ValueError(f"No game state with id {game_state_id}.")
+        
+
         # TODO: Make projections CORRECT & DYNAMIC
-        fixed_projections = [("energy_prod_coal", 50), ("energy_prod_wind", 50), ("sea_level", 10)]
-        for metric, projected_value in fixed_projections:
+        # Work in progress here
+        #
+        voting_status1 = self.voting_get_status(game_state_id, 1)
+        voting_status2 = self.voting_get_status(game_state_id, 2)
+
+        def running_average(running_mean: float, new_value: float, n: int) -> float:
+            return (running_mean * n + new_value) / (n + 1)
+
+        def mean(values: list[float]) -> float:
+            return sum(values) / len(values)
+
+        voting_means1 = {
+            "fossil_fuel_taxes": 0,
+            "reduction_infra": 0,
+        }
+
+        for i, user_status in enumerate(voting_status1["userStatuses"]):
+            for parameter_status in user_status["parameterStatuses"]:
+                voting_means1[parameter_status["parameter"]] = running_average(voting_means1[parameter_status["parameter"]], parameter_status["votedValue"], i)
+
+        voting_means2 = {
+            "gases_agriculture": 0,
+            "reduction_meat": 0,
+            "reduction_waste": 0
+        }
+        for i, user_status in enumerate(voting_status2["userStatuses"]):
+            for parameter_status in user_status["parameterStatuses"]:
+                voting_means1[parameter_status["parameter"]] = running_average(voting_means2[parameter_status["parameter"]], parameter_status["votedValue"], i)
+
+
+        def linear_mapping(x: float, in_min: float, in_max: float, out_min: float, out_max: float) -> float:
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
+
+        # NOTE: Hardcoded projections, just in case you want to test something
+        # projections = {
+        #     "fossil_fuel_taxes": 100, 
+        #     "gases_agriculture": 100, 
+        #     "reduction_meat": 10,
+        #     "reduction_waste": 10,
+        #     "reduction_infra": 100,
+        #     "global": 100
+        # }
+
+        # NOTE: please forgive me for this @Dani
+        min_bad_values = {
+            "fossil_fuel_taxes": -15, 
+            "reduction_infra": 0,
+            "gases_agriculture": 0, 
+            "reduction_meat": 40,
+            "reduction_waste": 40,
+        }
+        max_good_values = {
+            "fossil_fuel_taxes": 100, 
+            "reduction_infra": 100,
+            "gases_agriculture": 100, 
+            "reduction_meat": 10,
+            "reduction_waste": 10,
+        }
+
+        voting_mean1_in_percentage = 0.0
+        voting_mean2_in_percentage = 0.0
+        for i, (metric, voting_mean1) in enumerate(voting_means1.items()):
+            voting_mean1_for_metric = linear_mapping(voting_mean1, min_bad_values[metric], max_good_values[metric], 0.0, 100.0)
+            voting_mean1_in_percentage = running_average(voting_mean1_in_percentage, voting_mean1_for_metric, i)
+
+        for i, (metric, voting_mean2) in enumerate(voting_means2.items()):
+            voting_mean2_for_metric = linear_mapping(voting_mean2, min_bad_values[metric], max_good_values[metric], 0.0, 100.0)
+            voting_mean2_in_percentage = running_average(voting_mean2_in_percentage, voting_mean2_for_metric, i)
+
+        # NOTE: check out crazy climate simulator, en-roads wishes they had this model
+        buergerat_weight_1 = 0.7
+        global_value = buergerat_weight_1 * voting_mean1_in_percentage + (1 - buergerat_weight_1) * voting_mean2_in_percentage
+
+        projections = {
+            "fossil_fuel_taxes": voting_means1["fossil_fuel_taxes"],
+            "reduction_infra": voting_means1["reduction_infra"],
+            "gases_agriculture": voting_means2["gases_agriculture"],
+            "reduction_meat": voting_means2["reduction_meat"],
+            "reduction_waste": voting_means2["reduction_waste"],
+            "global": global_value
+        }
+
+        for metric, projected_value in projections.items():
             query = f"UPDATE Projection SET projected_value = %s WHERE game_state = %s AND metric = %s;"
             execute(Query(query, (projected_value, game_state_id, metric)), commit=True)
 
@@ -321,13 +408,18 @@ class GameStateManager:
         query = (f"SELECT ScenarioCondition.metric, ScenarioCondition.min_value, ScenarioCondition.max_value "
                  f"FROM ScenarioCondition INNER JOIN Post_depends_on ON ScenarioCondition.name = Post_depends_on.scenario_condition "
                  f"WHERE Post_depends_on.post = %s;")
-        all_conditions = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
+        all_conditions: dict[str, tuple[float, float]] = {row[0]: (row[1], row[2]) for row in execute(Query(query, (name,)))}
         query = f"SELECT metric, projected_value FROM Projection WHERE game_state = %s;"
-        projected_metrics = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
+        projected_metrics: dict[str, float] = {row[0]: row[1] for row in execute(Query(query, (game_state_id,)))}
 
         for metric in all_conditions:
-            if metric not in projected_metrics or projected_metrics[metric] is None:
+            if metric not in projected_metrics:
                 raise RuntimeError(f"Metric {metric} has not been projected in this session.")
+            if not projected_metrics:
+                raise RuntimeError("Projected metrics is empty.")
+            if projected_metrics[metric] is None:
+                raise RuntimeError(f"Projected metrics {projected_metrics} does not contain metric {metric}.")
+
             min_value, max_value = all_conditions[metric]
             if not (min_value <= projected_metrics[metric] <= max_value):
                 return False
@@ -362,8 +454,8 @@ class GameStateManager:
         game_state_id = execute(Query(query, (username,)))[0][0]
         query = f"SELECT phase FROM GameState WHERE id = %s;"
         phase = execute(Query(query, (game_state_id,)))[0][0]
-        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value:
-            raise RuntimeError("Game is not in voting nor discussion phase.")
+        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
+            raise RuntimeError("Game is not in voting nor discussion phase nor debriefing phase.")
         if self.voting_has_committed(username, parameter):
             raise RuntimeError(f"User {username} has already committed a vote for {parameter}.")
         query = f"UPDATE Voting SET voted_value = %s WHERE user = %s AND parameter = %s;"
@@ -388,8 +480,8 @@ class GameStateManager:
     def voting_get_status(self, game_state_id: int, buergerrat: int) -> dict:
         query = f"SELECT phase, voting_end FROM GameState WHERE id = %s;"
         phase, voting_end = execute(Query(query, (game_state_id,)))[0]
-        if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
-            raise RuntimeError("Game is not in voting nor in discussion phase.")
+        # if phase != GamePhase.VOTING.value and phase != GamePhase.DISCUSSION.value and phase != GamePhase.DEBRIEFING.value:
+        #     raise RuntimeError(f"Game is not in voting nor in discussion phase nor in debriefing phase but {phase}")
         query = (f"SELECT User.username, User.plays_as "
                  f"FROM User INNER JOIN Session ON User.member_of = Session.session_id "
                  f"WHERE User.buergerrat = %s AND Session.game_state = %s;")
@@ -416,7 +508,7 @@ class GameStateManager:
 
     def voting_set_timer(self, game_state_id: int):
         # duration_min = 5
-        duration_min = 0.5  # TODO: rollback to 5 for the final prototype, just speed up voting here
+        duration_min = 0.1  # TODO: rollback to 5 for the final prototype, just speed up voting here
         voting_end = datetime.now() + timedelta(minutes=duration_min)
         query = f"UPDATE GameState SET voting_end = %s WHERE id = %s;"
         execute(Query(query, (voting_end, game_state_id)))

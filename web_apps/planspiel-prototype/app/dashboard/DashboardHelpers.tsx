@@ -4,21 +4,29 @@ import { TbZzz } from "react-icons/tb";
 import { FaPoo } from "react-icons/fa";
 import { ToCamelCase } from "./StringHelper";
 
-export function FilteredUserList({userStati, applyFilter, description, includeBrgrrt, annotation} : {
+export function FilteredUserList({userStati, applyFilter, description, includeBrgrrt, annotation, showPwd=false} : {
     userStati: UserView[], 
     applyFilter: (value: UserView,index: number , array: UserView[]) => unknown, 
     description: string,
     includeBrgrrt?: boolean
     annotation?: string
+    showPwd?: boolean
 }) {
 
     const filteredUsers = userStati.filter(applyFilter);
     return (
+        <>
         <div className="bg-[#faf2] backdrop-blur-2xl rounded-2xl mt-2 mb-2 pb-2 pt-2 shadow-[0px_10px_10px_rgba(0,0,0,0.5)]">
+        
                     {description? 
                     <div className="ml-5">
                         {filteredUsers.length} {description}
                     </div> : <></>}
+                    {showPwd && filteredUsers.length != 0?
+                    <div className="ml-5 flex">
+                        <div className="ml-2 px-3 py-1 text-amber-300  rounded-full bg-[#44447788]">Achtung: Die Passwörter werden mit dem ersten Anmeldesversuch der Teilnehmer festgelegt.</div>
+                    </div> : <></>
+                    }  
                     {filteredUsers.length != 0 && <div className="text-xs text-slate-400 flex">
                         <div className="ml-[3.75rem]">Benutzername</div>
                         <div className="absolute left-[35%]">Name</div>
@@ -30,7 +38,11 @@ export function FilteredUserList({userStati, applyFilter, description, includeBr
                     <div className="ml-5 text-sm text-lime-400">
                         {filteredUsers.length != 0? annotation : ""}
                     </div>
-                </div>
+                     
+        </div>
+        
+                </> 
+                
     )
 }
 

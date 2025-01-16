@@ -1,0 +1,1 @@
+Fracking kann das Risiko von Erdbeben erhöhen und zur Verschmutzung von Grundwasser führen. Gleichzeitig ist der Wasserverbrauch enorm: Ein Fracking-Vorgang verbraucht bis zu 20 Millionen Liter Wasser.

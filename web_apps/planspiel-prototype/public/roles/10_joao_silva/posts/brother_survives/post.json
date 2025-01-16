@@ -1,0 +1,8 @@
+{
+	"type": "by_me",
+	"author": "Me",
+	"isScenario": true,
+	"conditions": [
+		"global_good"
+	]
+}

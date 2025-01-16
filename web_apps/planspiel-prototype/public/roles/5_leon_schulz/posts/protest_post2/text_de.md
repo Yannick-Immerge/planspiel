@@ -1,0 +1,1 @@
+Ich habe nichts gegen Klimaschutz. Aber wir müssen realistisch bleiben. Unsere Region darf nicht der Preis für eine grüne Politik sein, die Menschen zurücklässt. 🚶‍♂️⚡ #FairnessImWandel #GemeinsamStark

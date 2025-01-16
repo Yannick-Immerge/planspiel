@@ -1,0 +1,2 @@
+Pro-Kopf-Fleischkonsum in China ist zwar gestiegen, bleibt jedoch moderater im Vergleich zu Ländern wie den USA oder Australien. Eine starke Reduktion würde daher die Ernährungssituation unverhältnismäßig belasten, insbesondere in ländlichen Gebieten, wo Fleisch ein wichtiger Proteinlieferant ist.
+Laut der **FAO (Food and Agriculture Organization)** liegt der jährliche Fleischkonsum pro Kopf in China (ca. 60 kg/Jahr) deutlich unter dem der USA (über 100 kg/Jahr).ier kommt ein **Fakt** rein. Du kannst Markdown verwenden, Bilder Funktionieren aber nicht.

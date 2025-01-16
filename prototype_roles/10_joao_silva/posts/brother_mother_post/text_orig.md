@@ -1,0 +1,3 @@
+Como todos os anos, hoje, no aniversário da morte do meu amado irmão Marco, faço uma doação de R$ 5.000 aos corajosos bombeiros e bombeiras que nos protegem dos incêndios devastadores que assolam o nosso lindo Brasil. Marco deu tudo o que tinha por pessoas que ele nem sequer conhecia. Com profunda tristeza e enorme admiração, hoje lembramos de você, Marco. 🙏🔥
+
+*mais informações:* Há quatro anos, um incêndio florestal devastador atingiu nossa região. A terra seca não conseguiu conter as chamas, e muitas pessoas não puderam ser evacuadas a tempo. Meu irmão Marco, que era bombeiro, perdeu a vida enquanto evacuava um pequeno vilarejo em meio às densas nuvens de fumaça. Sua coragem nunca será esquecida.
